@@ -1,30 +1,337 @@
-/vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
+# Habbis Project - Professional .gitignore
+# Laravel API + React Native/Expo + Docker
 
-# Laravel 4 specific
-bootstrap/compiled.php
-app/storage/
+# ===========================================
+# Laravel API (.env files)
+# ===========================================
+api/.env
+api/.env.backup
+api/.env.production
+api/.env.local
+api/.env.testing
 
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
+# ===========================================
+# Laravel Framework
+# ===========================================
+api/vendor/
+api/node_modules/
+api/npm-debug.log*
+api/yarn-debug.log*
+api/yarn-error.log*
 
-# Laravel 5 & Lumen specific with changed public path
-public_html/storage
-public_html/hot
+# Laravel specific
+api/storage/app/*
+api/storage/framework/cache/*
+api/storage/framework/sessions/*
+api/storage/framework/testing/*
+api/storage/framework/views/*
+api/storage/logs/*
+api/bootstrap/cache/*
 
-storage/*.key
+# Laravel compiled files
+api/bootstrap/compiled.php
+api/bootstrap/compiled.json
+api/bootstrap/packages.php
+api/bootstrap/services.php
+api/bootstrap/config.php
+api/bootstrap/routes.php
+api/bootstrap/events.php
+
+# Laravel IDE helper
+api/.phpstorm.meta.php
+api/_ide_helper.php
+api/_ide_helper_models.php
+api/.php_cs.cache
+
+# ===========================================
+# React Native / Expo Mobile
+# ===========================================
+mobile/node_modules/
+mobile/.expo/
+mobile/.expo-shared/
+mobile/dist/
+mobile/web-build/
+mobile/.next/
+mobile/.nuxt/
+
+# Expo
+mobile/.expo/
+mobile/.expo-shared/
+mobile/expo-env.d.ts
+
+# React Native
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/app/release/
+mobile/ios/build/
+mobile/ios/Pods/
+mobile/ios/*.xcworkspace
+mobile/ios/*.xcuserstate
+mobile/ios/DerivedData/
+
+# Metro
+mobile/.metro-health-check*
+
+# ===========================================
+# Environment Variables
+# ===========================================
 .env
-Homestead.yaml
-Homestead.json
-/.vagrant
-.phpunit.result.cache
-
-/public/build
-/storage/pail
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.backup
-.env.production
-.phpactor.json
-auth.json
+.env.*.local
+
+# ===========================================
+# Docker
+# ===========================================
+.docker/
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
+
+# Docker volumes
+postgres_data/
+redis_data/
+mysql_data/
+
+# ===========================================
+# IDE & Editor Files
+# ===========================================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===========================================
+# Operating System Files
+# ===========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# Logs & Debugging
+# ===========================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# ===========================================
+# Dependencies & Package Managers
+# ===========================================
+# NPM
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Composer (PHP)
+api/vendor/
+composer.phar
+composer.lock
+
+# ===========================================
+# Build & Distribution
+# ===========================================
+# Build outputs
+build/
+dist/
+out/
+target/
+
+# Temporary folders
+tmp/
+temp/
+
+# ===========================================
+# Database
+# ===========================================
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+
+# ===========================================
+# Security & Secrets
+# ===========================================
+# API Keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# JWT secrets
+jwt-secret.txt
+jwt-private.key
+jwt-public.key
+
+# ===========================================
+# Testing
+# ===========================================
+# Test coverage
+coverage/
+.nyc_output/
+.coverage/
+
+# Test results
+test-results/
+junit.xml
+test-report.xml
+
+# ===========================================
+# Documentation
+# ===========================================
+# Generated docs
+docs/build/
+docs/_build/
+
+# ===========================================
+# Miscellaneous
+# ===========================================
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Cache files
+.cache/
+.parcel-cache/
+
+# ===========================================
+# Project Specific
+# ===========================================
+# Expo specific
+mobile/.expo/
+mobile/.expo-shared/
+mobile/expo-env.d.ts
+
+# Laravel specific
+api/storage/app/*
+api/storage/framework/cache/*
+api/storage/framework/sessions/*
+api/storage/framework/testing/*
+api/storage/framework/views/*
+api/storage/logs/*
+
+# Docker specific
+.dockerignore
+docker-compose.override.yml
+
+# ===========================================
+# Keep Important Files
+# ===========================================
+# Keep example files
+!api/.env.example
+!mobile/.env.example
+
+# Keep documentation
+!README.md
+!QUICK_START.md
+!docs/
+
+# Keep configuration files
+!docker-compose.yml
+!Dockerfile
+!api/Dockerfile
+!mobile/Dockerfile
+
+# Keep scripts
+!start.ps1
+!stop.ps1
+!start-habbis.sh
+!stop-habbis.sh

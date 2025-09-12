@@ -1,0 +1,143 @@
+# Habbis Project - Git Attributes
+# Define attributes for pathnames
+
+# ===========================================
+# Text Files
+# ===========================================
+# Ensure all text files use LF line endings
+*.txt text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.csv text eol=lf
+
+# ===========================================
+# Code Files
+# ===========================================
+# PHP files
+*.php text eol=lf
+*.phtml text eol=lf
+
+# JavaScript/TypeScript files
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+
+# CSS/SCSS files
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+
+# HTML files
+*.html text eol=lf
+*.htm text eol=lf
+
+# ===========================================
+# Configuration Files
+# ===========================================
+# Docker files
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Package files
+package.json text eol=lf
+package-lock.json text eol=lf
+composer.json text eol=lf
+composer.lock text eol=lf
+
+# ===========================================
+# Binary Files
+# ===========================================
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.webp binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Archives
+*.zip binary
+*.tar.gz binary
+*.rar binary
+*.7z binary
+
+# Executables
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# ===========================================
+# Language Specific
+# ===========================================
+# PHP
+*.php linguist-language=PHP
+api/*.php linguist-language=PHP
+
+# JavaScript/TypeScript
+*.js linguist-language=JavaScript
+*.jsx linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+mobile/src/**/*.ts linguist-language=TypeScript
+mobile/src/**/*.tsx linguist-language=TypeScript
+
+# CSS
+*.css linguist-language=CSS
+*.scss linguist-language=SCSS
+
+# Docker
+Dockerfile linguist-language=Dockerfile
+*.dockerfile linguist-language=Dockerfile
+
+# YAML
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# ===========================================
+# Diff Settings
+# ===========================================
+# Large files that should not be diffed
+*.sql diff=sql
+*.log diff=log
+*.min.js diff=minified
+*.min.css diff=minified
+
+# ===========================================
+# Merge Settings
+# ===========================================
+# Files that should not be merged automatically
+package-lock.json merge=union
+yarn.lock merge=union
+composer.lock merge=union
+
+# ===========================================
+# Export Settings
+# ===========================================
+# Files that should not be exported
+*.env export-ignore
+*.log export-ignore
+node_modules/ export-ignore
+api/vendor/ export-ignore
+.git/ export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore

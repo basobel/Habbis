@@ -1,0 +1,128 @@
+# Docker Compose configuration for Habbis development environment
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: habbis-db
+    environment:
+      POSTGRES_DB: habbis
+      POSTGRES_USER: habbis
+      POSTGRES_PASSWORD: habbis_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./api/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - habbis-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U habbis -d habbis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  cache:
+    image: redis:7-alpine
+    container_name: habbis-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - habbis-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel API
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: habbis-api
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=pgsql
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_DATABASE=habbis
+      - DB_USERNAME=habbis
+      - DB_PASSWORD=habbis_password
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    networks:
+      - habbis-network
+    command: >
+      sh -c "
+        composer install --no-interaction --prefer-dist --optimize-autoloader &&
+        php artisan key:generate &&
+        php artisan migrate:fresh --seed &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+  # Nginx for API
+  nginx-api:
+    image: nginx:alpine
+    container_name: habbis-nginx-api
+    ports:
+      - "80:80"
+    volumes:
+      - ./api/nginx.conf:/etc/nginx/nginx.conf
+      - ./api:/var/www/html
+    depends_on:
+      - api
+    networks:
+      - habbis-network
+
+  # Expo Development Server
+  expo:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: habbis-expo
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+    ports:
+      - "19000:19000"  # Expo DevTools
+      - "19001:19001"  # Metro bundler
+      - "19002:19002"  # Expo tunnel
+      - "19006:19006"  # Web
+    volumes:
+      - ./mobile:/app
+      - /app/node_modules
+    networks:
+      - habbis-network
+    command: >
+      sh -c "
+        npm install &&
+        npx expo start --web --host 0.0.0.0 --port 19006
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  habbis-network:
+    driver: bridge
