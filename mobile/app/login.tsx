@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { router } from 'expo-router';
 import { login } from '@/store/slices/authSlice';
+import FormInput from '@/components/FormInput';
+import FormButton from '@/components/FormButton';
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
@@ -11,74 +13,114 @@ export default function LoginScreen() {
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async () => {
-    if (!formData.email || !formData.password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
+    setErrors({});
+    
     try {
       await dispatch(login(formData)).unwrap();
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Login Failed', error || 'Please check your credentials');
+      if (error.errors) {
+        setErrors(error.errors);
+      } else {
+        Alert.alert('Login Failed', error.message || 'Please check your credentials');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleForgotPassword = () => {
+    router.push('/forgot-password');
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <Text style={styles.title}>Welcome Back</Text>
       <Text style={styles.subtitle}>Sign in to continue your journey</Text>
 
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
+        <FormInput
+          label="Email"
+          placeholder="Enter your email"
           value={formData.email}
           onChangeText={(text) => setFormData({ ...formData, email: text })}
           keyboardType="email-address"
           autoCapitalize="none"
+          error={errors.email}
+          required
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
+        <FormInput
+          label="Password"
+          placeholder="Enter your password"
           value={formData.password}
           onChangeText={(text) => setFormData({ ...formData, password: text })}
           secureTextEntry
+          error={errors.password}
+          required
         />
 
         <TouchableOpacity
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={isLoading}
+          style={styles.forgotPassword}
+          onPress={handleForgotPassword}
         >
-          <Text style={styles.buttonText}>
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </Text>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.linkButton}
+        <FormButton
+          title="Sign In"
+          onPress={handleLogin}
+          loading={isLoading}
+          disabled={isLoading}
+          style={styles.button}
+        />
+
+        <FormButton
+          title="Don't have an account? Sign Up"
           onPress={() => router.replace('/register')}
-        >
-          <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
-        </TouchableOpacity>
+          variant="secondary"
+          style={styles.linkButton}
+        />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
     padding: 20,
   },
   title: {
@@ -97,35 +139,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
   },
-  input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    padding: 16,
+  forgotPassword: {
+    alignSelf: 'flex-end',
     marginBottom: 16,
-    fontSize: 16,
+  },
+  forgotPasswordText: {
+    color: '#1E40AF',
+    fontSize: 14,
+    fontWeight: '500',
   },
   button: {
-    backgroundColor: '#1E40AF',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
     marginBottom: 16,
   },
-  buttonDisabled: {
-    backgroundColor: '#94A3B8',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   linkButton: {
-    alignItems: 'center',
-  },
-  linkText: {
-    color: '#1E40AF',
-    fontSize: 16,
+    marginTop: 8,
   },
 });

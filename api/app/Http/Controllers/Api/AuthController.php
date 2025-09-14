@@ -10,36 +10,52 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
+        // Rate limiting temporarily disabled for development
+
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'timezone' => $request->timezone ?? 'UTC',
+            'level' => 1,
+            'experience_points' => 0,
+            'premium_currency' => 100, // Welcome bonus
+            'notifications_enabled' => true,
         ]);
 
         // Create default pet for new user
         $user->pets()->create([
             'name' => $request->pet_name ?? 'My Pet',
             'species' => $request->pet_species ?? 'dragon',
+            'level' => 1,
+            'experience_points' => 0,
+            'is_active' => true,
         ]);
+
+        // Send email verification (temporarily disabled for development)
+        // $user->sendEmailVerificationNotification();
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'User registered successfully',
+            'message' => 'User registered successfully!',
             'user' => $user->load('pets'),
             'token' => $token,
+            'email_verified' => true, // Temporarily set to true for development
         ], 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
+        // Rate limiting temporarily disabled for development
         $credentials = $request->only('email', 'password');
 
         if (!Auth::attempt($credentials)) {
@@ -49,6 +65,15 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        
+        // Check if email is verified (temporarily disabled for development)
+        // if (!$user->hasVerifiedEmail()) {
+        //     Auth::logout();
+        //     throw ValidationException::withMessages([
+        //         'email' => ['Please verify your email address before logging in.'],
+        //     ]);
+        // }
+
         $user->update(['last_activity_at' => now()]);
 
         $token = $user->createToken('auth-token')->plainTextToken;
@@ -57,6 +82,7 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'user' => $user->load(['pets', 'activeHabits']),
             'token' => $token,
+            'email_verified' => true,
         ]);
     }
 

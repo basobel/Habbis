@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\HabitController;
 use App\Http\Controllers\Api\PetController;
 use App\Http\Controllers\Api\BattleController;
@@ -26,6 +28,14 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
 });
 
+// Password reset routes
+Route::post('/password/email', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
+
+// Email verification routes
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verifyEmail'])
+    ->name('verification.verify');
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -34,6 +44,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('refresh', [AuthController::class, 'refresh']);
     });
+
+    // Email verification
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
+    Route::post('/email/resend-verification', [EmailVerificationController::class, 'resendVerificationEmail']);
+
+    // Password management
+    Route::post('/password/change', [PasswordResetController::class, 'changePassword']);
 
     // User profile
     Route::get('profile', function (Request $request) {

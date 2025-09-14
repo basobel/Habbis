@@ -13,7 +13,11 @@ RUN apk add --no-cache \
     npm \
     git \
     unzip \
-    curl
+    curl \
+    autoconf \
+    gcc \
+    g++ \
+    make
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -26,6 +30,10 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     bcmath \
     opcache \
     pcntl
+
+# Install Redis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
