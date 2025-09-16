@@ -144,9 +144,9 @@ Write-Host ""
 Write-Host "Milej zabawy z Habbis!" -ForegroundColor Green
 Write-Host ""
 
-# Otwórz przeglądarkę z aplikacją
-Write-Host "Otwieranie aplikacji w przegladarce..." -ForegroundColor Yellow
-Start-Process "http://localhost:19006"
+# Otwórz przeglądarkę z aplikacją (tylko jeśli Expo nie otworzy automatycznie)
+Write-Host "Aplikacja powinna otworzyc sie automatycznie w przegladarce" -ForegroundColor Yellow
+Write-Host "Jesli nie, otworz: http://localhost:19006" -ForegroundColor Cyan
 
 # Wróć do katalogu głównego
 Set-Location ".."

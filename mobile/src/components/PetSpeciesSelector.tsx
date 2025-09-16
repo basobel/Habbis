@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface PetSpeciesSelectorProps {
   selectedSpecies: string;
@@ -57,16 +58,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: Colors.text.primary,
     marginBottom: 12,
   },
   scrollView: {
     marginHorizontal: -4,
   },
   speciesCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background.card,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border.secondary,
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 4,
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
     maxWidth: 140,
   },
   selectedCard: {
-    borderColor: '#1E40AF',
-    backgroundColor: '#EFF6FF',
+    borderColor: Colors.primary[600],
+    backgroundColor: Colors.primary[50],
   },
   emoji: {
     fontSize: 32,
@@ -85,20 +86,20 @@ const styles = StyleSheet.create({
   speciesName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: Colors.text.primary,
     marginBottom: 4,
     textAlign: 'center',
   },
   selectedText: {
-    color: '#1E40AF',
+    color: Colors.primary[600],
   },
   description: {
     fontSize: 11,
-    color: '#6B7280',
+    color: Colors.text.secondary,
     textAlign: 'center',
     lineHeight: 14,
   },
   selectedDescription: {
-    color: '#1E40AF',
+    color: Colors.primary[600],
   },
 });

@@ -7,6 +7,7 @@ import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import PetSpeciesSelector from '@/components/PetSpeciesSelector';
+import { Colors } from '../src/constants/colors';
 
 export default function RegisterScreen() {
   const dispatch = useDispatch();
@@ -121,6 +122,7 @@ export default function RegisterScreen() {
           value={formData.username}
           onChangeText={(text) => setFormData({ ...formData, username: text })}
           autoCapitalize="none"
+          returnKeyType="next"
           error={errors.username}
           required
         />
@@ -132,6 +134,7 @@ export default function RegisterScreen() {
           onChangeText={(text) => setFormData({ ...formData, email: text })}
           keyboardType="email-address"
           autoCapitalize="none"
+          returnKeyType="next"
           error={errors.email}
           required
         />
@@ -142,6 +145,7 @@ export default function RegisterScreen() {
           value={formData.password}
           onChangeText={(text) => setFormData({ ...formData, password: text })}
           secureTextEntry
+          returnKeyType="next"
           error={errors.password}
           required
         />
@@ -154,6 +158,7 @@ export default function RegisterScreen() {
           value={formData.password_confirmation}
           onChangeText={(text) => setFormData({ ...formData, password_confirmation: text })}
           secureTextEntry
+          returnKeyType="next"
           error={errors.password_confirmation}
           required
         />
@@ -163,6 +168,8 @@ export default function RegisterScreen() {
           placeholder="Give your pet a name"
           value={formData.pet_name}
           onChangeText={(text) => setFormData({ ...formData, pet_name: text })}
+          returnKeyType="done"
+          onSubmitEditing={handleRegister}
           error={errors.pet_name}
         />
 
@@ -193,7 +200,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.background.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -204,12 +211,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#1E40AF',
+    color: Colors.primary[600],
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748B',
+    color: Colors.text.secondary,
     marginBottom: 32,
     textAlign: 'center',
   },

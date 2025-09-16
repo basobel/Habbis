@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, TouchableOpacityProps } from 'react-native';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface FormButtonProps extends TouchableOpacityProps {
   title: string;
@@ -17,18 +18,103 @@ export default function FormButton({
   disabled,
   ...props 
 }: FormButtonProps) {
+  const { colors, isLoaded } = useThemeContext();
+
+  // Fallback colors if theme not loaded
+  const fallbackColors = {
+    primary: '#7C3AED',
+    textInverse: '#FFFFFF',
+    textSecondary: '#64748B',
+    error: '#EF4444',
+  };
+
+  const getButtonStyle = () => {
+    const baseStyle = [styles.button, styles[size]];
+    
+    if (!isLoaded || !colors) {
+      // Fallback styles
+      switch (variant) {
+        case 'primary':
+          return [...baseStyle, { backgroundColor: fallbackColors.primary }];
+        case 'secondary':
+          return [...baseStyle, { 
+            backgroundColor: 'transparent', 
+            borderWidth: 1, 
+            borderColor: fallbackColors.primary 
+          }];
+        case 'danger':
+          return [...baseStyle, { backgroundColor: fallbackColors.error }];
+        default:
+          return [...baseStyle, { backgroundColor: fallbackColors.primary }];
+      }
+    }
+
+    // Theme-based styles
+    switch (variant) {
+      case 'primary':
+        return [...baseStyle, { backgroundColor: colors?.primary?.[600] || fallbackColors.primary }];
+      case 'secondary':
+        return [...baseStyle, { 
+          backgroundColor: 'transparent', 
+          borderWidth: 1, 
+          borderColor: colors?.primary?.[600] || fallbackColors.primary 
+        }];
+      case 'danger':
+        return [...baseStyle, { backgroundColor: colors?.error?.[500] || fallbackColors.error }];
+      default:
+        return [...baseStyle, { backgroundColor: colors?.primary?.[600] || fallbackColors.primary }];
+    }
+  };
+
+  const getTextStyle = () => {
+    const baseStyle = [styles.text];
+    
+    if (!isLoaded || !colors) {
+      // Fallback styles
+      switch (variant) {
+        case 'primary':
+        case 'danger':
+          return [...baseStyle, { color: fallbackColors.textInverse }];
+        case 'secondary':
+          return [...baseStyle, { color: fallbackColors.primary }];
+        default:
+          return [...baseStyle, { color: fallbackColors.textInverse }];
+      }
+    }
+
+    // Theme-based styles
+    switch (variant) {
+      case 'primary':
+      case 'danger':
+        return [...baseStyle, { color: colors?.text?.inverse || fallbackColors.textInverse }];
+      case 'secondary':
+        return [...baseStyle, { color: colors?.primary?.[600] || fallbackColors.primary }];
+      default:
+        return [...baseStyle, { color: colors?.text?.inverse || fallbackColors.textInverse }];
+    }
+  };
+
+  const getIndicatorColor = () => {
+    if (!isLoaded || !colors) {
+      return variant === 'primary' ? fallbackColors.textInverse : fallbackColors.primary;
+    }
+    return variant === 'primary' ? colors?.text?.inverse || fallbackColors.textInverse : colors?.primary?.[600] || fallbackColors.primary;
+  };
+
   const buttonStyle = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    (disabled || loading) && styles.disabled,
+    ...getButtonStyle(),
+    (disabled || loading) && { 
+      backgroundColor: colors?.secondary?.[400] || fallbackColors.textSecondary,
+      borderColor: colors?.secondary?.[400] || fallbackColors.textSecondary,
+    },
     style,
   ];
 
   const textStyle = [
-    styles.text,
-    styles[`${variant}Text`],
-    (disabled || loading) && styles.disabledText,
+    ...getTextStyle(),
+    (disabled || loading) && { 
+      color: colors?.text?.inverse || fallbackColors.textInverse 
+    },
   ];
 
   return (
@@ -39,7 +125,7 @@ export default function FormButton({
     >
       {loading ? (
         <ActivityIndicator 
-          color={variant === 'primary' ? '#fff' : '#1E40AF'} 
+          color={getIndicatorColor()} 
           size="small" 
         />
       ) : (
@@ -56,17 +142,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
-  primary: {
-    backgroundColor: '#1E40AF',
-  },
-  secondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#1E40AF',
-  },
-  danger: {
-    backgroundColor: '#EF4444',
-  },
   small: {
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -79,24 +154,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 32,
   },
-  disabled: {
-    backgroundColor: '#94A3B8',
-    borderColor: '#94A3B8',
-  },
   text: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  primaryText: {
-    color: '#fff',
-  },
-  secondaryText: {
-    color: '#1E40AF',
-  },
-  dangerText: {
-    color: '#fff',
-  },
-  disabledText: {
-    color: '#fff',
   },
 });

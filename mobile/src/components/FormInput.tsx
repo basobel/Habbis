@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface FormInputProps extends TextInputProps {
   label?: string;
@@ -14,24 +15,59 @@ export default function FormInput({
   style, 
   ...props 
 }: FormInputProps) {
+  const { colors, isLoaded } = useThemeContext();
+
+  // Debug logging
+  console.log('FormInput render:', { isLoaded, colors: !!colors, error: colors?.error });
+
+  // Don't render if theme is not loaded or colors are not available
+  if (!isLoaded || !colors || !colors.error) {
+    return (
+      <View style={styles.container}>
+        {label && (
+          <Text style={[styles.label, { color: '#4C1D95' }]}>
+            {label}
+            {required && <Text style={[styles.required, { color: '#EF4444' }]}> *</Text>}
+          </Text>
+        )}
+        <TextInput
+          style={[
+            styles.input,
+            { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', color: '#4C1D95' },
+            error ? { borderColor: '#EF4444' } : null,
+            style,
+          ]}
+          placeholderTextColor="#94A3B8"
+          {...props}
+        />
+        {error && <Text style={[styles.errorText, { color: '#EF4444' }]}>{error}</Text>}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {label && (
-        <Text style={styles.label}>
+        <Text style={[styles.label, { color: colors?.text?.secondary || '#64748B' }]}>
           {label}
-          {required && <Text style={styles.required}> *</Text>}
+          {required && <Text style={[styles.required, { color: colors?.error?.[500] || '#EF4444' }]}> *</Text>}
         </Text>
       )}
       <TextInput
         style={[
           styles.input,
-          error && styles.inputError,
+          {
+            backgroundColor: colors?.input?.background || colors?.background?.card || '#FFFFFF',
+            borderColor: colors?.input?.border || colors?.border?.secondary || '#E2E8F0',
+            color: colors?.input?.text || colors?.text?.primary || '#4C1D95',
+          },
+          error ? { borderColor: colors?.error?.[500] || '#EF4444' } : null,
           style,
         ]}
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor={colors?.input?.placeholder || colors?.text?.placeholder || '#9CA3AF'}
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors?.error?.[500] || '#EF4444' }]}>{error}</Text>}
     </View>
   );
 }
@@ -43,27 +79,24 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
     marginBottom: 8,
   },
   required: {
-    color: '#EF4444',
+    // Color will be set dynamically
   },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 8,
     padding: 16,
     fontSize: 16,
-    color: '#1F2937',
+    // Colors will be set dynamically
   },
   inputError: {
-    borderColor: '#EF4444',
+    // Border color will be set dynamically
   },
   errorText: {
     fontSize: 12,
-    color: '#EF4444',
     marginTop: 4,
+    // Color will be set dynamically
   },
 });

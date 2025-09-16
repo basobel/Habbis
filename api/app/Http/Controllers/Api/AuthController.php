@@ -40,8 +40,8 @@ class AuthController extends Controller
             'is_active' => true,
         ]);
 
-        // Send email verification (temporarily disabled for development)
-        // $user->sendEmailVerificationNotification();
+        // Send email verification
+        $user->sendEmailVerificationNotification();
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
             'message' => 'User registered successfully!',
             'user' => $user->load('pets'),
             'token' => $token,
-            'email_verified' => true, // Temporarily set to true for development
+            'email_verified' => false, // User needs to verify email
         ], 201);
     }
 

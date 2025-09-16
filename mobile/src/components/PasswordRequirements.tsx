@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface PasswordRequirementsProps {
   password: string;
@@ -63,9 +64,9 @@ export default function PasswordRequirements({ password }: PasswordRequirementsP
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.background.secondary,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border.secondary,
     borderRadius: 8,
     padding: 16,
     marginTop: 8,
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: Colors.text.primary,
     marginBottom: 12,
   },
   requirement: {
@@ -87,10 +88,10 @@ const styles = StyleSheet.create({
     width: 20,
   },
   checkmarkMet: {
-    color: '#22C55E',
+    color: Colors.success[500],
   },
   checkmarkUnmet: {
-    color: '#94A3B8',
+    color: Colors.secondary[400],
   },
   requirementText: {
     fontSize: 12,
@@ -98,14 +99,14 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   requirementMet: {
-    color: '#22C55E',
+    color: Colors.success[500],
   },
   requirementUnmet: {
-    color: '#6B7280',
+    color: Colors.text.secondary,
   },
   successText: {
     fontSize: 12,
-    color: '#22C55E',
+    color: Colors.success[500],
     fontWeight: '600',
     textAlign: 'center',
     marginTop: 8,

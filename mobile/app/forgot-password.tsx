@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 export default function ForgotPasswordScreen() {
+  const { colors, isLoaded } = useThemeContext();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -53,17 +55,28 @@ export default function ForgotPasswordScreen() {
     router.replace('/login');
   };
 
+  // Show loading if theme is not loaded
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: '#4C1D95' }]}>Loading...</Text>
+        </View>
+      </View>
+    );
+  }
+
   if (isEmailSent) {
     return (
-      <View style={styles.container}>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background.primary }]} contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.title}>Check Your Email</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.text.primary }]}>Check Your Email</Text>
+          <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
             We've sent a password reset link to{'\n'}
-            <Text style={styles.email}>{email}</Text>
+            <Text style={[styles.email, { color: colors.primary[600] }]}>{email}</Text>
           </Text>
           
-          <Text style={styles.description}>
+          <Text style={[styles.description, { color: colors.text.muted }]}>
             Please check your email and follow the instructions to reset your password.
           </Text>
 
@@ -73,19 +86,19 @@ export default function ForgotPasswordScreen() {
             style={styles.button}
           />
 
-          <Text style={styles.helpText}>
+          <Text style={[styles.helpText, { color: colors.text.muted }]}>
             Didn't receive the email? Check your spam folder or try again.
           </Text>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background.primary }]} contentContainerStyle={styles.scrollContent}>
       <View style={styles.content}>
-        <Text style={styles.title}>Forgot Password?</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Forgot Password?</Text>
+        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
           No worries! Enter your email address and we'll send you a link to reset your password.
         </Text>
 
@@ -124,7 +137,7 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    // backgroundColor will be set dynamically
   },
   scrollContent: {
     flexGrow: 1,
@@ -140,24 +153,24 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#1E40AF',
+    // color will be set dynamically
     marginBottom: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748B',
+    // color will be set dynamically
     marginBottom: 32,
     textAlign: 'center',
     lineHeight: 24,
   },
   email: {
     fontWeight: '600',
-    color: '#1E40AF',
+    // color will be set dynamically
   },
   description: {
     fontSize: 14,
-    color: '#6B7280',
+    // color will be set dynamically
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 20,
@@ -170,7 +183,7 @@ const styles = StyleSheet.create({
   },
   helpText: {
     fontSize: 12,
-    color: '#9CA3AF',
+    // color will be set dynamically
     textAlign: 'center',
     marginTop: 24,
     lineHeight: 16,

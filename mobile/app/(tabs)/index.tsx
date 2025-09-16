@@ -10,15 +10,26 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getMe } from '@/store/slices/authSlice';
+import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState } from '@/types';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
   const { user, isLoading } = useSelector((state: RootState) => state.auth);
   const { habits, stats } = useSelector((state: RootState) => state.habits);
+  const { colors, isLoaded } = useThemeContext();
 
   const [refreshing, setRefreshing] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout() as any);
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   useEffect(() => {
     dispatch(getMe());
@@ -43,60 +54,85 @@ export default function HomeScreen() {
     return `Amazing! ${user.current_streak_days} day streak!`;
   };
 
+  // Don't render if theme is not loaded
+  if (!isLoaded || !colors) {
+    return (
+      <ScrollView
+        style={[styles.container, { backgroundColor: '#F5F3FF' }]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.header}>
+          <Text style={[styles.greeting, { color: '#4C1D95' }]}>
+            {getGreeting()}, {user?.username || 'User'}!
+          </Text>
+          <Text style={[styles.subtitle, { color: '#6D28D9' }]}>{getStreakMessage()}</Text>
+        </View>
+        {/* ... rest of fallback content ... */}
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background.primary }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       <View style={styles.header}>
-        <Text style={styles.greeting}>
-          {getGreeting()}, {user?.username || 'User'}!
-        </Text>
-        <Text style={styles.subtitle}>{getStreakMessage()}</Text>
+        <View style={styles.headerTop}>
+          <Text style={[styles.greeting, { color: colors.text.primary }]}>
+            {getGreeting()}, {user?.username || 'User'}!
+          </Text>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Ionicons name="log-out-outline" size={24} color={colors.text.primary} />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>{getStreakMessage()}</Text>
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
+        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
           <Ionicons name="trophy" size={24} color="#F59E0B" />
-          <Text style={styles.statNumber}>{user?.level || 1}</Text>
-          <Text style={styles.statLabel}>Level</Text>
+          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.level || 1}</Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Level</Text>
         </View>
         
-        <View style={styles.statCard}>
+        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
           <Ionicons name="flame" size={24} color="#EF4444" />
-          <Text style={styles.statNumber}>{user?.current_streak_days || 0}</Text>
-          <Text style={styles.statLabel}>Streak</Text>
+          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.current_streak_days || 0}</Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Streak</Text>
         </View>
         
-        <View style={styles.statCard}>
-          <Ionicons name="diamond" size={24} color="#8B5CF6" />
-          <Text style={styles.statNumber}>{user?.premium_currency || 0}</Text>
-          <Text style={styles.statLabel}>Gems</Text>
+        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
+          <Ionicons name="diamond" size={24} color={colors.primary[600]} />
+          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.premium_currency || 0}</Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Gems</Text>
         </View>
       </View>
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Today's Habits</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Today's Habits</Text>
           <TouchableOpacity onPress={() => router.push('/habits')}>
-            <Text style={styles.seeAllText}>See All</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary[600] }]}>See All</Text>
           </TouchableOpacity>
         </View>
         
         {habits.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="checkmark-circle-outline" size={48} color="#9CA3AF" />
-            <Text style={styles.emptyStateTitle}>No habits yet</Text>
-            <Text style={styles.emptyStateText}>
+          <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
+            <Ionicons name="checkmark-circle-outline" size={48} color={colors.text.muted} />
+            <Text style={[styles.emptyStateTitle, { color: colors.text.primary }]}>No habits yet</Text>
+            <Text style={[styles.emptyStateText, { color: colors.text.secondary }]}>
               Create your first habit to start building good routines!
             </Text>
             <TouchableOpacity
-              style={styles.createButton}
+              style={[styles.createButton, { backgroundColor: colors.primary[600] }]}
               onPress={() => router.push('/habits/create')}
             >
-              <Text style={styles.createButtonText}>Create Habit</Text>
+              <Text style={[styles.createButtonText, { color: colors.text.inverse }]}>Create Habit</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -104,7 +140,7 @@ export default function HomeScreen() {
             {habits.slice(0, 3).map((habit) => (
               <TouchableOpacity
                 key={habit.id}
-                style={styles.habitCard}
+                style={[styles.habitCard, { backgroundColor: colors.background.card }]}
                 onPress={() => router.push(`/habits/${habit.id}`)}
               >
                 <View style={styles.habitInfo}>
@@ -112,8 +148,8 @@ export default function HomeScreen() {
                     <Ionicons name="star" size={20} color="#FFFFFF" />
                   </View>
                   <View style={styles.habitDetails}>
-                    <Text style={styles.habitName}>{habit.name}</Text>
-                    <Text style={styles.habitStreak}>
+                    <Text style={[styles.habitName, { color: colors.text.primary }]}>{habit.name}</Text>
+                    <Text style={[styles.habitStreak, { color: colors.text.secondary }]}>
                       {habit.current_streak} day streak
                     </Text>
                   </View>
@@ -122,7 +158,7 @@ export default function HomeScreen() {
                   {habit.isCompletedToday ? (
                     <Ionicons name="checkmark-circle" size={24} color="#10B981" />
                   ) : (
-                    <Ionicons name="ellipse-outline" size={24} color="#9CA3AF" />
+                    <Ionicons name="ellipse-outline" size={24} color={colors.text.muted} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -133,32 +169,32 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Quick Actions</Text>
         </View>
         
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
             onPress={() => router.push('/pets')}
           >
-            <Ionicons name="paw" size={24} color="#1E40AF" />
-            <Text style={styles.actionButtonText}>Feed Pet</Text>
+            <Ionicons name="paw" size={24} color={colors.primary[600]} />
+            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Feed Pet</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
             onPress={() => router.push('/battles')}
           >
-            <Ionicons name="flash" size={24} color="#1E40AF" />
-            <Text style={styles.actionButtonText}>Battle</Text>
+            <Ionicons name="flash" size={24} color={colors.primary[600]} />
+            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Battle</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
             onPress={() => router.push('/achievements')}
           >
-            <Ionicons name="trophy" size={24} color="#1E40AF" />
-            <Text style={styles.actionButtonText}>Achievements</Text>
+            <Ionicons name="trophy" size={24} color={colors.primary[600]} />
+            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Achievements</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -169,21 +205,28 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
   },
   header: {
     padding: 24,
     paddingTop: 16,
   },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
+    flex: 1,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+  },
+  logoutButton: {
+    padding: 8,
+    borderRadius: 8,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -193,7 +236,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -206,12 +248,10 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
     marginTop: 4,
   },
   section: {
@@ -227,41 +267,34 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
   },
   seeAllText: {
     fontSize: 16,
-    color: '#1E40AF',
     fontWeight: '600',
   },
   emptyState: {
     alignItems: 'center',
     padding: 32,
     marginHorizontal: 24,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
   },
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 24,
   },
   createButton: {
-    backgroundColor: '#1E40AF',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
   },
   createButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -269,7 +302,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   habitCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -301,12 +333,10 @@ const styles = StyleSheet.create({
   habitName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 4,
   },
   habitStreak: {
     fontSize: 14,
-    color: '#6B7280',
   },
   habitStatus: {
     marginLeft: 12,
@@ -318,7 +348,6 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -331,7 +360,6 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E40AF',
     marginTop: 8,
   },
 });

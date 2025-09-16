@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface SuccessMessageProps {
   message: string;
@@ -20,16 +21,16 @@ export default function SuccessMessage({ message, visible = true }: SuccessMessa
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: Colors.success[50],
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: Colors.success[100],
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
   },
   message: {
     fontSize: 14,
-    color: '#166534',
+    color: Colors.success[700],
     textAlign: 'center',
     lineHeight: 20,
   },

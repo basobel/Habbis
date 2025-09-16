@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface RegistrationProgressProps {
   currentStep: number;
@@ -51,27 +52,27 @@ const styles = StyleSheet.create({
   step: {
     flex: 1,
     height: 4,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.border.secondary,
     marginHorizontal: 2,
     borderRadius: 2,
   },
   completedStep: {
-    backgroundColor: '#22C55E',
+    backgroundColor: Colors.success[500],
   },
   currentStep: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: Colors.primary[600],
   },
   stepInfo: {
     alignItems: 'center',
   },
   stepText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: Colors.text.secondary,
     marginBottom: 4,
   },
   stepName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: Colors.text.primary,
   },
 });

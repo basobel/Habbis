@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface EmailVerificationBannerProps {
   email: string;
@@ -44,9 +45,9 @@ export default function EmailVerificationBanner({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: Colors.warning[50],
     borderWidth: 1,
-    borderColor: '#FCD34D',
+    borderColor: Colors.warning[100],
     borderRadius: 8,
     margin: 16,
   },
@@ -56,12 +57,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#92400E',
+    color: Colors.warning[700],
     marginBottom: 8,
   },
   message: {
     fontSize: 14,
-    color: '#92400E',
+    color: Colors.warning[700],
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -70,13 +71,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: Colors.warning[500],
     borderRadius: 6,
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
   buttonText: {
-    color: '#fff',
+    color: Colors.text.inverse,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   dismissText: {
-    color: '#92400E',
+    color: Colors.warning[700],
     fontSize: 14,
     fontWeight: '500',
   },

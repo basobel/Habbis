@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface PasswordStrengthIndicatorProps {
   password: string;
@@ -25,7 +26,7 @@ export default function PasswordStrengthIndicator({ password }: PasswordStrength
 
   const { score, checks } = getPasswordStrength(password);
   const strength = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][score] || 'Very Weak';
-  const color = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#16A34A'][score] || '#EF4444';
+  const color = [Colors.error[500], Colors.warning[500], Colors.warning[500], Colors.success[500], Colors.success[600]][score] || Colors.error[500];
 
   if (!password) return null;
 
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   },
   strengthBar: {
     height: 4,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.border.secondary,
     borderRadius: 2,
     marginBottom: 8,
   },
@@ -82,9 +83,9 @@ const styles = StyleSheet.create({
   },
   check: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: Colors.secondary[400],
   },
   checkPassed: {
-    color: '#22C55E',
+    color: Colors.success[500],
   },
 });
