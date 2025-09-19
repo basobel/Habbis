@@ -16,6 +16,7 @@ import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState } from '@/types';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import HabitCard from '@/components/HabitCard';
+import HamburgerMenu from '@/components/HamburgerMenu';
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ export default function HomeScreen() {
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const lastScrollY = useRef(0);
 
@@ -34,6 +36,34 @@ export default function HomeScreen() {
       router.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
+    }
+  };
+
+  const handleNavigate = (screen: string) => {
+    switch (screen) {
+      case 'profile':
+        router.push('/(tabs)/profile');
+        break;
+      case 'settings':
+        router.push('/settings');
+        break;
+      case 'premium':
+        router.push('/premium');
+        break;
+      case 'achievements':
+        router.push('/achievements');
+        break;
+      case 'statistics':
+        router.push('/statistics');
+        break;
+      case 'help':
+        router.push('/help');
+        break;
+      case 'about':
+        router.push('/about');
+        break;
+      default:
+        console.log(`Unknown screen: ${screen}`);
     }
   };
 
@@ -85,9 +115,12 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={[styles.topNavigationBar, { backgroundColor: '#FFFFFF' }]}>
-          <TouchableOpacity style={styles.menuButton}>
-            <Ionicons name="menu" size={24} color="#4C1D95" />
-          </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setIsHamburgerMenuVisible(true)}
+        >
+          <Ionicons name="menu" size={24} color="#4C1D95" />
+        </TouchableOpacity>
           <Text style={[styles.appTitle, { color: '#4C1D95' }]}>
             {user?.username || 'Habbis'}
           </Text>
@@ -111,6 +144,13 @@ export default function HomeScreen() {
             <Text style={[styles.emptyStateTitle, { color: '#4C1D95' }]}>Loading...</Text>
           </View>
         </ScrollView>
+
+        {/* Hamburger Menu */}
+        <HamburgerMenu
+          isVisible={isHamburgerMenuVisible}
+          onClose={() => setIsHamburgerMenuVisible(false)}
+          onNavigate={handleNavigate}
+        />
       </SafeAreaView>
     );
   }
@@ -119,7 +159,10 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Top Navigation Bar */}
       <View style={[styles.topNavigationBar, { backgroundColor: colors.background.card }]}>
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => setIsHamburgerMenuVisible(true)}
+        >
           <Ionicons name="menu" size={24} color={colors.text.primary} />
         </TouchableOpacity>
             <Text style={[styles.appTitle, { color: colors.text.primary }]}>
@@ -311,6 +354,13 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }

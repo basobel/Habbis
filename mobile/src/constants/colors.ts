@@ -57,6 +57,13 @@ export const Colors = {
     700: '#B91C1C',
   },
 
+  // Kolory akcentowe
+  accent: {
+    gold: '#F59E0B',      // Złoty dla Premium
+    silver: '#94A3B8',    // Srebrny
+    bronze: '#CD7F32',    // Brązowy
+  },
+
   // Kolory tła (zoptymalizowane dla spójności)
   background: {
     primary: '#F5F3FF',    // Bardzo jasny fiolet
@@ -112,6 +119,11 @@ export const Colors = {
       border: '#475569',     // Szara ramka (lepszy kontrast)
       text: '#E2E8F0',       // Jasny tekst
       placeholder: '#64748B', // Szary placeholder (lepszy kontrast)
+    },
+    accent: {
+      gold: '#F59E0B',      // Złoty dla Premium
+      silver: '#94A3B8',    // Srebrny
+      bronze: '#CD7F32',    // Brązowy
     },
   },
 } as const;

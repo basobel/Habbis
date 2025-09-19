@@ -48,6 +48,11 @@ interface ThemeColors {
     600: string;
     700: string;
   };
+  accent: {
+    gold: string;
+    silver: string;
+    bronze: string;
+  };
 }
 
 const THEME_STORAGE_KEY = '@habbis_theme_mode';
@@ -103,6 +108,7 @@ export const useTheme = () => {
         primary: Colors.primary,
         secondary: Colors.secondary,
         error: Colors.error,
+        accent: Colors.accent,
       };
     }
 
@@ -119,6 +125,7 @@ export const useTheme = () => {
       primary: Colors.primary,
       secondary: Colors.secondary,
       error: Colors.error,
+      accent: Colors.accent,
     };
   }, [actualTheme, isLoaded]);
 
