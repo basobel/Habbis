@@ -21,11 +21,12 @@ interface HamburgerMenuProps {
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const menuWidth = screenWidth * 0.85; // 85% szerokości ekranu
 
 export default function HamburgerMenu({ isVisible, onClose, onNavigate }: HamburgerMenuProps) {
   const { colors, isDark } = useThemeContext();
   const dispatch = useDispatch();
-  const slideAnim = useRef(new Animated.Value(-screenWidth)).current;
+  const slideAnim = useRef(new Animated.Value(-menuWidth)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
     } else {
       Animated.parallel([
         Animated.timing(slideAnim, {
-          toValue: -screenWidth,
+          toValue: -menuWidth,
           duration: 300,
           useNativeDriver: true,
         }),
@@ -62,7 +63,7 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
     // Najpierw uruchom animację zamykania
     Animated.parallel([
       Animated.timing(slideAnim, {
-        toValue: -screenWidth,
+        toValue: -menuWidth,
         duration: 300,
         useNativeDriver: true,
       }),
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width: screenWidth * 0.85,
+    width: menuWidth,
     height: screenHeight,
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },

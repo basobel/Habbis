@@ -1,41 +1,111 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  RefreshControl,
   SafeAreaView,
-  Animated,
+  RefreshControl,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getMe, logout } from '@/store/slices/authSlice';
-import { RootState } from '@/types';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import HabitCard from '@/components/HabitCard';
 import HamburgerMenu from '@/components/HamburgerMenu';
 
-export default function HomeScreen() {
-  const dispatch = useDispatch();
-  const { user, isLoading } = useSelector((state: RootState) => state.auth);
-  const { habits, stats } = useSelector((state: RootState) => state.habits);
+interface Habit {
+  id: string;
+  title: string;
+  description: string;
+  streak: number;
+  target: number;
+  completed: boolean;
+  category: 'health' | 'work' | 'personal' | 'learning';
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
-
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
 
-  const handleLogout = async () => {
-    try {
-      await dispatch(logout() as any);
-      router.replace('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
+  // Mock data
+  const [habits, setHabits] = useState<Habit[]>([
+    {
+      id: '1',
+      title: 'Poranna gimnastyka',
+      description: '15 minut ćwiczeń każdego ranka',
+      streak: 7,
+      target: 30,
+      completed: false,
+      category: 'health',
+      difficulty: 'medium',
+    },
+    {
+      id: '2',
+      title: 'Czytanie książek',
+      description: '30 minut czytania dziennie',
+      streak: 12,
+      target: 21,
+      completed: true,
+      category: 'learning',
+      difficulty: 'easy',
+    },
+    {
+      id: '3',
+      title: 'Medytacja',
+      description: '10 minut medytacji',
+      streak: 3,
+      target: 7,
+      completed: false,
+      category: 'personal',
+      difficulty: 'easy',
+    },
+  ]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const handleHabitToggle = (habitId: string) => {
+    setHabits(prevHabits =>
+      prevHabits.map(habit =>
+        habit.id === habitId
+          ? { ...habit, completed: !habit.completed, streak: habit.completed ? habit.streak - 1 : habit.streak + 1 }
+          : habit
+      )
+    );
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'health': return 'fitness';
+      case 'work': return 'briefcase';
+      case 'personal': return 'person';
+      case 'learning': return 'book';
+      default: return 'star';
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'health': return '#22C55E';
+      case 'work': return '#3B82F6';
+      case 'personal': return '#8B5CF6';
+      case 'learning': return '#F59E0B';
+      default: return '#6B7280';
+    }
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return '#22C55E';
+      case 'medium': return '#F59E0B';
+      case 'hard': return '#EF4444';
+      default: return '#6B7280';
     }
   };
 
@@ -53,303 +123,143 @@ export default function HomeScreen() {
       case 'achievements':
         router.push('/achievements');
         break;
-      case 'statistics':
-        router.push('/statistics');
+      case 'logout':
+        // Handle logout
         break;
-      case 'help':
-        router.push('/help');
-        break;
-      case 'about':
-        router.push('/about');
-        break;
-      default:
-        console.log(`Unknown screen: ${screen}`);
     }
   };
 
-  useEffect(() => {
-    dispatch(getMe() as any);
-  }, [dispatch]);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    (dispatch(getMe() as any) as any).finally(() => setRefreshing(false));
-  }, [dispatch]);
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      useNativeDriver: false,
-      listener: (event: any) => {
-        const currentScrollY = event.nativeEvent.contentOffset.y;
-        const scrollDirection = currentScrollY > lastScrollY.current ? 'down' : 'up';
-        
-        // Ukryj panel przy scrollowaniu w dół, pokaż przy scrollowaniu w górę
-        if (scrollDirection === 'down' && currentScrollY > 50) {
-          setIsUserStatsVisible(false);
-        } else if (scrollDirection === 'up' || currentScrollY <= 50) {
-          setIsUserStatsVisible(true);
-        }
-        
-        lastScrollY.current = currentScrollY;
-      },
-    }
-  );
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 18) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
-  const getStreakMessage = () => {
-    if (!user) return 'Start your journey!';
-    if (user.current_streak_days === 0) return 'Ready to start a new streak?';
-    if (user.current_streak_days === 1) return 'Great start! Keep it up!';
-    return `Amazing! ${user.current_streak_days} day streak!`;
-  };
-
-  // Don't render if theme is not loaded
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={[styles.topNavigationBar, { backgroundColor: '#FFFFFF' }]}>
-        <TouchableOpacity 
-          style={styles.menuButton}
-          onPress={() => setIsHamburgerMenuVisible(true)}
-        >
-          <Ionicons name="menu" size={24} color="#4C1D95" />
-        </TouchableOpacity>
-          <Text style={[styles.appTitle, { color: '#4C1D95' }]}>
-            {user?.username || 'Habbis'}
-          </Text>
-          <View style={styles.topBarActions}>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="search" size={24} color="#4C1D95" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="filter" size={24} color="#4C1D95" />
-            </TouchableOpacity>
-          </View>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading habits...</Text>
         </View>
-        <ScrollView
-          style={styles.habitsScrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <View style={[styles.emptyState, { backgroundColor: '#FFFFFF' }]}>
-            <Ionicons name="checkmark-circle-outline" size={48} color="#9CA3AF" />
-            <Text style={[styles.emptyStateTitle, { color: '#4C1D95' }]}>Loading...</Text>
-          </View>
-        </ScrollView>
-
-        {/* Hamburger Menu */}
-        <HamburgerMenu
-          isVisible={isHamburgerMenuVisible}
-          onClose={() => setIsHamburgerMenuVisible(false)}
-          onNavigate={handleNavigate}
-        />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      {/* Top Navigation Bar */}
-      <View style={[styles.topNavigationBar, { backgroundColor: colors.background.card }]}>
-        <TouchableOpacity 
-          style={styles.menuButton}
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
+        <TouchableOpacity
+          style={styles.hamburgerButton}
           onPress={() => setIsHamburgerMenuVisible(true)}
         >
           <Ionicons name="menu" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-            <Text style={[styles.appTitle, { color: colors.text.primary }]}>
-              {user?.username || 'Habbis'}
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>Moje Nawyk</Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              {habits.length} nawyków • {habits.filter(h => h.completed).length} ukończonych dziś
             </Text>
-        <View style={styles.topBarActions}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="search" size={24} color={colors.text.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="filter" size={24} color={colors.text.primary} />
+          </View>
+          <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary[600] }]}>
+            <Ionicons name="add" size={24} color={colors.text.inverse} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* User Stats Panel - Full Version with Progress Bars */}
-      {user && isUserStatsVisible && (
-        <Animated.View 
-          style={[
-            styles.userStatsPanel, 
-            { 
-              backgroundColor: colors.background.card,
-              opacity: isUserStatsVisible ? 1 : 0,
-              transform: [{
-                translateY: isUserStatsVisible ? 0 : -100
-              }]
-            }
-          ]}
-        >
-          <View style={styles.userStatsContent}>
-            {/* Left side - Avatar with Level Badge */}
-            <View style={styles.avatarContainer}>
-              <View style={[styles.avatar, { backgroundColor: colors.primary[100] }]}>
-                <Ionicons name="person" size={40} color={colors.primary[600]} />
-              </View>
-              <View style={styles.levelBadge}>
-                <Text style={[styles.levelText, { color: colors.text.inverse }]}>
-                  Lvl {user.level || 1}
-                </Text>
-              </View>
-            </View>
-
-            {/* Right side - Full Stats with Progress Bars */}
-            <View style={styles.fullStats}>
-              {/* Health */}
-              <View style={styles.statRow}>
-                <View style={styles.statIcon}>
-                  <Ionicons name="heart" size={16} color="#EF4444" />
-                </View>
-                <View style={styles.statContent}>
-                  <View style={styles.statHeader}>
-                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Zdrowie</Text>
-                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
-                      {user.health || 50} / 100
-                    </Text>
-                  </View>
-                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
-                    <View 
-                      style={[
-                        styles.progressBar, 
-                        { 
-                          width: `${((user.health || 50) / 100) * 100}%`,
-                          backgroundColor: '#EF4444'
-                        }
-                      ]} 
-                    />
-                  </View>
-                </View>
-              </View>
-
-              {/* Experience */}
-              <View style={styles.statRow}>
-                <View style={styles.statIcon}>
-                  <Ionicons name="star" size={16} color="#F59E0B" />
-                </View>
-                <View style={styles.statContent}>
-                  <View style={styles.statHeader}>
-                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Doświadczenie</Text>
-                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
-                      {user.experience_points || 2500} / 5000
-                    </Text>
-                  </View>
-                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
-                    <View 
-                      style={[
-                        styles.progressBar, 
-                        { 
-                          width: `${((user.experience_points || 2500) / 5000) * 100}%`,
-                          backgroundColor: '#F59E0B'
-                        }
-                      ]} 
-                    />
-                  </View>
-                </View>
-              </View>
-
-              {/* Power */}
-              <View style={styles.statRow}>
-                <View style={styles.statIcon}>
-                  <Ionicons name="flash" size={16} color="#3B82F6" />
-                </View>
-                <View style={styles.statContent}>
-                  <View style={styles.statHeader}>
-                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Moc</Text>
-                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
-                      {user.power || 250} / 500
-                    </Text>
-                  </View>
-                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
-                    <View 
-                      style={[
-                        styles.progressBar, 
-                        { 
-                          width: `${((user.power || 250) / 500) * 100}%`,
-                          backgroundColor: '#3B82F6'
-                        }
-                      ]} 
-                    />
-                  </View>
-                </View>
-              </View>
-
-              {/* Bottom Row - Level, Gold, Premium Currency */}
-              <View style={styles.bottomStats}>
-                <View style={styles.currencyItem}>
-                  <Ionicons name="trophy" size={16} color={colors.primary[600]} />
-                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
-                    Poziom {user.level || 1} Mag
-                  </Text>
-                </View>
-                <View style={styles.currencyItem}>
-                  <Ionicons name="logo-bitcoin" size={16} color="#F59E0B" />
-                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
-                    {user.gold || 0}
-                  </Text>
-                </View>
-                <View style={styles.currencyItem}>
-                  <Ionicons name="gift" size={16} color="#10B981" />
-                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
-                    {user.premium_currency || 100}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-      )}
-
-      {/* Scrollable Habits List */}
+      {/* Habits List */}
       <ScrollView
-        style={styles.habitsScrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         showsVerticalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
       >
         {habits.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
             <Ionicons name="checkmark-circle-outline" size={48} color={colors.text.muted} />
-            <Text style={[styles.emptyStateTitle, { color: colors.text.primary }]}>No habits yet</Text>
-            <Text style={[styles.emptyStateText, { color: colors.text.secondary }]}>
-              Create your first habit to start building good routines!
+            <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
+              Brak nawyków
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.text.secondary }]}>
+              Dodaj swój pierwszy nawyk!
             </Text>
             <TouchableOpacity
-              style={[styles.createButton, { backgroundColor: colors.primary[600] }]}
-              onPress={() => console.log('Create habit pressed')}
+              style={[styles.addHabitButton, { backgroundColor: colors.primary[600] }]}
             >
-              <Text style={[styles.createButtonText, { color: colors.text.inverse }]}>Create Habit</Text>
+              <Text style={[styles.addHabitButtonText, { color: colors.text.inverse }]}>
+                Dodaj nawyk
+              </Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.habitsList}>
             {habits.map((habit) => (
-              <HabitCard
+              <TouchableOpacity
                 key={habit.id}
-                habit={habit}
-                onComplete={() => {
-                  // Handle habit completion
-                  console.log('Complete habit:', habit.id);
-                }}
-                onSkip={() => {
-                  // Handle habit skip
-                  console.log('Skip habit:', habit.id);
-                }}
-              />
+                style={[
+                  styles.habitCard,
+                  {
+                    backgroundColor: colors.background.card,
+                    borderColor: habit.completed ? colors.primary[500] : colors.border.primary,
+                    borderWidth: habit.completed ? 2 : 1,
+                  }
+                ]}
+                onPress={() => handleHabitToggle(habit.id)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.habitHeader}>
+                  <View style={styles.habitInfo}>
+                    <View style={[styles.categoryIcon, { backgroundColor: `${getCategoryColor(habit.category)}20` }]}>
+                      <Ionicons
+                        name={getCategoryIcon(habit.category) as any}
+                        size={20}
+                        color={getCategoryColor(habit.category)}
+                      />
+                    </View>
+                    <View style={styles.habitText}>
+                      <Text style={[styles.habitTitle, { color: colors.text.primary }]}>
+                        {habit.title}
+                      </Text>
+                      <Text style={[styles.habitDescription, { color: colors.text.secondary }]}>
+                        {habit.description}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[
+                    styles.completionButton,
+                    {
+                      backgroundColor: habit.completed ? colors.primary[500] : colors.background.primary,
+                      borderColor: habit.completed ? colors.primary[500] : colors.border.primary,
+                    }
+                  ]}>
+                    <Ionicons
+                      name={habit.completed ? "checkmark" : "add"}
+                      size={20}
+                      color={habit.completed ? colors.text.inverse : colors.text.secondary}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.habitStats}>
+                  <View style={styles.statItem}>
+                    <Text style={[styles.statValue, { color: colors.primary[600] }]}>
+                      {habit.streak}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                      Streak
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text style={[styles.statValue, { color: colors.text.secondary }]}>
+                      {habit.target}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+                      Cel
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <View style={[styles.difficultyBadge, { backgroundColor: `${getDifficultyColor(habit.difficulty)}20` }]}>
+                      <Text style={[styles.difficultyText, { color: getDifficultyColor(habit.difficulty) }]}>
+                        {habit.difficulty.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -369,158 +279,153 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Top Navigation Bar - Fixed at top
-  topNavigationBar: {
-    flexDirection: 'row',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  menuButton: {
+  hamburgerButton: {
     padding: 8,
+    marginBottom: 8,
   },
-  appTitle: {
-    fontSize: 20,
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  topBarActions: {
-    flexDirection: 'row',
-    gap: 8,
+  subtitle: {
+    fontSize: 14,
+    marginTop: 2,
   },
-  actionButton: {
-    padding: 8,
-  },
-  // User Stats Panel - Full version with progress bars
-  userStatsPanel: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 20,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  userStatsContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 20,
-  },
-  avatarContainer: {
-    marginRight: 16,
-    position: 'relative',
-  },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+  addButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  levelBadge: {
-    position: 'absolute',
-    bottom: -5,
-    right: -5,
-    backgroundColor: '#7C3AED',
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  levelText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  fullStats: {
+  content: {
     flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
-  statRow: {
+  emptyState: {
+    alignItems: 'center',
+    padding: 32,
+    marginTop: 32,
+    borderRadius: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  addHabitButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  addHabitButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  habitsList: {
+    paddingBottom: 20,
+  },
+  habitCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  habitHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
-  statIcon: {
-    width: 24,
+  habitInfo: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
-  },
-  statContent: {
     flex: 1,
   },
-  statHeader: {
+  categoryIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  habitText: {
+    flex: 1,
+  },
+  habitTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  habitDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  completionButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  habitStats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    alignItems: 'center',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
     fontWeight: '500',
   },
-  statValue: {
-    fontSize: 12,
-    fontWeight: '600',
+  difficultyBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  progressBarContainer: {
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  bottomStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  currencyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  currencyValue: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  // Scrollable Habits List
-  habitsScrollView: {
-    flex: 1,
-  },
-  emptyState: {
-    alignItems: 'center',
-    padding: 32,
-    marginHorizontal: 16,
-    marginTop: 32,
-    borderRadius: 16,
-  },
-  emptyStateTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  createButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  createButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  habitsList: {
-    paddingBottom: 60, // Space for bottom tab bar (reduced from 100 to 60)
+  difficultyText: {
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
