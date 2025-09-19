@@ -398,6 +398,7 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
+    paddingBottom: 32, // Dodaj padding bottom żeby nie był przykrywany przez dolny panel
     borderTopWidth: 1,
   },
   logoutButton: {

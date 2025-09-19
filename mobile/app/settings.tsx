@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,20 +11,26 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { useTheme } from '@/hooks/useTheme';
+import { useNavigation } from '@/hooks/useNavigation';
+import SharedHeader from '@/components/SharedHeader';
+import HamburgerMenu from '@/components/HamburgerMenu';
 
 export default function SettingsScreen() {
   const { colors, isLoaded } = useThemeContext();
   const { themeMode, setTheme } = useTheme();
+  const { handleNavigate } = useNavigation();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [soundEnabled, setSoundEnabled] = React.useState(true);
   const [hapticEnabled, setHapticEnabled] = React.useState(true);
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: '#4C1D95' }]}>Ustawienia</Text>
-        </View>
+        <SharedHeader
+          title="Ustawienia"
+          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        />
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
@@ -136,9 +142,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <Text style={[styles.title, { color: colors.text.primary }]}>Ustawienia</Text>
-      </View>
+      <SharedHeader
+        title="Ustawienia"
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+      />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {settingsSections.map((section, sectionIndex) => (
@@ -155,8 +162,8 @@ export default function SettingsScreen() {
                     { borderBottomColor: colors.border.primary },
                     itemIndex === section.items.length - 1 && styles.lastItem,
                   ]}
-                  onPress={item.onPress}
-                  disabled={item.type === 'switch'}
+                  onPress={'onPress' in item ? item.onPress : undefined}
+                  disabled={'type' in item && item.type === 'switch'}
                 >
                   <View style={styles.settingItemLeft}>
                     <View style={[styles.settingIcon, { backgroundColor: colors.primary[100] }]}>
@@ -174,7 +181,7 @@ export default function SettingsScreen() {
                     </View>
                   </View>
                   <View style={styles.settingItemRight}>
-                    {item.type === 'switch' ? (
+                    {'type' in item && item.type === 'switch' ? (
                       <Switch
                         value={item.value}
                         onValueChange={item.onToggle}
@@ -191,6 +198,13 @@ export default function SettingsScreen() {
           </View>
         ))}
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
@@ -198,16 +212,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,

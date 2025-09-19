@@ -73,6 +73,7 @@ export default function TabLayout() {
           name="profile"
           options={{
             href: null, // Ukryj z dolnego paska nawigacji
+            headerShown: false, // Ukryj header - używamy SharedHeader
           }}
         />
       </Tabs>
@@ -149,6 +150,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           href: null, // Ukryj z dolnego paska nawigacji
+          headerShown: false, // Ukryj header - używamy SharedHeader
         }}
       />
     </Tabs>

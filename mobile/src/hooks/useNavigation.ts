@@ -23,6 +23,15 @@ export const useNavigation = () => {
       case 'achievements':
         router.push('/achievements');
         break;
+      case 'statistics':
+        router.push('/statistics');
+        break;
+      case 'help':
+        router.push('/help');
+        break;
+      case 'about':
+        router.push('/about');
+        break;
       case 'logout':
         dispatch(logout() as any);
         break;

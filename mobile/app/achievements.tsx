@@ -1,412 +1,487 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
+  RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
+import SharedHeader from '@/components/SharedHeader';
+import HamburgerMenu from '@/components/HamburgerMenu';
+import AchievementCard from '@/components/AchievementCard';
+import AchievementCategory from '@/components/AchievementCategory';
+
+const { width } = Dimensions.get('window');
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  category: 'time' | 'progress' | 'quick' | 'special' | 'social' | 'guild';
+  type: 'badge' | 'title' | 'reward' | 'progress';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  points: number;
+  isUnlocked: boolean;
+  progress: number;
+  maxProgress: number;
+  unlockedAt?: Date;
+  icon: string;
+  color: string;
+  requirements: string[];
+  rewards: {
+    points: number;
+    title?: string;
+    item?: string;
+  };
+}
 
 export default function AchievementsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Mock data - w przyszłości będzie z Redux store
+  const [achievements] = useState<Achievement[]>([
+    // Czasowe osiągnięcia
+    {
+      id: '1',
+      title: 'Wczesny Ptak',
+      description: 'Wykonaj zadanie o 5:00 rano',
+      category: 'time',
+      type: 'badge',
+      rarity: 'rare',
+      points: 50,
+      isUnlocked: true,
+      progress: 1,
+      maxProgress: 1,
+      unlockedAt: new Date('2024-01-15T05:00:00'),
+      icon: '🌅',
+      color: '#F59E0B',
+      requirements: ['Wykonaj zadanie między 5:00 a 6:00'],
+      rewards: { points: 50, title: 'Wczesny Ptak' }
+    },
+    {
+      id: '2',
+      title: 'Nocny Marek',
+      description: 'Wykonaj zadanie po północy',
+      category: 'time',
+      type: 'badge',
+      rarity: 'epic',
+      points: 100,
+      isUnlocked: false,
+      progress: 0,
+      maxProgress: 1,
+      icon: '🌙',
+      color: '#8B5CF6',
+      requirements: ['Wykonaj zadanie między 00:00 a 02:00'],
+      rewards: { points: 100, title: 'Nocny Marek' }
+    },
+    {
+      id: '3',
+      title: 'Weekendowy Wojownik',
+      description: 'Wykonaj 10 zadań w weekend',
+      category: 'time',
+      type: 'progress',
+      rarity: 'common',
+      points: 75,
+      isUnlocked: false,
+      progress: 7,
+      maxProgress: 10,
+      icon: '🏆',
+      color: '#22C55E',
+      requirements: ['Wykonaj zadania w sobotę lub niedzielę'],
+      rewards: { points: 75, title: 'Weekendowy Wojownik' }
+    },
+    // Progresowe osiągnięcia
+    {
+      id: '4',
+      title: 'Żelazna Wola',
+      description: 'Utrzymaj streak przez 30 dni',
+      category: 'progress',
+      type: 'progress',
+      rarity: 'legendary',
+      points: 500,
+      isUnlocked: false,
+      progress: 15,
+      maxProgress: 30,
+      icon: '💪',
+      color: '#EF4444',
+      requirements: ['Nie przerwij serii przez 30 dni'],
+      rewards: { points: 500, title: 'Żelazna Wola', item: 'Złoty Medal' }
+    },
+    {
+      id: '5',
+      title: 'Mistrz Nawyków',
+      description: 'Ukończ 100 nawyków',
+      category: 'progress',
+      type: 'badge',
+      rarity: 'epic',
+      points: 200,
+      isUnlocked: true,
+      progress: 100,
+      maxProgress: 100,
+      unlockedAt: new Date('2024-01-20T14:30:00'),
+      icon: '🎯',
+      color: '#7C3AED',
+      requirements: ['Ukończ 100 różnych nawyków'],
+      rewards: { points: 200, title: 'Mistrz Nawyków' }
+    },
+    // Szybkie osiągnięcia
+    {
+      id: '6',
+      title: 'Pierwsze Kroki',
+      description: 'Stwórz swój pierwszy nawyk',
+      category: 'quick',
+      type: 'badge',
+      rarity: 'common',
+      points: 10,
+      isUnlocked: true,
+      progress: 1,
+      maxProgress: 1,
+      unlockedAt: new Date('2024-01-01T10:00:00'),
+      icon: '👶',
+      color: '#22C55E',
+      requirements: ['Stwórz pierwszy nawyk'],
+      rewards: { points: 10, title: 'Nowicjusz' }
+    },
+    {
+      id: '7',
+      title: 'Perfekcjonista',
+      description: 'Wykonaj wszystkie zadania w jednym dniu',
+      category: 'quick',
+      type: 'badge',
+      rarity: 'rare',
+      points: 75,
+      isUnlocked: false,
+      progress: 0,
+      maxProgress: 1,
+      icon: '✨',
+      color: '#F59E0B',
+      requirements: ['Wykonaj wszystkie aktywne nawyki w jednym dniu'],
+      rewards: { points: 75, title: 'Perfekcjonista' }
+    },
+    // Specjalne osiągnięcia
+    {
+      id: '8',
+      title: 'Dzień Urodzin',
+      description: 'Wykonaj zadanie w dniu urodzin',
+      category: 'special',
+      type: 'badge',
+      rarity: 'legendary',
+      points: 1000,
+      isUnlocked: false,
+      progress: 0,
+      maxProgress: 1,
+      icon: '🎂',
+      color: '#EC4899',
+      requirements: ['Wykonaj zadanie w dniu swoich urodzin'],
+      rewards: { points: 1000, title: 'Solenizant', item: 'Tort Urodzinowy' }
+    },
+    {
+      id: '9',
+      title: 'Nowy Rok, Nowy Ja',
+      description: 'Wykonaj zadanie 1 stycznia',
+      category: 'special',
+      type: 'badge',
+      rarity: 'epic',
+      points: 300,
+      isUnlocked: true,
+      progress: 1,
+      maxProgress: 1,
+      unlockedAt: new Date('2024-01-01T00:00:00'),
+      icon: '🎊',
+      color: '#10B981',
+      requirements: ['Wykonaj zadanie 1 stycznia'],
+      rewards: { points: 300, title: 'Nowy Rok, Nowy Ja' }
+    },
+    // Społeczne osiągnięcia
+    {
+      id: '10',
+      title: 'Mentor',
+      description: 'Pomóż 5 innym graczom',
+      category: 'social',
+      type: 'badge',
+      rarity: 'epic',
+      points: 150,
+      isUnlocked: false,
+      progress: 2,
+      maxProgress: 5,
+      icon: '👨‍🏫',
+      color: '#3B82F6',
+      requirements: ['Pomóż innym graczom w komentarzach lub poradach'],
+      rewards: { points: 150, title: 'Mentor' }
+    },
+    // Gildiowe osiągnięcia
+    {
+      id: '11',
+      title: 'Gildiowy Bohater',
+      description: 'Przyczyn się do rozwoju gildii',
+      category: 'guild',
+      type: 'progress',
+      rarity: 'rare',
+      points: 200,
+      isUnlocked: false,
+      progress: 0,
+      maxProgress: 10,
+      icon: '🏰',
+      color: '#8B5CF6',
+      requirements: ['Wykonaj 10 zadań gildiowych'],
+      rewards: { points: 200, title: 'Gildiowy Bohater' }
+    }
+  ]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const categories = [
+    { key: 'time', label: 'Czasowe', icon: '🕐', color: '#F59E0B' },
+    { key: 'progress', label: 'Progresowe', icon: '📈', color: '#22C55E' },
+    { key: 'quick', label: 'Szybkie', icon: '⚡', color: '#EF4444' },
+    { key: 'special', label: 'Specjalne', icon: '🎯', color: '#8B5CF6' },
+    { key: 'social', label: 'Społeczne', icon: '👥', color: '#3B82F6' },
+    { key: 'guild', label: 'Gildiowe', icon: '🏰', color: '#EC4899' },
+  ];
+
+  const filteredAchievements = selectedCategory 
+    ? achievements.filter(achievement => achievement.category === selectedCategory)
+    : achievements;
+
+  const unlockedCount = achievements.filter(a => a.isUnlocked).length;
+  const totalPoints = achievements.filter(a => a.isUnlocked).reduce((sum, a) => sum + a.points, 0);
+
+  const getCategoryStats = (categoryKey: string) => {
+    const categoryAchievements = achievements.filter(a => a.category === categoryKey);
+    const unlocked = categoryAchievements.filter(a => a.isUnlocked).length;
+    const total = categoryAchievements.length;
+    return { unlocked, total };
+  };
 
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: '#4C1D95' }]}>Osiągnięcia</Text>
-        </View>
+        <SharedHeader
+          title="Osiągnięcia"
+          subtitle="Loading..."
+          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        />
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
+          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading achievements...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const achievements = [
-    {
-      id: 'first_habit',
-      title: 'Pierwszy krok',
-      description: 'Stwórz swój pierwszy nawyk',
-      icon: 'footsteps-outline',
-      unlocked: true,
-      progress: 100,
-      reward: '10 XP',
-    },
-    {
-      id: 'week_streak',
-      title: 'Tygodniowa seria',
-      description: 'Utrzymaj nawyk przez 7 dni z rzędu',
-      icon: 'calendar-outline',
-      unlocked: true,
-      progress: 100,
-      reward: '50 XP',
-    },
-    {
-      id: 'month_streak',
-      title: 'Miesięczna seria',
-      description: 'Utrzymaj nawyk przez 30 dni z rzędu',
-      icon: 'trophy-outline',
-      unlocked: false,
-      progress: 65,
-      reward: '200 XP',
-    },
-    {
-      id: 'habit_master',
-      title: 'Mistrz nawyków',
-      description: 'Stwórz 10 różnych nawyków',
-      icon: 'star-outline',
-      unlocked: false,
-      progress: 30,
-      reward: '100 XP',
-    },
-    {
-      id: 'early_bird',
-      title: 'Ranny ptaszek',
-      description: 'Wykonaj nawyk przed 7:00 rano',
-      icon: 'sunny-outline',
-      unlocked: false,
-      progress: 0,
-      reward: '25 XP',
-    },
-    {
-      id: 'night_owl',
-      title: 'Nocna sowa',
-      description: 'Wykonaj nawyk po 22:00',
-      icon: 'moon-outline',
-      unlocked: false,
-      progress: 0,
-      reward: '25 XP',
-    },
-    {
-      id: 'perfect_week',
-      title: 'Idealny tydzień',
-      description: 'Wykonaj wszystkie nawyki przez cały tydzień',
-      icon: 'checkmark-circle-outline',
-      unlocked: false,
-      progress: 0,
-      reward: '150 XP',
-    },
-    {
-      id: 'social_butterfly',
-      title: 'Motywator',
-      description: 'Dołącz do gildii i pomóż innym',
-      icon: 'people-outline',
-      unlocked: false,
-      progress: 0,
-      reward: '75 XP',
-    },
-  ];
-
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
-  const totalCount = achievements.length;
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <Text style={[styles.title, { color: colors.text.primary }]}>Osiągnięcia</Text>
-        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-          {unlockedCount} z {totalCount} odblokowanych
-        </Text>
+      <SharedHeader
+        title="Osiągnięcia"
+        subtitle={`${unlockedCount}/${achievements.length} odblokowanych • ${totalPoints} punktów`}
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+      />
+
+      {/* Stats Overview */}
+      <View style={[styles.statsContainer, { backgroundColor: colors.background.card }]}>
+        <View style={styles.statItem}>
+          <Text style={[styles.statValue, { color: colors.primary?.[600] || '#6D28D9' }]}>
+            {unlockedCount}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+            Osiągnięcia
+          </Text>
+        </View>
+        <View style={styles.statItem}>
+          <Text style={[styles.statValue, { color: colors.success?.[500] || '#22C55E' }]}>
+            {totalPoints}
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+            Punkty
+          </Text>
+        </View>
+        <View style={styles.statItem}>
+          <Text style={[styles.statValue, { color: colors.warning?.[500] || '#F59E0B' }]}>
+            {Math.round((unlockedCount / achievements.length) * 100)}%
+          </Text>
+          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+            Postęp
+          </Text>
+        </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Progress Overview */}
-        <View style={[styles.progressCard, { backgroundColor: colors.background.card }]}>
-          <View style={styles.progressHeader}>
-            <Ionicons name="trophy" size={24} color={colors.accent.gold} />
-            <Text style={[styles.progressTitle, { color: colors.text.primary }]}>
-              Twój postęp
+      {/* Categories */}
+      <View style={styles.categoriesContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
+          <TouchableOpacity
+            style={[
+              styles.categoryButton,
+              {
+                backgroundColor: selectedCategory === null 
+                  ? colors.primary?.[100] || '#EDE9FE'
+                  : colors.background.card || '#FFFFFF',
+                borderColor: selectedCategory === null 
+                  ? colors.primary?.[600] || '#6D28D9'
+                  : colors.border.primary || '#C4B5FD',
+              }
+            ]}
+            onPress={() => setSelectedCategory(null)}
+          >
+            <Text style={styles.categoryIcon}>🏆</Text>
+            <Text style={[
+              styles.categoryLabel,
+              { color: selectedCategory === null ? colors.primary?.[600] || '#6D28D9' : colors.text.secondary }
+            ]}>
+              Wszystkie
             </Text>
-          </View>
-          <View style={styles.progressBarContainer}>
-            <View style={[styles.progressBar, { backgroundColor: colors.background.primary }]}>
-              <View 
+          </TouchableOpacity>
+          {categories.map((category) => {
+            const stats = getCategoryStats(category.key);
+            return (
+              <TouchableOpacity
+                key={category.key}
                 style={[
-                  styles.progressFill, 
-                  { 
-                    width: `${(unlockedCount / totalCount) * 100}%`,
-                    backgroundColor: colors.accent.gold
+                  styles.categoryButton,
+                  {
+                    backgroundColor: selectedCategory === category.key 
+                      ? colors.primary?.[100] || '#EDE9FE'
+                      : colors.background.card || '#FFFFFF',
+                    borderColor: selectedCategory === category.key 
+                      ? colors.primary?.[600] || '#6D28D9'
+                      : colors.border.primary || '#C4B5FD',
                   }
-                ]} 
-              />
-            </View>
-            <Text style={[styles.progressText, { color: colors.text.secondary }]}>
-              {Math.round((unlockedCount / totalCount) * 100)}%
+                ]}
+                onPress={() => setSelectedCategory(category.key)}
+              >
+                <Text style={styles.categoryIcon}>{category.icon}</Text>
+                <Text style={[
+                  styles.categoryLabel,
+                  { color: selectedCategory === category.key ? colors.primary?.[600] || '#6D28D9' : colors.text.secondary }
+                ]}>
+                  {category.label}
+                </Text>
+                <Text style={[styles.categoryCount, { color: colors.text.secondary }]}>
+                  {stats.unlocked}/{stats.total}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* Achievements List */}
+      <ScrollView
+        style={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        showsVerticalScrollIndicator={false}
+      >
+        {filteredAchievements.length === 0 ? (
+          <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
+            <Ionicons name="trophy-outline" size={64} color={colors.text.secondary} />
+            <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
+              Brak osiągnięć
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.text.secondary }]}>
+              W tej kategorii nie ma jeszcze osiągnięć
             </Text>
           </View>
-        </View>
-
-        {/* Achievements List */}
-        <View style={styles.achievementsList}>
-          {achievements.map((achievement, index) => (
-            <View
-              key={achievement.id}
-              style={[
-                styles.achievementCard,
-                { 
-                  backgroundColor: colors.background.card,
-                  opacity: achievement.unlocked ? 1 : 0.6,
-                }
-              ]}
-            >
-              <View style={styles.achievementLeft}>
-                <View
-                  style={[
-                    styles.achievementIcon,
-                    {
-                      backgroundColor: achievement.unlocked 
-                        ? colors.accent.gold 
-                        : colors.background.primary,
-                    }
-                  ]}
-                >
-                  <Ionicons
-                    name={achievement.icon as any}
-                    size={24}
-                    color={achievement.unlocked ? colors.text.inverse : colors.text.muted}
-                  />
-                </View>
-                <View style={styles.achievementText}>
-                  <Text
-                    style={[
-                      styles.achievementTitle,
-                      { 
-                        color: achievement.unlocked 
-                          ? colors.text.primary 
-                          : colors.text.muted 
-                      }
-                    ]}
-                  >
-                    {achievement.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.achievementDescription,
-                      { 
-                        color: achievement.unlocked 
-                          ? colors.text.secondary 
-                          : colors.text.muted 
-                      }
-                    ]}
-                  >
-                    {achievement.description}
-                  </Text>
-                  {!achievement.unlocked && achievement.progress > 0 && (
-                    <View style={styles.progressContainer}>
-                      <View style={[styles.miniProgressBar, { backgroundColor: colors.border.primary }]}>
-                        <View
-                          style={[
-                            styles.miniProgressFill,
-                            {
-                              width: `${achievement.progress}%`,
-                              backgroundColor: colors.primary[500],
-                            }
-                          ]}
-                        />
-                      </View>
-                      <Text style={[styles.progressLabel, { color: colors.text.muted }]}>
-                        {achievement.progress}%
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-              <View style={styles.achievementRight}>
-                {achievement.unlocked ? (
-                  <View style={[styles.unlockedBadge, { backgroundColor: colors.success[100] }]}>
-                    <Ionicons name="checkmark" size={16} color={colors.success[600]} />
-                  </View>
-                ) : (
-                  <View style={[styles.lockedBadge, { backgroundColor: colors.background.primary }]}>
-                    <Ionicons name="lock-closed" size={16} color={colors.text.muted} />
-                  </View>
-                )}
-                <Text style={[styles.rewardText, { color: colors.accent.gold }]}>
-                  {achievement.reward}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* Motivation Section */}
-        <View style={[styles.motivationCard, { backgroundColor: colors.background.card }]}>
-          <Ionicons name="bulb-outline" size={32} color={colors.accent.gold} />
-          <Text style={[styles.motivationTitle, { color: colors.text.primary }]}>
-            Kontynuuj swoją podróż!
-          </Text>
-          <Text style={[styles.motivationText, { color: colors.text.secondary }]}>
-            Każdy nawyk to krok w kierunku lepszej wersji siebie. 
-            Osiągnięcia pomogą Ci śledzić postępy i motywować się do dalszych działań.
-          </Text>
-        </View>
+        ) : (
+          <View style={styles.achievementsList}>
+            {filteredAchievements.map((achievement) => (
+              <AchievementCard
+                key={achievement.id}
+                achievement={achievement}
+              />
+            ))}
+          </View>
+        )}
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
+  container: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { fontSize: 16, fontWeight: '500' },
+  statsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  title: {
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    marginTop: 4,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  progressCard: {
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  progressTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 12,
-  },
-  progressBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 12,
-  },
-  achievementsList: {
-    gap: 12,
-  },
-  achievementCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-  },
-  achievementLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  achievementIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  achievementText: {
-    flex: 1,
-  },
-  achievementTitle: {
-    fontSize: 16,
-    fontWeight: '600',
     marginBottom: 4,
   },
-  achievementDescription: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  miniProgressBar: {
-    flex: 1,
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginRight: 8,
-  },
-  miniProgressFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  progressLabel: {
+  statLabel: {
     fontSize: 12,
     fontWeight: '500',
   },
-  achievementRight: {
+  categoriesContainer: {
+    paddingVertical: 16,
+  },
+  categoriesScroll: {
+    paddingHorizontal: 16,
+  },
+  categoryButton: {
     alignItems: 'center',
-  },
-  unlockedBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  lockedBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  rewardText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  motivationCard: {
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderRadius: 12,
+    borderWidth: 1,
+    marginRight: 12,
+    minWidth: 80,
+  },
+  categoryIcon: {
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  categoryLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  categoryCount: {
+    fontSize: 10,
+    marginTop: 2,
+  },
+  content: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
+  emptyState: {
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 32,
+    padding: 32,
+    marginTop: 32,
+    borderRadius: 16,
   },
-  motivationTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 12,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  motivationText: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
+  emptyTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 16, marginBottom: 8 },
+  emptySubtitle: { fontSize: 14, textAlign: 'center' },
+  achievementsList: { paddingBottom: 20 },
 });

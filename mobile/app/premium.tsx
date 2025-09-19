@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,16 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
+import SharedHeader from '@/components/SharedHeader';
+import HamburgerMenu from '@/components/HamburgerMenu';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function PremiumScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
