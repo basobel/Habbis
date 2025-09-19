@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  SafeAreaView,
+  Animated,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
@@ -13,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState } from '@/types';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import HabitCard from '@/components/HabitCard';
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
@@ -21,6 +24,9 @@ export default function HomeScreen() {
   const { colors, isLoaded } = useThemeContext();
 
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
 
   const handleLogout = async () => {
     try {
@@ -32,13 +38,33 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    dispatch(getMe());
+    dispatch(getMe() as any);
   }, [dispatch]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    dispatch(getMe()).finally(() => setRefreshing(false));
+    (dispatch(getMe() as any) as any).finally(() => setRefreshing(false));
   }, [dispatch]);
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+      listener: (event: any) => {
+        const currentScrollY = event.nativeEvent.contentOffset.y;
+        const scrollDirection = currentScrollY > lastScrollY.current ? 'down' : 'up';
+        
+        // Ukryj panel przy scrollowaniu w dół, pokaż przy scrollowaniu w górę
+        if (scrollDirection === 'down' && currentScrollY > 50) {
+          setIsUserStatsVisible(false);
+        } else if (scrollDirection === 'up' || currentScrollY <= 50) {
+          setIsUserStatsVisible(true);
+        }
+        
+        lastScrollY.current = currentScrollY;
+      },
+    }
+  );
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -57,70 +83,201 @@ export default function HomeScreen() {
   // Don't render if theme is not loaded
   if (!isLoaded || !colors) {
     return (
-      <ScrollView
-        style={[styles.container, { backgroundColor: '#F5F3FF' }]}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={styles.header}>
-          <Text style={[styles.greeting, { color: '#4C1D95' }]}>
-            {getGreeting()}, {user?.username || 'User'}!
+      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+        <View style={[styles.topNavigationBar, { backgroundColor: '#FFFFFF' }]}>
+          <TouchableOpacity style={styles.menuButton}>
+            <Ionicons name="menu" size={24} color="#4C1D95" />
+          </TouchableOpacity>
+          <Text style={[styles.appTitle, { color: '#4C1D95' }]}>
+            {user?.username || 'Habbis'}
           </Text>
-          <Text style={[styles.subtitle, { color: '#6D28D9' }]}>{getStreakMessage()}</Text>
+          <View style={styles.topBarActions}>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="search" size={24} color="#4C1D95" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="filter" size={24} color="#4C1D95" />
+            </TouchableOpacity>
+          </View>
         </View>
-        {/* ... rest of fallback content ... */}
-      </ScrollView>
+        <ScrollView
+          style={styles.habitsScrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={[styles.emptyState, { backgroundColor: '#FFFFFF' }]}>
+            <Ionicons name="checkmark-circle-outline" size={48} color="#9CA3AF" />
+            <Text style={[styles.emptyStateTitle, { color: '#4C1D95' }]}>Loading...</Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background.primary }]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={[styles.greeting, { color: colors.text.primary }]}>
-            {getGreeting()}, {user?.username || 'User'}!
-          </Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={24} color={colors.text.primary} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      {/* Top Navigation Bar */}
+      <View style={[styles.topNavigationBar, { backgroundColor: colors.background.card }]}>
+        <TouchableOpacity style={styles.menuButton}>
+          <Ionicons name="menu" size={24} color={colors.text.primary} />
+        </TouchableOpacity>
+            <Text style={[styles.appTitle, { color: colors.text.primary }]}>
+              {user?.username || 'Habbis'}
+            </Text>
+        <View style={styles.topBarActions}>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="search" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-        </View>
-        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>{getStreakMessage()}</Text>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
-          <Ionicons name="trophy" size={24} color="#F59E0B" />
-          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.level || 1}</Text>
-          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Level</Text>
-        </View>
-        
-        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
-          <Ionicons name="flame" size={24} color="#EF4444" />
-          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.current_streak_days || 0}</Text>
-          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Streak</Text>
-        </View>
-        
-        <View style={[styles.statCard, { backgroundColor: colors.background.card }]}>
-          <Ionicons name="diamond" size={24} color={colors.primary[600]} />
-          <Text style={[styles.statNumber, { color: colors.text.primary }]}>{user?.premium_currency || 0}</Text>
-          <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Gems</Text>
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="filter" size={24} color={colors.text.primary} />
+          </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Today's Habits</Text>
-          <TouchableOpacity onPress={() => router.push('/habits')}>
-            <Text style={[styles.seeAllText, { color: colors.primary[600] }]}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        
+      {/* User Stats Panel - Full Version with Progress Bars */}
+      {user && isUserStatsVisible && (
+        <Animated.View 
+          style={[
+            styles.userStatsPanel, 
+            { 
+              backgroundColor: colors.background.card,
+              opacity: isUserStatsVisible ? 1 : 0,
+              transform: [{
+                translateY: isUserStatsVisible ? 0 : -100
+              }]
+            }
+          ]}
+        >
+          <View style={styles.userStatsContent}>
+            {/* Left side - Avatar with Level Badge */}
+            <View style={styles.avatarContainer}>
+              <View style={[styles.avatar, { backgroundColor: colors.primary[100] }]}>
+                <Ionicons name="person" size={40} color={colors.primary[600]} />
+              </View>
+              <View style={styles.levelBadge}>
+                <Text style={[styles.levelText, { color: colors.text.inverse }]}>
+                  Lvl {user.level || 1}
+                </Text>
+              </View>
+            </View>
+
+            {/* Right side - Full Stats with Progress Bars */}
+            <View style={styles.fullStats}>
+              {/* Health */}
+              <View style={styles.statRow}>
+                <View style={styles.statIcon}>
+                  <Ionicons name="heart" size={16} color="#EF4444" />
+                </View>
+                <View style={styles.statContent}>
+                  <View style={styles.statHeader}>
+                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Zdrowie</Text>
+                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                      {user.health || 50} / 100
+                    </Text>
+                  </View>
+                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
+                    <View 
+                      style={[
+                        styles.progressBar, 
+                        { 
+                          width: `${((user.health || 50) / 100) * 100}%`,
+                          backgroundColor: '#EF4444'
+                        }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* Experience */}
+              <View style={styles.statRow}>
+                <View style={styles.statIcon}>
+                  <Ionicons name="star" size={16} color="#F59E0B" />
+                </View>
+                <View style={styles.statContent}>
+                  <View style={styles.statHeader}>
+                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Doświadczenie</Text>
+                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                      {user.experience_points || 2500} / 5000
+                    </Text>
+                  </View>
+                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
+                    <View 
+                      style={[
+                        styles.progressBar, 
+                        { 
+                          width: `${((user.experience_points || 2500) / 5000) * 100}%`,
+                          backgroundColor: '#F59E0B'
+                        }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* Power */}
+              <View style={styles.statRow}>
+                <View style={styles.statIcon}>
+                  <Ionicons name="flash" size={16} color="#3B82F6" />
+                </View>
+                <View style={styles.statContent}>
+                  <View style={styles.statHeader}>
+                    <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Moc</Text>
+                    <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                      {user.power || 250} / 500
+                    </Text>
+                  </View>
+                  <View style={[styles.progressBarContainer, { backgroundColor: colors.background.primary }]}>
+                    <View 
+                      style={[
+                        styles.progressBar, 
+                        { 
+                          width: `${((user.power || 250) / 500) * 100}%`,
+                          backgroundColor: '#3B82F6'
+                        }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              </View>
+
+              {/* Bottom Row - Level, Gold, Premium Currency */}
+              <View style={styles.bottomStats}>
+                <View style={styles.currencyItem}>
+                  <Ionicons name="trophy" size={16} color={colors.primary[600]} />
+                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
+                    Poziom {user.level || 1} Mag
+                  </Text>
+                </View>
+                <View style={styles.currencyItem}>
+                  <Ionicons name="logo-bitcoin" size={16} color="#F59E0B" />
+                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
+                    {user.gold || 0}
+                  </Text>
+                </View>
+                <View style={styles.currencyItem}>
+                  <Ionicons name="gift" size={16} color="#10B981" />
+                  <Text style={[styles.currencyValue, { color: colors.text.primary }]}>
+                    {user.premium_currency || 100}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+      )}
+
+      {/* Scrollable Habits List */}
+      <ScrollView
+        style={styles.habitsScrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         {habits.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
             <Ionicons name="checkmark-circle-outline" size={48} color={colors.text.muted} />
@@ -130,75 +287,31 @@ export default function HomeScreen() {
             </Text>
             <TouchableOpacity
               style={[styles.createButton, { backgroundColor: colors.primary[600] }]}
-              onPress={() => router.push('/habits/create')}
+              onPress={() => console.log('Create habit pressed')}
             >
               <Text style={[styles.createButtonText, { color: colors.text.inverse }]}>Create Habit</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.habitsList}>
-            {habits.slice(0, 3).map((habit) => (
-              <TouchableOpacity
+            {habits.map((habit) => (
+              <HabitCard
                 key={habit.id}
-                style={[styles.habitCard, { backgroundColor: colors.background.card }]}
-                onPress={() => router.push(`/habits/${habit.id}`)}
-              >
-                <View style={styles.habitInfo}>
-                  <View style={[styles.habitIcon, { backgroundColor: habit.color }]}>
-                    <Ionicons name="star" size={20} color="#FFFFFF" />
-                  </View>
-                  <View style={styles.habitDetails}>
-                    <Text style={[styles.habitName, { color: colors.text.primary }]}>{habit.name}</Text>
-                    <Text style={[styles.habitStreak, { color: colors.text.secondary }]}>
-                      {habit.current_streak} day streak
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.habitStatus}>
-                  {habit.isCompletedToday ? (
-                    <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                  ) : (
-                    <Ionicons name="ellipse-outline" size={24} color={colors.text.muted} />
-                  )}
-                </View>
-              </TouchableOpacity>
+                habit={habit}
+                onComplete={() => {
+                  // Handle habit completion
+                  console.log('Complete habit:', habit.id);
+                }}
+                onSkip={() => {
+                  // Handle habit skip
+                  console.log('Skip habit:', habit.id);
+                }}
+              />
             ))}
           </View>
         )}
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Quick Actions</Text>
-        </View>
-        
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
-            onPress={() => router.push('/pets')}
-          >
-            <Ionicons name="paw" size={24} color={colors.primary[600]} />
-            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Feed Pet</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
-            onPress={() => router.push('/battles')}
-          >
-            <Ionicons name="flash" size={24} color={colors.primary[600]} />
-            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Battle</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.background.card }]}
-            onPress={() => router.push('/achievements')}
-          >
-            <Ionicons name="trophy" size={24} color={colors.primary[600]} />
-            <Text style={[styles.actionButtonText, { color: colors.primary[600] }]}>Achievements</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -206,76 +319,135 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    padding: 24,
-    paddingTop: 16,
-  },
-  headerTop: {
+  // Top Navigation Bar - Fixed at top
+  topNavigationBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  subtitle: {
-    fontSize: 16,
-  },
-  logoutButton: {
+  menuButton: {
     padding: 8,
-    borderRadius: 8,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    marginBottom: 32,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-  statLabel: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
-  sectionTitle: {
+  appTitle: {
     fontSize: 20,
     fontWeight: 'bold',
   },
-  seeAllText: {
-    fontSize: 16,
+  topBarActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    padding: 8,
+  },
+  // User Stats Panel - Full version with progress bars
+  userStatsPanel: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  userStatsContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 20,
+  },
+  avatarContainer: {
+    marginRight: 16,
+    position: 'relative',
+  },
+  avatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  levelBadge: {
+    position: 'absolute',
+    bottom: -5,
+    right: -5,
+    backgroundColor: '#7C3AED',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  levelText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  fullStats: {
+    flex: 1,
+  },
+  statRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statIcon: {
+    width: 24,
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  statContent: {
+    flex: 1,
+  },
+  statHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  statValue: {
+    fontSize: 12,
     fontWeight: '600',
+  },
+  progressBarContainer: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  bottomStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  currencyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  currencyValue: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  // Scrollable Habits List
+  habitsScrollView: {
+    flex: 1,
   },
   emptyState: {
     alignItems: 'center',
     padding: 32,
-    marginHorizontal: 24,
+    marginHorizontal: 16,
+    marginTop: 32,
     borderRadius: 16,
   },
   emptyStateTitle: {
@@ -299,67 +471,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   habitsList: {
-    paddingHorizontal: 24,
-  },
-  habitCard: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  habitInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  habitIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  habitDetails: {
-    flex: 1,
-  },
-  habitName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  habitStreak: {
-    fontSize: 14,
-  },
-  habitStatus: {
-    marginLeft: 12,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  actionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 8,
+    paddingBottom: 60, // Space for bottom tab bar (reduced from 100 to 60)
   },
 });

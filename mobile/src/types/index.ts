@@ -15,6 +15,11 @@ export interface User {
   timezone: string;
   created_at: string;
   updated_at: string;
+  // Additional fields for the new UI
+  health?: number;
+  power?: number;
+  gold?: number;
+  class?: string;
 }
 
 // Pet types
@@ -188,6 +193,39 @@ export interface UserAchievement {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
+}
+
+// Auth types
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  username: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  timezone?: string;
+  pet_name?: string;
+  pet_species?: PetSpecies;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+export interface HabitsResponse {
+  habits: Habit[] | PaginatedResponse<Habit>;
+}
+
+export interface HabitResponse {
+  habit: Habit;
+}
+
+export interface HabitStatsResponse {
+  stats: HabitStats;
 }
 
 // API Response types

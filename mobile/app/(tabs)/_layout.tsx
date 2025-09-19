@@ -33,15 +33,6 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="habits"
-          options={{
             title: 'Habits',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="checkmark-circle" size={size} color={color} />
@@ -49,7 +40,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="pets"
+          name="habits"
           options={{
             title: 'Pets',
             tabBarIcon: ({ color, size }) => (
@@ -58,11 +49,20 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="battles"
+          name="pets"
           options={{
             title: 'Battles',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="flash" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="battles"
+          options={{
+            title: 'Guilds',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="people" size={size} color={color} />
             ),
           }}
         />
@@ -82,15 +82,19 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary[600],
-        tabBarInactiveTintColor: colors.text.muted,
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)',
         tabBarStyle: {
-          backgroundColor: colors.background.card,
-          borderTopWidth: 1,
-          borderTopColor: colors.border.primary,
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
+          backgroundColor: colors.primary[600],
+          borderTopWidth: 0,
+          paddingBottom: 4,
+          paddingTop: 4,
+          height: 50,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         headerStyle: {
           backgroundColor: colors.primary[600],
@@ -104,23 +108,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="habits"
-        options={{
           title: 'Habits',
+          headerShown: false, // Ukryj header dla głównego ekranu
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-circle" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="pets"
+        name="habits"
         options={{
           title: 'Pets',
           tabBarIcon: ({ color, size }) => (
@@ -129,11 +125,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="battles"
+        name="pets"
         options={{
           title: 'Battles',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flash" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="battles"
+        options={{
+          title: 'Guilds',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
           ),
         }}
       />

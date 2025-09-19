@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { User, LoginCredentials, RegisterData } from '@/types';
+import { REHYDRATE } from 'redux-persist';
+import { User, LoginCredentials, RegisterData, AuthResponse } from '@/types';
 import { authApi, setAuthToken } from '@/services/api';
 
 interface AuthState {
@@ -19,24 +20,24 @@ const initialState: AuthState = {
 };
 
 // Async thunks
-export const login = createAsyncThunk(
+export const login = createAsyncThunk<AuthResponse, LoginCredentials>(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       const response = await authApi.login(credentials);
-      return response.data;
+      return response.data as AuthResponse;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
   }
 );
 
-export const register = createAsyncThunk(
+export const register = createAsyncThunk<AuthResponse, RegisterData>(
   'auth/register',
   async (userData: RegisterData, { rejectWithValue }) => {
     try {
       const response = await authApi.register(userData);
-      return response.data;
+      return response.data as AuthResponse;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
@@ -55,12 +56,12 @@ export const logout = createAsyncThunk(
   }
 );
 
-export const getMe = createAsyncThunk(
+export const getMe = createAsyncThunk<{ user: User }, void>(
   'auth/getMe',
   async (_, { rejectWithValue }) => {
     try {
       const response = await authApi.getMe();
-      return response.data;
+      return response.data as { user: User };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get user data');
     }
@@ -89,6 +90,15 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Rehydrate from storage
+      .addCase(REHYDRATE, (state, action: any) => {
+        if (action.payload?.auth?.token) {
+          state.token = action.payload.auth.token;
+          state.user = action.payload.auth.user;
+          state.isAuthenticated = action.payload.auth.isAuthenticated;
+          setAuthToken(action.payload.auth.token);
+        }
+      })
       // Login
       .addCase(login.pending, (state) => {
         state.isLoading = true;

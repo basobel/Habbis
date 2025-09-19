@@ -1,6 +1,5 @@
-# Habbis - Stop Script (Development Mode)
-# Zatrzymuje backend (Docker)
-# Dla trybu production użyj: .\stop-prod.ps1
+# Habbis - Stop Development Mode
+# Zatrzymuje tylko backend (Docker)
 
 Write-Host "Zatrzymywanie Habbis Development..." -ForegroundColor Red
 Write-Host "===================================" -ForegroundColor Red
@@ -14,27 +13,15 @@ try {
     Write-Host "Blad podczas zatrzymywania backendu!" -ForegroundColor Red
 }
 
-# Expo działa w osobnym oknie terminala
-Write-Host "Expo dziala w osobnym oknie terminala" -ForegroundColor Yellow
+# Expo działa lokalnie - poinformuj użytkownika
+Write-Host "Expo dziala lokalnie w osobnym oknie terminala" -ForegroundColor Yellow
 Write-Host "Aby zatrzymac Expo, zamknij okno terminala z Expo" -ForegroundColor Cyan
-
-# Sprawdź czy porty są wolne
-Write-Host "Sprawdzanie portow..." -ForegroundColor Yellow
-$ports = @(8000, 19006, 19000, 5432, 6379)
-foreach ($port in $ports) {
-    $process = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
-    if ($process) {
-        Write-Host "Port $port jest nadal zajety" -ForegroundColor Yellow
-    } else {
-        Write-Host "Port $port jest wolny" -ForegroundColor Green
-    }
-}
 
 Write-Host ""
 Write-Host "Development zatrzymany!" -ForegroundColor Green
 Write-Host "======================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Aby uruchomic ponownie:" -ForegroundColor Cyan
-Write-Host "   Development: .\start.ps1" -ForegroundColor White
+Write-Host "   Development: .\start-dev.ps1" -ForegroundColor White
 Write-Host "   Production: .\start-prod.ps1" -ForegroundColor White
 Write-Host ""
