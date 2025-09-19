@@ -40,7 +40,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="habits"
+          name="pets"
           options={{
             title: 'Pets',
             tabBarIcon: ({ color, size }) => (
@@ -49,18 +49,18 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="pets"
+          name="battle"
           options={{
-            title: 'Battles',
+            title: 'Battle',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="flash" size={size} color={color} />
             ),
           }}
         />
         <Tabs.Screen
-          name="battles"
+          name="guild"
           options={{
-            title: 'Guilds',
+            title: 'Guild',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="people" size={size} color={color} />
             ),
@@ -113,7 +113,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="habits"
+        name="pets"
         options={{
           title: 'Pets',
           tabBarIcon: ({ color, size }) => (
@@ -122,18 +122,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="pets"
+        name="battle"
         options={{
-          title: 'Battles',
+          title: 'Battle',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flash" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="battles"
+        name="guild"
         options={{
-          title: 'Guilds',
+          title: 'Guild',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),

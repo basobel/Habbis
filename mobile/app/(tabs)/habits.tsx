@@ -116,16 +116,6 @@ export default function PetsScreen() {
     },
   ]);
 
-  if (!isLoaded || !colors || !colors.primary || !colors.primary[500]) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading pets...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // Simulate API call
@@ -200,9 +190,19 @@ export default function PetsScreen() {
   };
 
   const getFilterColor = (filter: string) => {
-    if (selectedFilter === filter) return colors.primary[600];
-    return colors.text.secondary;
+    if (selectedFilter === filter) return colors?.primary?.[600] || '#6D28D9';
+    return colors?.text?.secondary || '#6B7280';
   };
+
+  if (!isLoaded || !colors || !colors.primary || !colors.primary[500]) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading pets...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
