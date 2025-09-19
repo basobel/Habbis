@@ -11,8 +11,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import PetCard from '@/components/PetCard';
 import PetDetailsModal from '@/components/PetDetailsModal';
+import SharedHeader from '@/components/SharedHeader';
+import HamburgerMenu from '@/components/HamburgerMenu';
 
 interface Pet {
   id: string;
@@ -35,10 +38,12 @@ interface Pet {
 
 export default function PetsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'common' | 'rare' | 'epic' | 'legendary'>('all');
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   // Mock data - w przyszłości będzie z Redux store
   const [pets, setPets] = useState<Pet[]>([
@@ -194,6 +199,7 @@ export default function PetsScreen() {
     return colors?.text?.secondary || '#6B7280';
   };
 
+
   if (!isLoaded || !colors || !colors.primary || !colors.primary[500]) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
@@ -207,22 +213,21 @@ export default function PetsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={[styles.title, { color: colors.text.primary }]}>Moje Zwierzęta</Text>
-            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-              {pets.length} zwierząt • {pets.filter(p => p.isActive).length} aktywnych
-            </Text>
-          </View>
-          <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary[600] }]}>
-            <Ionicons name="add" size={24} color={colors.text.inverse} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <SharedHeader
+        title="Moje Zwierzęta"
+        subtitle={`${pets.length} zwierząt • ${pets.filter(p => p.isActive).length} aktywnych`}
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        rightAction={{
+          icon: 'add',
+          onPress: () => {
+            // TODO: Implement add pet
+            console.log('Add pet');
+          }
+        }}
+      />
 
       {/* Filter Tabs */}
-      <View style={[styles.filterContainer, { backgroundColor: colors.background.card }]}>
+      <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {[
             { key: 'all', label: 'Wszystkie' },
@@ -237,8 +242,8 @@ export default function PetsScreen() {
               style={[
                 styles.filterButton,
                 {
-                  backgroundColor: selectedFilter === filter.key ? colors.primary[100] : 'transparent',
-                  borderColor: selectedFilter === filter.key ? colors.primary[500] : colors.border.primary,
+                  backgroundColor: selectedFilter === filter.key ? colors.primary?.[100] || '#EDE9FE' : 'transparent',
+                  borderColor: selectedFilter === filter.key ? colors.primary?.[500] || '#7C3AED' : colors.border?.primary || '#C4B5FD',
                 }
               ]}
               onPress={() => setSelectedFilter(filter.key as any)}
@@ -306,6 +311,13 @@ export default function PetsScreen() {
         onPlay={handlePlayWithPet}
         onEquip={handleEquipPet}
       />
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
@@ -322,36 +334,9 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    marginTop: 2,
-  },
-  addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   filterContainer: {
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    marginTop: 8,
   },
   filterScroll: {
     paddingHorizontal: 16,

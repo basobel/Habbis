@@ -43,6 +43,7 @@ export default function TabLayout() {
           name="pets"
           options={{
             title: 'Pets',
+            headerShown: false, // Ukryj header - używamy SharedHeader
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="paw" size={size} color={color} />
             ),
@@ -52,6 +53,7 @@ export default function TabLayout() {
           name="battle"
           options={{
             title: 'Battle',
+            headerShown: false, // Ukryj header - używamy SharedHeader
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="flash" size={size} color={color} />
             ),
@@ -61,6 +63,7 @@ export default function TabLayout() {
           name="guild"
           options={{
             title: 'Guild',
+            headerShown: false, // Ukryj header - używamy SharedHeader
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="people" size={size} color={color} />
             ),
@@ -116,6 +119,7 @@ export default function TabLayout() {
         name="pets"
         options={{
           title: 'Pets',
+          headerShown: false, // Ukryj header - używamy SharedHeader
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="paw" size={size} color={color} />
           ),
@@ -125,6 +129,7 @@ export default function TabLayout() {
         name="battle"
         options={{
           title: 'Battle',
+          headerShown: false, // Ukryj header - używamy SharedHeader
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flash" size={size} color={color} />
           ),
@@ -134,6 +139,7 @@ export default function TabLayout() {
         name="guild"
         options={{
           title: 'Guild',
+          headerShown: false, // Ukryj header - używamy SharedHeader
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),

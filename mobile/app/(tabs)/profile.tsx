@@ -15,14 +15,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState } from '@/types';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import HabitCard from '@/components/HabitCard';
 import HamburgerMenu from '@/components/HamburgerMenu';
+import SharedHeader from '@/components/SharedHeader';
 
 export default function ProfileScreen() {
   const dispatch = useDispatch();
   const { user, isLoading } = useSelector((state: RootState) => state.auth);
   const { habits, stats } = useSelector((state: RootState) => state.habits);
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
@@ -39,25 +42,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleNavigate = (screen: string) => {
-    switch (screen) {
-      case 'profile':
-        router.push('/(tabs)/profile');
-        break;
-      case 'settings':
-        router.push('/settings');
-        break;
-      case 'premium':
-        router.push('/premium');
-        break;
-      case 'achievements':
-        router.push('/achievements');
-        break;
-      case 'logout':
-        handleLogout();
-        break;
-    }
-  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -101,30 +85,11 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header with Hamburger Menu */}
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <TouchableOpacity
-          style={styles.hamburgerButton}
-          onPress={() => setIsHamburgerMenuVisible(true)}
-        >
-          <Ionicons name="menu" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
-        <Animated.View
-          style={[
-            styles.headerContent,
-            {
-              opacity: headerOpacity,
-              transform: [{ translateY: headerTranslateY }],
-            },
-          ]}
-        >
-          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-            Witaj, {user?.username || 'Użytkowniku'}!
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
-            Kontynuuj swoją podróż z nawykami
-          </Text>
-        </Animated.View>
-      </View>
+      <SharedHeader
+        title={`Witaj, ${user?.username || 'Użytkowniku'}!`}
+        subtitle="Kontynuuj swoją podróż z nawykami"
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -291,28 +256,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  hamburgerButton: {
-    padding: 8,
-    marginBottom: 8,
-  },
-  headerContent: {
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    textAlign: 'center',
   },
   scrollView: {
     flex: 1,

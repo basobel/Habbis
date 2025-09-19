@@ -8,10 +8,11 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import HamburgerMenu from '@/components/HamburgerMenu';
+import SharedHeader from '@/components/SharedHeader';
 
 interface Habit {
   id: string;
@@ -26,6 +27,7 @@ interface Habit {
 
 export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
@@ -109,25 +111,6 @@ export default function HabitsScreen() {
     }
   };
 
-  const handleNavigate = (screen: string) => {
-    switch (screen) {
-      case 'profile':
-        router.push('/(tabs)/profile');
-        break;
-      case 'settings':
-        router.push('/settings');
-        break;
-      case 'premium':
-        router.push('/premium');
-        break;
-      case 'achievements':
-        router.push('/achievements');
-        break;
-      case 'logout':
-        // Handle logout
-        break;
-    }
-  };
 
   if (!isLoaded || !colors) {
     return (
@@ -142,25 +125,18 @@ export default function HabitsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <TouchableOpacity
-          style={styles.hamburgerButton}
-          onPress={() => setIsHamburgerMenuVisible(true)}
-        >
-          <Ionicons name="menu" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <View>
-            <Text style={[styles.title, { color: colors.text.primary }]}>Moje Nawyk</Text>
-            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-              {habits.length} nawyków • {habits.filter(h => h.completed).length} ukończonych dziś
-            </Text>
-          </View>
-          <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary[600] }]}>
-            <Ionicons name="add" size={24} color={colors.text.inverse} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <SharedHeader
+        title="Moje Nawyk"
+        subtitle={`${habits.length} nawyków • ${habits.filter(h => h.completed).length} ukończonych dziś`}
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        rightAction={{
+          icon: 'add',
+          onPress: () => {
+            // TODO: Implement add habit
+            console.log('Add habit');
+          }
+        }}
+      />
 
       {/* Habits List */}
       <ScrollView
@@ -287,36 +263,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  hamburgerButton: {
-    padding: 8,
-    marginBottom: 8,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    marginTop: 2,
-  },
-  addButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   content: {
     flex: 1,

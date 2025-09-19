@@ -10,8 +10,11 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeContext } from '../../src/contexts/ThemeContext';
 import { router } from 'expo-router';
+import { useThemeContext } from '../../src/contexts/ThemeContext';
+import { useNavigation } from '@/hooks/useNavigation';
+import SharedHeader from '@/components/SharedHeader';
+import HamburgerMenu from '@/components/HamburgerMenu';
 
 const { width } = Dimensions.get('window');
 
@@ -29,8 +32,10 @@ interface BattleMode {
 
 export default function BattleScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   // Fallback colors
   const primaryColor = colors?.primary?.[500] || '#7C3AED';
@@ -114,6 +119,7 @@ export default function BattleScreen() {
     router.push('/battle/fight');
   };
 
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return success500;
@@ -152,14 +158,11 @@ export default function BattleScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: textPrimary }]}>
-            🗡️ System Walki
-          </Text>
-          <Text style={[styles.subtitle, { color: textSecondary }]}>
-            Wybierz tryb walki i rozpocznij przygodę
-          </Text>
-        </View>
+        <SharedHeader
+          title="🗡️ System Walki"
+          subtitle="Wybierz tryb walki i rozpocznij przygodę"
+          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        />
 
         {/* Battle Modes Grid */}
         <View style={styles.modesGrid}>
@@ -286,6 +289,13 @@ export default function BattleScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
@@ -305,19 +315,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  header: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 22,
   },
   modesGrid: {
     padding: 20,
