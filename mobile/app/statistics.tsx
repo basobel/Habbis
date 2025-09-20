@@ -23,9 +23,10 @@ export default function StatisticsScreen() {
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: '#4C1D95' }]}>Statystyki</Text>
-        </View>
+        <SharedHeader
+          title="Statystyki"
+          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        />
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
@@ -76,12 +77,11 @@ export default function StatisticsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <Text style={[styles.title, { color: colors.text.primary }]}>Statystyki</Text>
-        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-          Śledź swoje postępy
-        </Text>
-      </View>
+      <SharedHeader
+        title="Statystyki"
+        subtitle="Śledź swoje postępy"
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+      />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Quick Stats */}
@@ -220,6 +220,13 @@ export default function StatisticsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
@@ -227,20 +234,6 @@ export default function StatisticsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 14,
-    marginTop: 4,
   },
   loadingContainer: {
     flex: 1,

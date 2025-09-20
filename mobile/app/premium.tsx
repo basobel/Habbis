@@ -24,9 +24,10 @@ export default function PremiumScreen() {
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: '#4C1D95' }]}>Premium</Text>
-        </View>
+        <SharedHeader
+          title="Premium"
+          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+        />
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
@@ -97,9 +98,10 @@ export default function PremiumScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <View style={[styles.header, { backgroundColor: colors.background.card }]}>
-        <Text style={[styles.title, { color: colors.text.primary }]}>Premium</Text>
-      </View>
+      <SharedHeader
+        title="Premium"
+        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
+      />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
@@ -212,6 +214,13 @@ export default function PremiumScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Hamburger Menu */}
+      <HamburgerMenu
+        isVisible={isHamburgerMenuVisible}
+        onClose={() => setIsHamburgerMenuVisible(false)}
+        onNavigate={handleNavigate}
+      />
     </SafeAreaView>
   );
 }
@@ -219,16 +228,6 @@ export default function PremiumScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
