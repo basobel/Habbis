@@ -1,60 +1,110 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface SecurityInfoProps {
   type: 'password' | 'email' | 'account';
+  variant?: 'tips' | 'requirements' | 'strength' | 'info';
 }
 
-export default function SecurityInfo({ type }: SecurityInfoProps) {
-  const getInfo = () => {
-    switch (type) {
-      case 'password':
-        return {
-          title: 'Password Security Tips',
-          tips: [
-            'Use at least 8 characters',
-            'Include uppercase and lowercase letters',
-            'Add numbers and special characters',
-            'Avoid common words or personal info',
-            'Don\'t reuse passwords from other accounts',
-          ],
-        };
-      case 'email':
-        return {
-          title: 'Email Security Tips',
-          tips: [
-            'Use a valid email address you can access',
-            'Check your spam folder for verification emails',
-            'Keep your email account secure',
-            'Don\'t share verification links with others',
-            'Contact support if you don\'t receive emails',
-          ],
-        };
-      case 'account':
-        return {
-          title: 'Account Security Tips',
-          tips: [
-            'Choose a unique username',
-            'Keep your login credentials private',
-            'Log out from shared devices',
-            'Report suspicious activity immediately',
-            'Enable two-factor authentication when available',
-          ],
-        };
-      default:
-        return { title: '', tips: [] };
-    }
-  };
+interface SecurityTip {
+  icon: string;
+  text: string;
+}
 
-  const { title, tips } = getInfo();
+const securityContent: Record<string, Record<string, SecurityTip[]>> = {
+  password: {
+    tips: [
+      { icon: '🔒', text: 'Use at least 8 characters' },
+      { icon: '🔤', text: 'Include uppercase and lowercase letters' },
+      { icon: '🔢', text: 'Add numbers and special characters' },
+      { icon: '🚫', text: 'Avoid common words or personal info' },
+      { icon: '🔄', text: 'Don\'t reuse passwords from other accounts' },
+    ],
+    requirements: [
+      { icon: '🔒', text: 'Use a unique password for each account' },
+      { icon: '🔤', text: 'Include a mix of letters, numbers, and symbols' },
+      { icon: '🚫', text: 'Avoid personal information like names or birthdays' },
+      { icon: '🔄', text: 'Change your password regularly' },
+      { icon: '💾', text: 'Use a password manager to store passwords securely' },
+    ],
+    info: [
+      { icon: '🔒', text: 'Use a unique password for each account' },
+      { icon: '🔤', text: 'Include a mix of letters, numbers, and symbols' },
+      { icon: '🚫', text: 'Avoid personal information like names or birthdays' },
+      { icon: '🔄', text: 'Change your password regularly' },
+      { icon: '💾', text: 'Use a password manager to store passwords securely' },
+    ],
+  },
+  email: {
+    info: [
+      { icon: '📧', text: 'Use a professional email address' },
+      { icon: '🔐', text: 'Enable two-factor authentication' },
+      { icon: '🛡️', text: 'Keep your email account secure' },
+      { icon: '📱', text: 'Use a secure email provider' },
+    ],
+  },
+  account: {
+    info: [
+      { icon: '🔐', text: 'Enable two-factor authentication' },
+      { icon: '🔒', text: 'Use strong, unique passwords' },
+      { icon: '📱', text: 'Keep your device secure' },
+      { icon: '🛡️', text: 'Regularly review account settings' },
+    ],
+  },
+};
+
+const getTitle = (type: string, variant: string): string => {
+  const titles: Record<string, Record<string, string>> = {
+    password: {
+      tips: 'Password Security Tips',
+      requirements: 'Password Requirements',
+      info: 'Password Security',
+      strength: 'Password Strength',
+    },
+    email: {
+      info: 'Email Security',
+    },
+    account: {
+      info: 'Account Security',
+    },
+  };
+  return titles[type]?.[variant] || 'Security Information';
+};
+
+export default function SecurityInfo({ type, variant = 'info' }: SecurityInfoProps) {
+  const { colors, isLoaded } = useThemeContext();
+
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+        <Text style={[styles.title, { color: '#4C1D95' }]}>
+          {getTitle(type, variant)}
+        </Text>
+        <Text style={[styles.loadingText, { color: '#64748B' }]}>Loading security information...</Text>
+      </View>
+    );
+  }
+
+  const tips = securityContent[type]?.[variant] || [];
+  const title = getTitle(type, variant);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={[styles.container, { 
+      backgroundColor: colors.background.secondary, 
+      borderColor: colors.border.secondary 
+    }]}>
+      <Text style={[styles.title, { color: colors.text.primary }]}>
+        {title}
+      </Text>
+      
       {tips.map((tip, index) => (
-        <Text key={index} style={styles.tip}>
-          • {tip}
-        </Text>
+        <View key={index} style={styles.tip}>
+          <Text style={styles.tipIcon}>{tip.icon}</Text>
+          <Text style={[styles.tipText, { color: colors.text.secondary }]}>
+            {tip.text}
+          </Text>
+        </View>
       ))}
     </View>
   );
@@ -62,23 +112,33 @@ export default function SecurityInfo({ type }: SecurityInfoProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 8,
     padding: 16,
-    marginTop: 16,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontStyle: 'italic',
   },
   tip: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 4,
-    lineHeight: 16,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  tipIcon: {
+    fontSize: 16,
+    marginRight: 8,
+    marginTop: 2,
+  },
+  tipText: {
+    fontSize: 14,
+    flex: 1,
+    lineHeight: 20,
   },
 });

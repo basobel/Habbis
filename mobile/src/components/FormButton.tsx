@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, TouchableOpacityProps } from 'react-native';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useThemeFallback } from '@/hooks/useThemeFallback';
 
 interface FormButtonProps extends TouchableOpacityProps {
   title: string;
@@ -8,6 +8,25 @@ interface FormButtonProps extends TouchableOpacityProps {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'small' | 'medium' | 'large';
 }
+
+const buttonVariants = {
+  primary: {
+    backgroundColor: (getPrimaryColor: () => string) => getPrimaryColor(),
+    textColor: (getTextColor: (variant: string) => string) => getTextColor('inverse'),
+    borderWidth: 0,
+  },
+  secondary: {
+    backgroundColor: () => 'transparent',
+    textColor: (getPrimaryColor: () => string) => getPrimaryColor(),
+    borderWidth: 1,
+    borderColor: (getPrimaryColor: () => string) => getPrimaryColor(),
+  },
+  danger: {
+    backgroundColor: (getErrorColor: () => string) => getErrorColor(),
+    textColor: (getTextColor: (variant: string) => string) => getTextColor('inverse'),
+    borderWidth: 0,
+  },
+};
 
 export default function FormButton({ 
   title, 
@@ -18,104 +37,44 @@ export default function FormButton({
   disabled,
   ...props 
 }: FormButtonProps) {
-  const { colors, isLoaded } = useThemeContext();
+  const { 
+    getPrimaryColor, 
+    getTextColor, 
+    getErrorColor,
+    getBackgroundColor,
+    isLoaded 
+  } = useThemeFallback();
 
-  // Fallback colors if theme not loaded
-  const fallbackColors = {
-    primary: '#7C3AED',
-    textInverse: '#FFFFFF',
-    textSecondary: '#64748B',
-    error: '#EF4444',
-  };
-
-  const getButtonStyle = () => {
-    const baseStyle = [styles.button, styles[size]];
-    
-    if (!isLoaded || !colors) {
-      // Fallback styles
-      switch (variant) {
-        case 'primary':
-          return [...baseStyle, { backgroundColor: fallbackColors.primary }];
-        case 'secondary':
-          return [...baseStyle, { 
-            backgroundColor: 'transparent', 
-            borderWidth: 1, 
-            borderColor: fallbackColors.primary 
-          }];
-        case 'danger':
-          return [...baseStyle, { backgroundColor: fallbackColors.error }];
-        default:
-          return [...baseStyle, { backgroundColor: fallbackColors.primary }];
-      }
-    }
-
-    // Theme-based styles
-    switch (variant) {
-      case 'primary':
-        return [...baseStyle, { backgroundColor: colors?.primary?.[600] || fallbackColors.primary }];
-      case 'secondary':
-        return [...baseStyle, { 
-          backgroundColor: 'transparent', 
-          borderWidth: 1, 
-          borderColor: colors?.primary?.[600] || fallbackColors.primary 
-        }];
-      case 'danger':
-        return [...baseStyle, { backgroundColor: colors?.error?.[500] || fallbackColors.error }];
-      default:
-        return [...baseStyle, { backgroundColor: colors?.primary?.[600] || fallbackColors.primary }];
-    }
-  };
-
-  const getTextStyle = () => {
-    const baseStyle = [styles.text];
-    
-    if (!isLoaded || !colors) {
-      // Fallback styles
-      switch (variant) {
-        case 'primary':
-        case 'danger':
-          return [...baseStyle, { color: fallbackColors.textInverse }];
-        case 'secondary':
-          return [...baseStyle, { color: fallbackColors.primary }];
-        default:
-          return [...baseStyle, { color: fallbackColors.textInverse }];
-      }
-    }
-
-    // Theme-based styles
-    switch (variant) {
-      case 'primary':
-      case 'danger':
-        return [...baseStyle, { color: colors?.text?.inverse || fallbackColors.textInverse }];
-      case 'secondary':
-        return [...baseStyle, { color: colors?.primary?.[600] || fallbackColors.primary }];
-      default:
-        return [...baseStyle, { color: colors?.text?.inverse || fallbackColors.textInverse }];
-    }
-  };
-
-  const getIndicatorColor = () => {
-    if (!isLoaded || !colors) {
-      return variant === 'primary' ? fallbackColors.textInverse : fallbackColors.primary;
-    }
-    return variant === 'primary' ? colors?.text?.inverse || fallbackColors.textInverse : colors?.primary?.[600] || fallbackColors.primary;
-  };
-
+  const variantConfig = buttonVariants[variant];
+  
   const buttonStyle = [
-    ...getButtonStyle(),
+    styles.button,
+    styles[size],
+    {
+      backgroundColor: variantConfig.backgroundColor(getPrimaryColor),
+      borderWidth: variantConfig.borderWidth,
+      ...(variantConfig.borderWidth > 0 && {
+        borderColor: variantConfig.borderColor?.(getPrimaryColor),
+      }),
+    },
     (disabled || loading) && { 
-      backgroundColor: colors?.secondary?.[400] || fallbackColors.textSecondary,
-      borderColor: colors?.secondary?.[400] || fallbackColors.textSecondary,
+      backgroundColor: getBackgroundColor('secondary'),
+      borderColor: getBackgroundColor('secondary'),
     },
     style,
   ];
 
   const textStyle = [
-    ...getTextStyle(),
+    styles.text,
+    {
+      color: variantConfig.textColor(getTextColor),
+    },
     (disabled || loading) && { 
-      color: colors?.text?.inverse || fallbackColors.textInverse 
+      color: getTextColor('inverse'),
     },
   ];
+
+  const indicatorColor = variant === 'secondary' ? getPrimaryColor() : getTextColor('inverse');
 
   return (
     <TouchableOpacity
@@ -125,7 +84,7 @@ export default function FormButton({
     >
       {loading ? (
         <ActivityIndicator 
-          color={getIndicatorColor()} 
+          color={indicatorColor} 
           size="small" 
         />
       ) : (

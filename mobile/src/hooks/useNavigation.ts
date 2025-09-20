@@ -36,7 +36,8 @@ export const useNavigation = () => {
         dispatch(logout() as any);
         break;
       default:
-        console.warn(`Unknown navigation target: ${screen}`);
+        // Unknown navigation target - można dodać logowanie w trybie development
+        break;
     }
   };
 

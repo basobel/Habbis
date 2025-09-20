@@ -11,107 +11,61 @@ interface HabitsState {
   error: string | null;
 }
 
+// Mock data - w rzeczywistej aplikacji będzie pobierane z API
+const mockHabits: Habit[] = [
+  {
+    id: 1,
+    user_id: 1,
+    name: 'Poranny jogging',
+    description: '30 minut biegania każdego ranka',
+    difficulty: 'medium' as const,
+    target_frequency: 5,
+    target_days: [1, 2, 3, 4, 5],
+    reward_config: { xp: 50, gold: 10 },
+    base_xp_reward: 50,
+    streak_bonus_xp: 10,
+    premium_currency_reward: 5,
+    current_streak: 7,
+    longest_streak: 15,
+    total_completions: 45,
+    last_completed_at: '2024-01-15T06:30:00Z',
+    is_active: true,
+    reminders_enabled: true,
+    reminder_times: ['06:00'],
+    color: '#10B981',
+    icon: 'fitness',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T06:30:00Z',
+  },
+  {
+    id: 2,
+    user_id: 1,
+    name: 'Czytanie książek',
+    description: 'Czytanie 20 stron dziennie',
+    difficulty: 'easy' as const,
+    target_frequency: 7,
+    target_days: [0, 1, 2, 3, 4, 5, 6],
+    reward_config: { xp: 30, gold: 5 },
+    base_xp_reward: 30,
+    streak_bonus_xp: 5,
+    premium_currency_reward: 2,
+    current_streak: 12,
+    longest_streak: 25,
+    total_completions: 78,
+    last_completed_at: '2024-01-15T21:00:00Z',
+    is_active: true,
+    reminders_enabled: true,
+    reminder_times: ['21:00'],
+    color: '#3B82F6',
+    icon: 'book',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-15T21:00:00Z',
+  },
+];
+
 const initialState: HabitsState = {
-  habits: [
-    {
-      id: 1,
-      user_id: 1,
-      name: 'Poranny jogging',
-      description: '30 minut biegania każdego ranka',
-      difficulty: 'medium' as const,
-      target_frequency: 5,
-      target_days: [1, 2, 3, 4, 5],
-      reward_config: { xp: 50, gold: 10 },
-      base_xp_reward: 50,
-      streak_bonus_xp: 10,
-      premium_currency_reward: 5,
-      current_streak: 7,
-      longest_streak: 15,
-      total_completions: 45,
-      last_completed_at: '2024-01-15T06:30:00Z',
-      is_active: true,
-      reminders_enabled: true,
-      reminder_times: ['06:00'],
-      color: '#10B981',
-      icon: 'fitness',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T06:30:00Z',
-    },
-    {
-      id: 2,
-      user_id: 1,
-      name: 'Czytanie książek',
-      description: 'Czytanie 20 stron dziennie',
-      difficulty: 'easy' as const,
-      target_frequency: 7,
-      target_days: [0, 1, 2, 3, 4, 5, 6],
-      reward_config: { xp: 30, gold: 5 },
-      base_xp_reward: 30,
-      streak_bonus_xp: 5,
-      premium_currency_reward: 2,
-      current_streak: 12,
-      longest_streak: 25,
-      total_completions: 78,
-      last_completed_at: '2024-01-15T21:00:00Z',
-      is_active: true,
-      reminders_enabled: true,
-      reminder_times: ['21:00'],
-      color: '#3B82F6',
-      icon: 'book',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T21:00:00Z',
-    },
-  ],
-  activeHabits: [
-    {
-      id: 1,
-      user_id: 1,
-      name: 'Poranny jogging',
-      description: '30 minut biegania każdego ranka',
-      difficulty: 'medium' as const,
-      target_frequency: 5,
-      target_days: [1, 2, 3, 4, 5],
-      reward_config: { xp: 50, gold: 10 },
-      base_xp_reward: 50,
-      streak_bonus_xp: 10,
-      premium_currency_reward: 5,
-      current_streak: 7,
-      longest_streak: 15,
-      total_completions: 45,
-      last_completed_at: '2024-01-15T06:30:00Z',
-      is_active: true,
-      reminders_enabled: true,
-      reminder_times: ['06:00'],
-      color: '#10B981',
-      icon: 'fitness',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T06:30:00Z',
-    },
-    {
-      id: 2,
-      user_id: 1,
-      name: 'Czytanie książek',
-      description: 'Czytanie 20 stron dziennie',
-      difficulty: 'easy' as const,
-      target_frequency: 7,
-      target_days: [0, 1, 2, 3, 4, 5, 6],
-      reward_config: { xp: 30, gold: 5 },
-      base_xp_reward: 30,
-      streak_bonus_xp: 5,
-      premium_currency_reward: 2,
-      current_streak: 12,
-      longest_streak: 25,
-      total_completions: 78,
-      last_completed_at: '2024-01-15T21:00:00Z',
-      is_active: true,
-      reminders_enabled: true,
-      reminder_times: ['21:00'],
-      color: '#3B82F6',
-      icon: 'book',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-15T21:00:00Z',
-    },
-  ],
+  habits: mockHabits,
+  activeHabits: [], // Będzie obliczane przez selektory
   selectedHabit: null,
   stats: null,
   isLoading: false,
@@ -250,7 +204,7 @@ const habitsSlice = createSlice({
           ? action.payload.habits 
           : action.payload.habits?.data || [];
         state.habits = habits;
-        state.activeHabits = habits.filter(habit => habit.is_active);
+        // activeHabits będzie obliczane przez selektor
         state.error = null;
       })
       .addCase(fetchHabits.rejected, (state, action) => {
@@ -279,9 +233,7 @@ const habitsSlice = createSlice({
       .addCase(createHabit.fulfilled, (state, action) => {
         state.isLoading = false;
         state.habits.unshift(action.payload.habit);
-        if (action.payload.habit.is_active) {
-          state.activeHabits.unshift(action.payload.habit);
-        }
+        // activeHabits będzie obliczane przez selektor
         state.error = null;
       })
       .addCase(createHabit.rejected, (state, action) => {
@@ -301,10 +253,7 @@ const habitsSlice = createSlice({
           state.habits[index] = updatedHabit;
         }
         
-        const activeIndex = state.activeHabits.findIndex(habit => habit.id === updatedHabit.id);
-        if (activeIndex !== -1) {
-          state.activeHabits[activeIndex] = updatedHabit;
-        }
+        // activeHabits będzie obliczane przez selektor
         
         if (state.selectedHabit?.id === updatedHabit.id) {
           state.selectedHabit = updatedHabit;
@@ -324,7 +273,7 @@ const habitsSlice = createSlice({
         state.isLoading = false;
         const habitId = action.payload;
         state.habits = state.habits.filter(habit => habit.id !== habitId);
-        state.activeHabits = state.activeHabits.filter(habit => habit.id !== habitId);
+        // activeHabits będzie obliczane przez selektor
         if (state.selectedHabit?.id === habitId) {
           state.selectedHabit = null;
         }
@@ -381,3 +330,12 @@ const habitsSlice = createSlice({
 
 export const { clearError, setSelectedHabit, updateHabitInList } = habitsSlice.actions;
 export default habitsSlice.reducer;
+
+// Selektory
+export const selectAllHabits = (state: { habits: HabitsState }) => state.habits.habits;
+export const selectActiveHabits = (state: { habits: HabitsState }) => 
+  state.habits.habits.filter(habit => habit.is_active);
+export const selectSelectedHabit = (state: { habits: HabitsState }) => state.habits.selectedHabit;
+export const selectHabitsStats = (state: { habits: HabitsState }) => state.habits.stats;
+export const selectHabitsLoading = (state: { habits: HabitsState }) => state.habits.isLoading;
+export const selectHabitsError = (state: { habits: HabitsState }) => state.habits.error;

@@ -1,114 +1,110 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface PasswordRequirementsProps {
   password: string;
 }
 
+interface Requirement {
+  text: string;
+  met: boolean;
+}
+
 export default function PasswordRequirements({ password }: PasswordRequirementsProps) {
-  const requirements = [
+  const { colors, isLoaded } = useThemeContext();
+
+  const requirements: Requirement[] = [
     {
       text: 'At least 8 characters',
       met: password.length >= 8,
     },
     {
-      text: 'One lowercase letter',
-      met: /[a-z]/.test(password),
-    },
-    {
-      text: 'One uppercase letter',
+      text: 'Contains uppercase letter',
       met: /[A-Z]/.test(password),
     },
     {
-      text: 'One number',
-      met: /\d/.test(password),
+      text: 'Contains lowercase letter',
+      met: /[a-z]/.test(password),
     },
     {
-      text: 'One special character',
-      met: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      text: 'Contains number',
+      met: /[0-9]/.test(password),
+    },
+    {
+      text: 'Contains special character',
+      met: /[^A-Za-z0-9]/.test(password),
     },
   ];
 
-  const allMet = requirements.every(req => req.met);
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+        <Text style={[styles.title, { color: '#4C1D95' }]}>Password Requirements</Text>
+        {requirements.map((req, index) => (
+          <View key={index} style={styles.requirement}>
+            <Text style={[styles.icon, { color: req.met ? '#10B981' : '#EF4444' }]}>
+              {req.met ? '✓' : '✗'}
+            </Text>
+            <Text style={[styles.text, { 
+              color: req.met ? '#10B981' : '#EF4444' 
+            }]}>
+              {req.text}
+            </Text>
+          </View>
+        ))}
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Password Requirements</Text>
-      
-      {requirements.map((requirement, index) => (
+    <View style={[styles.container, { 
+      backgroundColor: colors.background.secondary, 
+      borderColor: colors.border.secondary 
+    }]}>
+      <Text style={[styles.title, { color: colors.text.primary }]}>Password Requirements</Text>
+      {requirements.map((req, index) => (
         <View key={index} style={styles.requirement}>
-          <Text style={[
-            styles.checkmark,
-            requirement.met ? styles.checkmarkMet : styles.checkmarkUnmet
-          ]}>
-            {requirement.met ? '✓' : '○'}
+          <Text style={[styles.icon, { 
+            color: req.met ? colors.success[500] : colors.error[500] 
+          }]}>
+            {req.met ? '✓' : '✗'}
           </Text>
-          <Text style={[
-            styles.requirementText,
-            requirement.met ? styles.requirementMet : styles.requirementUnmet
-          ]}>
-            {requirement.text}
+          <Text style={[styles.text, { 
+            color: req.met ? colors.success[600] : colors.error[600] 
+          }]}>
+            {req.text}
           </Text>
         </View>
       ))}
-      
-      {allMet && (
-        <Text style={styles.successText}>
-          Great! Your password meets all requirements.
-        </Text>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background.secondary,
     borderWidth: 1,
-    borderColor: Colors.border.secondary,
     borderRadius: 8,
     padding: 16,
-    marginTop: 8,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    color: Colors.text.primary,
     marginBottom: 12,
   },
   requirement: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  checkmark: {
+  icon: {
     fontSize: 16,
     marginRight: 8,
-    width: 20,
+    fontWeight: 'bold',
   },
-  checkmarkMet: {
-    color: Colors.success[500],
-  },
-  checkmarkUnmet: {
-    color: Colors.secondary[400],
-  },
-  requirementText: {
-    fontSize: 12,
+  text: {
+    fontSize: 14,
     flex: 1,
-    lineHeight: 16,
-  },
-  requirementMet: {
-    color: Colors.success[500],
-  },
-  requirementUnmet: {
-    color: Colors.text.secondary,
-  },
-  successText: {
-    fontSize: 12,
-    color: Colors.success[500],
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 8,
   },
 });

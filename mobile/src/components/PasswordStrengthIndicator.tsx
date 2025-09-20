@@ -1,59 +1,77 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface PasswordStrengthIndicatorProps {
   password: string;
 }
 
 export default function PasswordStrengthIndicator({ password }: PasswordStrengthIndicatorProps) {
-  const getPasswordStrength = (password: string) => {
+  const { colors, isLoaded } = useThemeContext();
+
+  const getStrength = (password: string): { level: number; label: string; color: string } => {
     let score = 0;
-    const checks = {
-      length: password.length >= 8,
-      lowercase: /[a-z]/.test(password),
-      uppercase: /[A-Z]/.test(password),
-      numbers: /\d/.test(password),
-      symbols: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    };
-
-    Object.values(checks).forEach(check => {
-      if (check) score++;
-    });
-
-    return { score, checks };
+    
+    if (password.length >= 8) score += 1;
+    if (password.length >= 12) score += 1;
+    if (/[a-z]/.test(password)) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    
+    const levels = [
+      { level: 0, label: 'Very Weak', color: '#EF4444' },
+      { level: 1, label: 'Weak', color: '#F59E0B' },
+      { level: 2, label: 'Fair', color: '#F59E0B' },
+      { level: 3, label: 'Good', color: '#10B981' },
+      { level: 4, label: 'Strong', color: '#10B981' },
+      { level: 5, label: 'Very Strong', color: '#059669' },
+    ];
+    
+    return levels[Math.min(score, 5)];
   };
 
-  const { score, checks } = getPasswordStrength(password);
-  const strength = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][score] || 'Very Weak';
-  const color = [Colors.error[500], Colors.warning[500], Colors.warning[500], Colors.success[500], Colors.success[600]][score] || Colors.error[500];
+  const strength = getStrength(password);
+  const percentage = (strength.level / 5) * 100;
 
-  if (!password) return null;
+  if (!isLoaded || !colors) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={[styles.label, { color: '#4C1D95' }]}>Password Strength</Text>
+          <Text style={[styles.strength, { color: strength.color }]}>{strength.label}</Text>
+        </View>
+        <View style={[styles.progressBar, { backgroundColor: '#E2E8F0' }]}>
+          <View 
+            style={[
+              styles.progressFill, 
+              { 
+                backgroundColor: strength.color,
+                width: `${percentage}%`
+              }
+            ]} 
+          />
+        </View>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.strengthBar}>
-        <View style={[styles.strengthFill, { width: `${(score / 5) * 100}%`, backgroundColor: color }]} />
+    <View style={[styles.container, { backgroundColor: colors.background.secondary }]}>
+      <View style={styles.header}>
+        <Text style={[styles.label, { color: colors.text.primary }]}>Password Strength</Text>
+        <Text style={[styles.strength, { color: strength.color }]}>{strength.label}</Text>
       </View>
-      <Text style={[styles.strengthText, { color }]}>
-        Password Strength: {strength}
-      </Text>
-      <View style={styles.checks}>
-        <Text style={[styles.check, checks.length && styles.checkPassed]}>
-          ✓ At least 8 characters
-        </Text>
-        <Text style={[styles.check, checks.lowercase && styles.checkPassed]}>
-          ✓ Lowercase letter
-        </Text>
-        <Text style={[styles.check, checks.uppercase && styles.checkPassed]}>
-          ✓ Uppercase letter
-        </Text>
-        <Text style={[styles.check, checks.numbers && styles.checkPassed]}>
-          ✓ Number
-        </Text>
-        <Text style={[styles.check, checks.symbols && styles.checkPassed]}>
-          ✓ Special character
-        </Text>
+      <View style={[styles.progressBar, { backgroundColor: colors.border.primary }]}>
+        <View 
+          style={[
+            styles.progressFill, 
+            { 
+              backgroundColor: strength.color,
+              width: `${percentage}%`
+            }
+          ]} 
+        />
       </View>
     </View>
   );
@@ -61,31 +79,31 @@ export default function PasswordStrengthIndicator({ password }: PasswordStrength
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 8,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
   },
-  strengthBar: {
-    height: 4,
-    backgroundColor: Colors.border.secondary,
-    borderRadius: 2,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  strengthFill: {
-    height: '100%',
-    borderRadius: 2,
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
   },
-  strengthText: {
-    fontSize: 12,
+  strength: {
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: 8,
   },
-  checks: {
-    gap: 4,
+  progressBar: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
   },
-  check: {
-    fontSize: 12,
-    color: Colors.secondary[400],
-  },
-  checkPassed: {
-    color: Colors.success[500],
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
   },
 });

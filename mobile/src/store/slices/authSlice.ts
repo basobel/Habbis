@@ -25,7 +25,7 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials>(
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       const response = await authApi.login(credentials);
-      return response.data as AuthResponse;
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -37,7 +37,7 @@ export const register = createAsyncThunk<AuthResponse, RegisterData>(
   async (userData: RegisterData, { rejectWithValue }) => {
     try {
       const response = await authApi.register(userData);
-      return response.data as AuthResponse;
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
@@ -61,7 +61,7 @@ export const getMe = createAsyncThunk<{ user: User }, void>(
   async (_, { rejectWithValue }) => {
     try {
       const response = await authApi.getMe();
-      return response.data as { user: User };
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get user data');
     }

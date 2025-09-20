@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { useThemeFallback } from '@/hooks/useThemeFallback';
 
 interface SuccessMessageProps {
   message: string;
@@ -8,29 +8,33 @@ interface SuccessMessageProps {
 }
 
 export default function SuccessMessage({ message, visible = true }: SuccessMessageProps) {
+  const { getTextColor, getBackgroundColor, getBorderColor, getSuccessColor } = useThemeFallback();
+
   if (!visible || !message) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
+    <View style={[styles.container, {
+      backgroundColor: getBackgroundColor('secondary'),
+      borderColor: getBorderColor('primary'),
+    }]}>
+      <Text style={[styles.message, { color: getSuccessColor() }]}>
+        {message}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.success[50],
     borderWidth: 1,
-    borderColor: Colors.success[100],
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
   },
   message: {
     fontSize: 14,
-    color: Colors.success[700],
     textAlign: 'center',
     lineHeight: 20,
   },

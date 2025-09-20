@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useThemeFallback } from '@/hooks/useThemeFallback';
 
 interface FormInputProps extends TextInputProps {
   label?: string;
@@ -15,59 +15,36 @@ export default function FormInput({
   style, 
   ...props 
 }: FormInputProps) {
-  const { colors, isLoaded } = useThemeContext();
-
-  // Debug logging
-  console.log('FormInput render:', { isLoaded, colors: !!colors, error: colors?.error });
-
-  // Don't render if theme is not loaded or colors are not available
-  if (!isLoaded || !colors || !colors.error) {
-    return (
-      <View style={styles.container}>
-        {label && (
-          <Text style={[styles.label, { color: '#4C1D95' }]}>
-            {label}
-            {required && <Text style={[styles.required, { color: '#EF4444' }]}> *</Text>}
-          </Text>
-        )}
-        <TextInput
-          style={[
-            styles.input,
-            { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', color: '#4C1D95' },
-            error ? { borderColor: '#EF4444' } : null,
-            style,
-          ]}
-          placeholderTextColor="#94A3B8"
-          {...props}
-        />
-        {error && <Text style={[styles.errorText, { color: '#EF4444' }]}>{error}</Text>}
-      </View>
-    );
-  }
+  const { 
+    getTextColor, 
+    getBackgroundColor, 
+    getBorderColor, 
+    getErrorColor,
+    isLoaded 
+  } = useThemeFallback();
 
   return (
     <View style={styles.container}>
       {label && (
-        <Text style={[styles.label, { color: colors?.text?.secondary || '#64748B' }]}>
+        <Text style={[styles.label, { color: getTextColor('secondary') }]}>
           {label}
-          {required && <Text style={[styles.required, { color: colors?.error?.[500] || '#EF4444' }]}> *</Text>}
+          {required && <Text style={[styles.required, { color: getErrorColor() }]}> *</Text>}
         </Text>
       )}
       <TextInput
         style={[
           styles.input,
           {
-            backgroundColor: colors?.input?.background || colors?.background?.card || '#FFFFFF',
-            borderColor: colors?.input?.border || colors?.border?.secondary || '#E2E8F0',
-            color: colors?.input?.text || colors?.text?.primary || '#4C1D95',
+            backgroundColor: getBackgroundColor('card'),
+            borderColor: error ? getErrorColor() : getBorderColor('primary'),
+            color: getTextColor('primary'),
           },
-          error ? { borderColor: colors?.error?.[500] || '#EF4444' } : null,
           style,
         ]}
-        placeholderTextColor={colors?.input?.placeholder || colors?.text?.placeholder || '#9CA3AF'}
+        placeholderTextColor={getTextColor('placeholder')}
         {...props}
       />
-      {error && <Text style={[styles.errorText, { color: colors?.error?.[500] || '#EF4444' }]}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: getErrorColor() }]}>{error}</Text>}
     </View>
   );
 }

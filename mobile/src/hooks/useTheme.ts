@@ -77,7 +77,7 @@ export const useTheme = () => {
           setThemeMode(storedTheme as ThemeMode);
         }
       } catch (e) {
-        console.error("Failed to load theme from storage", e);
+        // Failed to load theme from storage - można dodać logowanie w trybie development
       } finally {
         setIsLoaded(true);
       }
@@ -90,7 +90,7 @@ export const useTheme = () => {
       await AsyncStorage.setItem(THEME_STORAGE_KEY, theme);
       setThemeMode(theme);
     } catch (e) {
-      console.error("Failed to save theme to storage", e);
+      // Failed to save theme to storage - można dodać logowanie w trybie development
     }
   };
 
