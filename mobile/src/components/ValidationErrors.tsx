@@ -1,28 +1,46 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface ValidationErrorsProps {
   errors: Record<string, string>;
 }
 
 export default function ValidationErrors({ errors }: ValidationErrorsProps) {
-  const { getTextColor, getBackgroundColor, getBorderColor, getErrorColor } = useThemeFallback();
+  const { colors, isLoaded } = useThemeContext();
 
   if (!errors || Object.keys(errors).length === 0) {
     return null;
   }
 
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, {
+        backgroundColor: '#F8FAFC',
+        borderColor: '#EF4444',
+      }]}>
+        <Text style={[styles.title, { color: '#EF4444' }]}>
+          Please fix the following errors:
+        </Text>
+        {Object.entries(errors).map(([field, message]) => (
+          <Text key={field} style={[styles.error, { color: '#EF4444' }]}>
+            • {message}
+          </Text>
+        ))}
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, {
-      backgroundColor: getBackgroundColor('secondary'),
-      borderColor: getBorderColor('error'),
+      backgroundColor: colors.background.secondary,
+      borderColor: colors.error[500],
     }]}>
-      <Text style={[styles.title, { color: getErrorColor() }]}>
+      <Text style={[styles.title, { color: colors.error[500] }]}>
         Please fix the following errors:
       </Text>
       {Object.entries(errors).map(([field, message]) => (
-        <Text key={field} style={[styles.error, { color: getErrorColor() }]}>
+        <Text key={field} style={[styles.error, { color: colors.error[500] }]}>
           • {message}
         </Text>
       ))}

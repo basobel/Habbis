@@ -5,33 +5,23 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
 
 export default function HelpScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="Pomoc"
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -90,9 +80,9 @@ export default function HelpScreen() {
   ];
 
   const toggleExpanded = (id: number) => {
-    setExpandedItems(prev => 
+    setExpandedItems((prev: number[]) => 
       prev.includes(id) 
-        ? prev.filter(item => item !== id)
+        ? prev.filter((item: number) => item !== id)
         : [...prev, id]
     );
   };
@@ -103,13 +93,7 @@ export default function HelpScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="Pomoc i wsparcie"
-        subtitle="Znajdź odpowiedzi na swoje pytania"
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
-
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Search */}
         <View style={[styles.searchContainer, { backgroundColor: colors.background.card }]}>
@@ -210,14 +194,7 @@ export default function HelpScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -236,7 +213,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 80, // Padding dla TopPanel
   },
   searchContainer: {
     padding: 16,

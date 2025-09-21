@@ -1,37 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function PremiumScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="Premium"
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -97,12 +87,7 @@ export default function PremiumScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="Premium"
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
-
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={[styles.heroSection, { backgroundColor: colors.accent.gold }]}>
@@ -214,14 +199,7 @@ export default function PremiumScreen() {
           </Text>
         </View>
       </ScrollView>
-
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -239,6 +217,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingTop: 80, // Padding dla TopPanel
   },
   heroSection: {
     margin: 16,

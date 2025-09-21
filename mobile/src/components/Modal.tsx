@@ -10,7 +10,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface ModalProps {
   visible: boolean;
@@ -33,7 +33,7 @@ export default function Modal({
   animationType = 'slide',
   size = 'medium',
 }: ModalProps) {
-  const { getTextColor, getBackgroundColor, getBorderColor } = useThemeFallback();
+  const { colors, isLoaded } = useThemeContext();
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -104,21 +104,27 @@ export default function Modal({
     return {};
   };
 
-  const renderContent = () => (
-    <View style={[styles.modalContainer, { backgroundColor: getBackgroundColor('card') }]}>
-      {title && (
-        <View style={[styles.header, { borderBottomColor: getBorderColor('primary') }]}>
-          <Text style={[styles.title, { color: getTextColor('primary') }]}>{title}</Text>
-          {showCloseButton && (
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={getTextColor('primary')} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-      <View style={styles.content}>{children}</View>
-    </View>
-  );
+  const renderContent = () => {
+    const backgroundColor = isLoaded && colors ? colors.background.card : '#FFFFFF';
+    const borderColor = isLoaded && colors ? colors.border.primary : '#E2E8F0';
+    const textColor = isLoaded && colors ? colors.text.primary : '#1F2937';
+
+    return (
+      <View style={[styles.modalContainer, { backgroundColor }]}>
+        {title && (
+          <View style={[styles.header, { borderBottomColor: borderColor }]}>
+            <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+            {showCloseButton && (
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Ionicons name="close" size={24} color={textColor} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+        <View style={styles.content}>{children}</View>
+      </View>
+    );
+  };
 
   if (animationType === 'none') {
     return (

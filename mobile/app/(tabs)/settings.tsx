@@ -6,35 +6,25 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { useTheme } from '@/hooks/useTheme';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
 
 export default function SettingsScreen() {
   const { colors, isLoaded } = useThemeContext();
   const { themeMode, setTheme } = useTheme();
-  const { handleNavigate } = useNavigation();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [soundEnabled, setSoundEnabled] = React.useState(true);
   const [hapticEnabled, setHapticEnabled] = React.useState(true);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="Ustawienia"
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -141,12 +131,7 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="Ustawienia"
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
-
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {settingsSections.map((section, sectionIndex) => (
           <View key={section.title} style={styles.section}>
@@ -198,14 +183,7 @@ export default function SettingsScreen() {
           </View>
         ))}
       </ScrollView>
-
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -224,7 +202,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 80, // Padding dla TopPanel
   },
   section: {
     marginBottom: 24,

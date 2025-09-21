@@ -6,7 +6,7 @@ import { useThemeContext } from '@/contexts/ThemeContext';
 interface ThemeToggleProps {
   size?: 'small' | 'medium' | 'large';
   showLabel?: boolean;
-  style?: any;
+  style?: object;
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ 

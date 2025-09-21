@@ -1,35 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
 
 export default function AboutScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="O aplikacji"
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -108,12 +98,7 @@ export default function AboutScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="O aplikacji"
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
-
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* App Info */}
         <View style={[styles.appInfoCard, { backgroundColor: colors.background.card }]}>
@@ -216,14 +201,7 @@ export default function AboutScreen() {
           </Text>
         </View>
       </ScrollView>
-
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -242,7 +220,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 80, // Padding dla TopPanel
   },
   appInfoCard: {
     alignItems: 'center',

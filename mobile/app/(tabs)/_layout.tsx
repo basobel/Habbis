@@ -93,6 +93,11 @@ export default function TabLayout() {
         <Stack.Screen name="battle" />
         <Stack.Screen name="guild" />
         <Stack.Screen name="profile" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="premium" />
+        <Stack.Screen name="statistics" />
+        <Stack.Screen name="help" />
+        <Stack.Screen name="about" />
       </Stack>
       
       <CircularMenu
