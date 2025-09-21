@@ -191,22 +191,6 @@ export default function CircularMenu({
           },
         ]}
       >
-        {/* Rozmyte tło dla głównego przycisku */}
-        <Animated.View
-          style={[
-            styles.mainButtonBackground,
-            {
-              width: size * 1.25,
-              height: size * 1.25,
-              borderRadius: (size * 1.25) / 2,
-              backgroundColor: isOpen ? '#EF4444' : colors.primary[600],
-              opacity: menuAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.15, 0.2],
-              }),
-            },
-          ]}
-        />
         
         {/* Główny przycisk */}
         <Animated.View
@@ -266,6 +250,15 @@ export default function CircularMenu({
         </Animated.View>
       </Animated.View>
 
+      {/* Overlay */}
+      {isOpen && (
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={closeMenu}
+        />
+      )}
+
       {/* Przyciski menu */}
       {isOpen && (
         <View style={[styles.menuItemsContainer, menuPosition]}>
@@ -303,22 +296,6 @@ export default function CircularMenu({
                   },
                 ]}
               >
-                {/* Rozmyte tło */}
-                <Animated.View
-                  style={[
-                    styles.menuItemBackground,
-                    {
-                      width: size * 1.25,
-                      height: size * 1.25,
-                      borderRadius: (size * 1.8) / 2,
-                      backgroundColor: item.color || colors.primary[500],
-                      opacity: buttonAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, 0.15],
-                      }),
-                    },
-                  ]}
-                />
                 
                 {/* Główny przycisk */}
                 <Animated.View
@@ -354,14 +331,17 @@ export default function CircularMenu({
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+  },
   menuButton: {
     position: 'absolute',
     zIndex: 1001,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mainButtonBackground: {
-    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -389,11 +369,6 @@ const styles = StyleSheet.create({
     height: 0,
   },
   menuItem: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuItemBackground: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',

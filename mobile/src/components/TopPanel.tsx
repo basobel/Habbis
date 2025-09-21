@@ -15,15 +15,21 @@ const { width: screenWidth } = Dimensions.get('window');
 
 interface TopPanelProps {
   onNavigate?: (screen: string) => void;
-  onHamburgerPress?: () => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
+  onClose?: () => void;
 }
 
-export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps) {
+export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, onToggle, onClose }: TopPanelProps) {
   const { colors, isLoaded } = useThemeContext();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
+  
+  const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
+  const setIsExpanded = onClose || setInternalIsExpanded;
   
   // Animacje
   const expandAnimation = useRef(new Animated.Value(0)).current;
+  const rotateAnimation = useRef(new Animated.Value(0)).current;
 
   // Dane użytkownika (mock)
   const userData = {
@@ -39,15 +45,26 @@ export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps
 
 
   useEffect(() => {
-    Animated.timing(expandAnimation, {
-      toValue: isExpanded ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
+    Animated.parallel([
+      Animated.timing(expandAnimation, {
+        toValue: isExpanded ? 1 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+      Animated.timing(rotateAnimation, {
+        toValue: isExpanded ? 1 : 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [isExpanded]);
 
   const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
+    if (onToggle) {
+      onToggle();
+    } else {
+      setIsExpanded(!isExpanded);
+    }
   };
 
   const handleProfilePress = () => {
@@ -102,21 +119,22 @@ export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps
             </View>
           </View>
 
-          <View style={styles.rightActions}>
-            {onHamburgerPress && (
-              <TouchableOpacity
-                style={[styles.hamburgerButton, { backgroundColor: colors.background.secondary }]}
-                onPress={onHamburgerPress}
-                activeOpacity={0.8}
-              >
-                <Ionicons 
-                  name="menu" 
-                  size={16} 
-                  color={colors.text.primary} 
-                />
-              </TouchableOpacity>
-            )}
-          </View>
+          <Animated.View
+            style={{
+              transform: [{
+                rotate: rotateAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '180deg'],
+                }),
+              }],
+            }}
+          >
+            <Ionicons 
+              name="chevron-down" 
+              size={16} 
+              color={colors.text.secondary} 
+            />
+          </Animated.View>
         </TouchableOpacity>
 
         {/* Rozwijane szczegóły */}
@@ -126,7 +144,7 @@ export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps
             {
               height: expandAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0, 200], // Wysokość szczegółów
+                outputRange: [0, 280], // Wysokość szczegółów
               }),
               opacity: expandAnimation,
             },
@@ -185,25 +203,80 @@ export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps
               </Text>
             </View>
 
-            {/* Waluty */}
-            <View style={styles.currencyRow}>
-              <View style={styles.currencyItem}>
-                <Ionicons name="logo-bitcoin" size={18} color="#F59E0B" />
-                <Text style={[styles.currencyAmount, { color: colors.text.primary }]}>
-                  {userData.coins.toLocaleString()}
-                </Text>
-                <Text style={[styles.currencyLabel, { color: colors.text.secondary }]}>
-                  Monety
-                </Text>
+            {/* Menu przyciski z ikonkami i tekstem */}
+            <View style={styles.menuButtonsContainer}>
+              {/* Pierwszy rząd */}
+              <View style={styles.menuRow}>
+                {[
+                  { id: 'settings', title: 'Ustawienia', icon: 'settings' as const, color: '#6B7280' },
+                  { id: 'premium', title: 'Premium', icon: 'diamond' as const, color: '#F59E0B' },
+                  { id: 'statistics', title: 'Statystyki', icon: 'bar-chart' as const, color: '#10B981' },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.menuButton}
+                    onPress={() => {
+                      onNavigate?.(`/${item.id}`);
+                      setIsExpanded(false);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <View
+                      style={[
+                        styles.menuButtonIcon,
+                        { backgroundColor: item.color },
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon}
+                        size={18}
+                        color="white"
+                      />
+                    </View>
+                    <Text style={[styles.menuButtonText, { color: colors.text.primary }]}>
+                      {item.title}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-              <View style={styles.currencyItem}>
-                <Ionicons name="diamond" size={18} color="#8B5CF6" />
-                <Text style={[styles.currencyAmount, { color: colors.text.primary }]}>
-                  {userData.premiumCoins}
-                </Text>
-                <Text style={[styles.currencyLabel, { color: colors.text.secondary }]}>
-                  Premium
-                </Text>
+              
+              {/* Drugi rząd */}
+              <View style={styles.menuRow}>
+                {[
+                  { id: 'help', title: 'Pomoc', icon: 'help-circle' as const, color: '#3B82F6' },
+                  { id: 'about', title: 'O aplikacji', icon: 'information-circle' as const, color: '#8B5CF6' },
+                  { id: 'logout', title: 'Wyloguj', icon: 'log-out' as const, color: '#EF4444' },
+                ].map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.menuButton}
+                    onPress={() => {
+                      if (item.id === 'logout') {
+                        onNavigate?.('/login');
+                      } else {
+                        onNavigate?.(`/${item.id}`);
+                      }
+                      setIsExpanded(false);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <View
+                      style={[
+                        styles.menuButtonIcon,
+                        { backgroundColor: item.color },
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon}
+                        size={18}
+                        color="white"
+                      />
+                    </View>
+                    <Text style={[styles.menuButtonText, { color: colors.text.primary }]}>
+                      {item.title}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
           </View>
@@ -262,18 +335,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-  rightActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  hamburgerButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   expandedContent: {
     overflow: 'hidden',
   },
@@ -310,24 +371,39 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 2,
   },
-  currencyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 8,
+  menuButtonsContainer: {
+    marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.1)',
   },
-  currencyItem: {
+  menuRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  menuButton: {
+    flex: 1,
     alignItems: 'center',
-    gap: 4,
+    paddingHorizontal: 8,
   },
-  currencyAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  menuButtonIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  currencyLabel: {
-    fontSize: 10,
+  menuButtonText: {
+    fontSize: 11,
     fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 14,
   },
 });
