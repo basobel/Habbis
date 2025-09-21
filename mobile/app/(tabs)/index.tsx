@@ -3,13 +3,16 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import FadeInView from '@/components/FadeInView';
+import ScreenWrapper from '@/components/ScreenWrapper';
+import ScreenScrollView from '@/components/ScreenScrollView';
+import useScreenState from '@/hooks/useScreenState';
 
 interface Habit {
   id: string;
@@ -24,7 +27,7 @@ interface Habit {
 
 export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const [refreshing, setRefreshing] = useState(false);
+  const { refreshing, onRefresh } = useScreenState();
 
   // Mock data
   const [habits, setHabits] = useState<Habit[]>([
@@ -60,12 +63,6 @@ export default function HabitsScreen() {
     },
   ]);
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
 
   const handleHabitToggle = (habitId: string) => {
     setHabits(prevHabits =>

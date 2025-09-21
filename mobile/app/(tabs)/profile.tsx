@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  SafeAreaView,
   Animated,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,17 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { getMe, logout } from '@/store/slices/authSlice';
 import { RootState } from '@/types';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
 import HabitCard from '@/components/HabitCard';
-import HamburgerMenu from '@/components/HamburgerMenu';
-import SharedHeader from '@/components/SharedHeader';
+import FadeInView from '@/components/FadeInView';
 
 export default function ProfileScreen() {
   const dispatch = useDispatch();
   const { user, isLoading } = useSelector((state: RootState) => state.auth);
   const { habits, stats } = useSelector((state: RootState) => state.habits);
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
@@ -74,22 +70,30 @@ export default function ProfileScreen() {
 
   if (!isLoaded || !colors || !colors.primary || !colors.primary[500]) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading profile...</Text>
+        </View>
       </View>
-      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header with Hamburger Menu */}
-      <SharedHeader
-        title={`Witaj, ${user?.username || 'Użytkowniku'}!`}
-        subtitle="Kontynuuj swoją podróż z nawykami"
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
+      <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
+              Witaj, {user?.username || 'Użytkowniku'}!
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              Kontynuuj swoją podróż z nawykami
+            </Text>
+          </View>
+        </View>
+      </View>
 
       <ScrollView
         style={styles.scrollView}
@@ -231,22 +235,37 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </View>
-    </View>
+        </View>
       </ScrollView>
-
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+      </View>
+    </FadeInView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 60,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.7,
   },
   loadingContainer: {
     flex: 1,
