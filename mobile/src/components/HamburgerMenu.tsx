@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { router } from 'expo-router';
 import { logout } from '@/store/slices/authSlice';
+import { useThemeContext } from '@/contexts/ThemeContext';
 import HamburgerMenuHeader from './HamburgerMenuHeader';
 import HamburgerMenuItems from './HamburgerMenuItems';
-import HamburgerMenuFooter from './HamburgerMenuFooter';
 
 interface HamburgerMenuProps {
   isVisible: boolean;
@@ -20,19 +22,22 @@ interface HamburgerMenuProps {
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-const menuWidth = screenWidth * 0.85; // 85% szerokości ekranu
+const menuWidth = screenWidth * 0.75; // 75% szerokości ekranu - bardziej kompaktowe
 
 export default function HamburgerMenu({ isVisible, onClose, onNavigate }: HamburgerMenuProps) {
   const dispatch = useDispatch();
+  const { colors, isLoaded } = useThemeContext();
   const slideAnim = useRef(new Animated.Value(-menuWidth)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
     if (isVisible) {
       Animated.parallel([
-        Animated.timing(slideAnim, {
+        Animated.spring(slideAnim, {
           toValue: 0,
-          duration: 300,
+          tension: 100,
+          friction: 8,
           useNativeDriver: true,
         }),
         Animated.timing(overlayOpacity, {
@@ -40,17 +45,28 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
           duration: 300,
           useNativeDriver: true,
         }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          tension: 100,
+          friction: 8,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: -menuWidth,
-          duration: 300,
+          duration: 250,
           useNativeDriver: true,
         }),
         Animated.timing(overlayOpacity, {
           toValue: 0,
-          duration: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.95,
+          duration: 250,
           useNativeDriver: true,
         }),
       ]).start();
@@ -76,9 +92,18 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
     });
   };
 
-  const handleLogout = () => {
-    dispatch(logout() as any);
-    handleClose();
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout() as any);
+      handleClose();
+      // Przekieruj do strony logowania
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Nawet jeśli wystąpi błąd, wyczyść stan lokalny
+      handleClose();
+      router.replace('/login');
+    }
   };
 
   const menuItems = [
@@ -148,17 +173,19 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
     },
   ];
 
-  if (!isVisible) return null;
+  if (!isVisible || !isLoaded || !colors) return null;
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="rgba(0, 0, 0, 0.5)" />
+      
       {/* Overlay */}
       <Animated.View
         style={[
           styles.overlay,
           {
             opacity: overlayOpacity,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
           },
         ]}
       >
@@ -174,15 +201,17 @@ export default function HamburgerMenu({ isVisible, onClose, onNavigate }: Hambur
         style={[
           styles.menu,
           {
-            backgroundColor: '#F5F3FF', // Fallback color
-            transform: [{ translateX: slideAnim }],
+            backgroundColor: colors.background.primary,
+            transform: [
+              { translateX: slideAnim },
+              { scale: scaleAnim }
+            ],
           },
         ]}
       >
         <SafeAreaView style={styles.safeArea}>
-          <HamburgerMenuHeader onClose={handleClose} />
+          <HamburgerMenuHeader onClose={handleClose} onLogout={handleLogout} />
           <HamburgerMenuItems menuItems={menuItems} />
-          <HamburgerMenuFooter onLogout={handleLogout} />
         </SafeAreaView>
       </Animated.View>
     </View>
@@ -216,10 +245,10 @@ const styles = StyleSheet.create({
     width: menuWidth,
     height: screenHeight,
     shadowColor: '#000',
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOffset: { width: 4, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 20,
   },
   safeArea: {
     flex: 1,

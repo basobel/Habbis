@@ -179,10 +179,6 @@ export default function CircularMenu({
         style={[
           styles.menuButton,
           {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            backgroundColor: isOpen ? '#EF4444' : colors.primary[600], // Czerwone gdy otwarte
             ...menuPosition,
             transform: [
               {
@@ -195,49 +191,79 @@ export default function CircularMenu({
           },
         ]}
       >
-        <TouchableOpacity
-          style={styles.menuButtonContent}
-          onPress={isOpen ? closeMenu : openMenu}
-          activeOpacity={0.8}
-        >
-          <Animated.View
-            style={{
+        {/* Rozmyte tło dla głównego przycisku */}
+        <Animated.View
+          style={[
+            styles.mainButtonBackground,
+            {
+              width: size * 1.25,
+              height: size * 1.25,
+              borderRadius: (size * 1.25) / 2,
+              backgroundColor: isOpen ? '#EF4444' : colors.primary[600],
               opacity: menuAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: [1, 0],
+                outputRange: [0.15, 0.2],
               }),
-            }}
+            },
+          ]}
+        />
+        
+        {/* Główny przycisk */}
+        <Animated.View
+          style={[
+            styles.mainButton,
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              backgroundColor: isOpen ? '#EF4444' : colors.primary[600],
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.menuButtonContent}
+            onPress={isOpen ? closeMenu : openMenu}
+            activeOpacity={0.8}
           >
-            <Ionicons
-              name="menu"
-              size={size * 0.4}
-              color={colors.text.inverse}
-            />
-          </Animated.View>
-          
-          <Animated.View
-            style={[
-              styles.closeButton,
-              {
-                opacity: closeButtonAnimation,
-                transform: [
-                  {
-                    scale: closeButtonAnimation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 1],
-                    }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <Ionicons
-              name="add"
-              size={size * 0.4}
-              color={colors.text.inverse}
-            />
-          </Animated.View>
-        </TouchableOpacity>
+            <Animated.View
+              style={{
+                opacity: menuAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 0],
+                }),
+              }}
+            >
+              <Ionicons
+                name="menu"
+                size={size * 0.4}
+                color={colors.text.inverse}
+              />
+            </Animated.View>
+            
+            <Animated.View
+              style={[
+                styles.closeButton,
+                {
+                  opacity: closeButtonAnimation,
+                  transform: [
+                    {
+                      scale: closeButtonAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, 1],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Ionicons
+                name="add"
+                size={size * 0.4}
+                color={colors.text.inverse}
+              />
+            </Animated.View>
+          </TouchableOpacity>
+        </Animated.View>
       </Animated.View>
 
       {/* Przyciski menu */}
@@ -253,10 +279,6 @@ export default function CircularMenu({
                 style={[
                   styles.menuItem,
                   {
-                    width: size,
-                    height: size,
-                    borderRadius: size / 2,
-                    backgroundColor: item.color || colors.primary[500],
                     transform: [
                       {
                         translateX: buttonAnimation.interpolate({
@@ -281,17 +303,47 @@ export default function CircularMenu({
                   },
                 ]}
               >
-                <TouchableOpacity
-                  style={styles.menuItemContent}
-                  onPress={() => handleItemPress(item)}
-                  activeOpacity={0.8}
+                {/* Rozmyte tło */}
+                <Animated.View
+                  style={[
+                    styles.menuItemBackground,
+                    {
+                      width: size * 1.25,
+                      height: size * 1.25,
+                      borderRadius: (size * 1.8) / 2,
+                      backgroundColor: item.color || colors.primary[500],
+                      opacity: buttonAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, 0.15],
+                      }),
+                    },
+                  ]}
+                />
+                
+                {/* Główny przycisk */}
+                <Animated.View
+                  style={[
+                    styles.menuItemButton,
+                    {
+                      width: size,
+                      height: size,
+                      borderRadius: size / 2,
+                      backgroundColor: item.color || colors.primary[500],
+                    },
+                  ]}
                 >
-                  <Ionicons
-                    name={item.icon}
-                    size={size * 0.3}
-                    color={colors.text.inverse}
-                  />
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.menuItemContent}
+                    onPress={() => handleItemPress(item)}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons
+                      name={item.icon}
+                      size={size * 0.3}
+                      color={colors.text.inverse}
+                    />
+                  </TouchableOpacity>
+                </Animated.View>
               </Animated.View>
             );
           })}
@@ -305,6 +357,15 @@ const styles = StyleSheet.create({
   menuButton: {
     position: 'absolute',
     zIndex: 1001,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainButtonBackground: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mainButton: {
     elevation: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -329,6 +390,15 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuItemBackground: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuItemButton: {
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },

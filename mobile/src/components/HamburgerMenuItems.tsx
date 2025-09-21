@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface MenuItem {
   id: string;
@@ -16,7 +16,58 @@ interface HamburgerMenuItemsProps {
 }
 
 export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProps) {
-  const { getTextColor, getPrimaryColor, getBorderColor, getBackgroundColor } = useThemeFallback();
+  const { colors, isLoaded } = useThemeContext();
+
+  if (!isLoaded || !colors) {
+    return (
+      <View style={styles.menuItems}>
+        {menuItems.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={[styles.menuItem, { borderBottomColor: '#E5E7EB' }]}
+            onPress={item.onPress}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemContent}>
+              <View style={styles.menuItemLeft}>
+                <View
+                  style={[
+                    styles.menuItemIcon,
+                    {
+                      backgroundColor: item.isPremium ? '#F59E0B' : '#F3F4F6',
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={20}
+                    color={item.isPremium ? 'white' : '#7C3AED'}
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.menuItemText,
+                    {
+                      color: item.isPremium ? '#F59E0B' : '#1F2937',
+                      fontWeight: item.isPremium ? '600' : '400',
+                    },
+                  ]}
+                >
+                  {item.title}
+                </Text>
+              </View>
+              {item.isPremium && (
+                <View style={[styles.premiumBadge, { backgroundColor: '#F59E0B' }]}>
+                  <Text style={[styles.premiumBadgeText, { color: 'white' }]}>PRO</Text>
+                </View>
+              )}
+              <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.menuItems}>
@@ -25,7 +76,7 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
           key={item.id}
           style={[
             styles.menuItem,
-            { borderBottomColor: getBorderColor('primary') },
+            { borderBottomColor: colors.border.primary },
           ]}
           onPress={item.onPress}
           activeOpacity={0.7}
@@ -37,15 +88,15 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
                   styles.menuItemIcon,
                   {
                     backgroundColor: item.isPremium
-                      ? '#F59E0B' // Gold color for premium
-                      : getBackgroundColor('secondary'),
+                      ? '#F59E0B'
+                      : colors.background.secondary,
                   },
                 ]}
               >
                 <Ionicons
                   name={item.icon as any}
                   size={20}
-                  color={item.isPremium ? getTextColor('inverse') : getPrimaryColor()}
+                  color={item.isPremium ? colors.text.inverse : colors.primary[600]}
                 />
               </View>
               <Text
@@ -53,8 +104,8 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
                   styles.menuItemText,
                   {
                     color: item.isPremium
-                      ? '#F59E0B' // Gold color for premium
-                      : getTextColor('primary'),
+                      ? '#F59E0B'
+                      : colors.text.primary,
                     fontWeight: item.isPremium ? '600' : '400',
                   },
                 ]}
@@ -64,7 +115,7 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
             </View>
             {item.isPremium && (
               <View style={[styles.premiumBadge, { backgroundColor: '#F59E0B' }]}>
-                <Text style={[styles.premiumBadgeText, { color: getTextColor('inverse') }]}>
+                <Text style={[styles.premiumBadgeText, { color: colors.text.inverse }]}>
                   PRO
                 </Text>
               </View>
@@ -72,7 +123,7 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
             <Ionicons
               name="chevron-forward"
               size={16}
-              color={getTextColor('secondary')}
+              color={colors.text.secondary}
             />
           </View>
         </TouchableOpacity>
@@ -84,7 +135,7 @@ export default function HamburgerMenuItems({ menuItems }: HamburgerMenuItemsProp
 const styles = StyleSheet.create({
   menuItems: {
     flex: 1,
-    paddingTop: 8,
+    paddingTop: 4,
   },
   menuItem: {
     borderBottomWidth: 1,
@@ -92,8 +143,8 @@ const styles = StyleSheet.create({
   menuItemContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -101,25 +152,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   menuItemText: {
-    fontSize: 16,
+    fontSize: 14,
     flex: 1,
   },
   premiumBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 10,
-    marginRight: 8,
+    borderRadius: 8,
+    marginRight: 6,
   },
   premiumBadgeText: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: 'bold',
   },
 });

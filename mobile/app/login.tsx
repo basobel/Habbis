@@ -3,7 +3,6 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  ScrollView, 
   Alert, 
   TouchableOpacity, 
   Animated, 
@@ -20,7 +19,7 @@ import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import { useThemeContext } from '@/contexts/ThemeContext';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
@@ -31,40 +30,31 @@ export default function LoginScreen() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Animacje
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
 
   // Animacja wejścia
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 800,
+        duration: 600,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        tension: 50,
-        friction: 7,
+        duration: 600,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
 
-  // Show loading if theme is not loaded
   if (!isLoaded || !colors) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Loading...</Text>
+      <View style={[styles.container, { backgroundColor: '#7C3AED' }]}>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -72,14 +62,14 @@ export default function LoginScreen() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email jest wymagany';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'Wprowadź poprawny adres email';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
+    if (!formData.password.trim()) {
+      newErrors.password = 'Hasło jest wymagane';
     }
 
     setErrors(newErrors);
@@ -87,21 +77,19 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
     setErrors({});
     
     try {
-      await (dispatch(login(formData) as any)).unwrap();
+      await dispatch(login(formData) as any).unwrap();
       router.replace('/(tabs)');
     } catch (error: any) {
       if (error?.errors) {
         setErrors(error.errors);
       } else {
-        Alert.alert('Login Failed', error?.message || 'Please check your credentials');
+        Alert.alert('Błąd logowania', error?.message || 'Sprawdź swoje dane logowania');
       }
     } finally {
       setIsLoading(false);
@@ -133,8 +121,7 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <View style={styles.scrollContent}>
-
+        <View style={styles.content}>
           {/* Title Section */}
           <Animated.View 
             style={[
@@ -154,67 +141,61 @@ export default function LoginScreen() {
             style={[
               styles.formCard,
               {
-                backgroundColor: colors?.background?.card || '#FFFFFF',
+                backgroundColor: colors.background.card,
                 opacity: fadeAnim,
                 transform: [{ translateY: slideAnim }]
               }
             ]}
           >
-            <View style={styles.form}>
-              <FormInput
-                label="Email"
-                placeholder="Wprowadź swój email"
-                value={formData.email}
-                onChangeText={(text) => setFormData({ ...formData, email: text })}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                returnKeyType="next"
-                error={errors.email}
-                required
-                style={styles.input}
-              />
+            <FormInput
+              label="Email"
+              placeholder="Wprowadź swój email"
+              value={formData.email}
+              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              returnKeyType="next"
+              error={errors.email}
+              required
+            />
 
-              <FormInput
-                label="Hasło"
-                placeholder="Wprowadź swoje hasło"
-                value={formData.password}
-                onChangeText={(text) => setFormData({ ...formData, password: text })}
-                secureTextEntry
-                returnKeyType="done"
-                onSubmitEditing={handleLogin}
-                error={errors.password}
-                required
-                style={styles.input}
-              />
+            <FormInput
+              label="Hasło"
+              placeholder="Wprowadź swoje hasło"
+              value={formData.password}
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              secureTextEntry
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+              error={errors.password}
+              required
+            />
 
-              <TouchableOpacity
-                style={styles.forgotPassword}
-                onPress={handleForgotPassword}
-              >
-                <Text style={[styles.forgotPasswordText, { color: colors?.primary?.[600] || '#7C3AED' }]}>
-                  Zapomniałeś hasła?
-                </Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              onPress={handleForgotPassword}
+            >
+              <Text style={[styles.forgotPasswordText, { color: colors.primary[600] }]}>
+                Zapomniałeś hasła?
+              </Text>
+            </TouchableOpacity>
 
-              <FormButton
-                title="Zaloguj się"
-                onPress={handleLogin}
-                loading={isLoading}
-                disabled={isLoading}
-                style={styles.button}
-                size="large"
-              />
+            <FormButton
+              title="Zaloguj się"
+              onPress={handleLogin}
+              loading={isLoading}
+              disabled={isLoading}
+              size="large"
+            />
 
-
-              <TouchableOpacity
-                onPress={() => router.replace('/register')}
-                style={styles.linkButton}
-              >
-                <Text style={[styles.linkButtonText, { color: colors?.primary?.[600] || '#7C3AED' }]}>
-                  Nie masz konta? Zarejestruj się
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              onPress={() => router.replace('/register')}
+              style={styles.linkButton}
+            >
+              <Text style={[styles.linkButtonText, { color: colors.primary[600] }]}>
+                Nie masz konta? Zarejestruj się
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         </View>
       </KeyboardAvoidingView>
@@ -236,7 +217,7 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  scrollContent: {
+  content: {
     flex: 1,
     justifyContent: 'center',
     paddingTop: 60,
@@ -245,7 +226,7 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
@@ -270,12 +251,6 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
-  form: {
-    width: '100%',
-  },
-  input: {
-    marginBottom: 12,
-  },
   forgotPassword: {
     alignSelf: 'flex-end',
     marginBottom: 20,
@@ -284,17 +259,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-  button: {
-    marginBottom: 16,
-  },
   linkButton: {
-    marginTop: 4,
+    marginTop: 16,
     alignItems: 'center',
     paddingVertical: 8,
   },
   linkButtonText: {
     fontSize: 13,
     fontWeight: '500',
+    textAlign: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: 'white',
     textAlign: 'center',
   },
   // Decorative elements

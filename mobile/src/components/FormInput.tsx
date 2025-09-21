@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface FormInputProps extends TextInputProps {
   label?: string;
@@ -15,36 +15,40 @@ export default function FormInput({
   style, 
   ...props 
 }: FormInputProps) {
-  const { 
-    getTextColor, 
-    getBackgroundColor, 
-    getBorderColor, 
-    getErrorColor,
-    isLoaded 
-  } = useThemeFallback();
+  const { colors, isLoaded } = useThemeContext();
+
+  if (!isLoaded || !colors) {
+    return (
+      <View style={styles.container}>
+        {label && <Text style={styles.label}>{label}</Text>}
+        <TextInput style={[styles.input, style]} {...props} />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       {label && (
-        <Text style={[styles.label, { color: getTextColor('secondary') }]}>
+        <Text style={[styles.label, { color: colors.text.secondary }]}>
           {label}
-          {required && <Text style={[styles.required, { color: getErrorColor() }]}> *</Text>}
+          {required && <Text style={[styles.required, { color: colors.error[500] }]}> *</Text>}
         </Text>
       )}
       <TextInput
         style={[
           styles.input,
           {
-            backgroundColor: getBackgroundColor('card'),
-            borderColor: error ? getErrorColor() : getBorderColor('primary'),
-            color: getTextColor('primary'),
+            backgroundColor: colors.background.card,
+            borderColor: error ? colors.error[500] : colors.border.primary,
+            color: colors.text.primary,
           },
           style,
         ]}
-        placeholderTextColor={getTextColor('placeholder')}
+        placeholderTextColor={colors.text.placeholder}
         {...props}
       />
-      {error && <Text style={[styles.errorText, { color: getErrorColor() }]}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.error[500] }]}>{error}</Text>}
     </View>
   );
 }

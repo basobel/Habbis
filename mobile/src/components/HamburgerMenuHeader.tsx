@@ -1,34 +1,66 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface HamburgerMenuHeaderProps {
   onClose: () => void;
+  onLogout: () => void;
 }
 
-export default function HamburgerMenuHeader({ onClose }: HamburgerMenuHeaderProps) {
-  const { getTextColor, getPrimaryColor, getBorderColor } = useThemeFallback();
+export default function HamburgerMenuHeader({ onClose, onLogout }: HamburgerMenuHeaderProps) {
+  const { colors, isLoaded } = useThemeContext();
+
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.header, { borderBottomColor: '#E5E7EB' }]}>
+        <View style={styles.headerContent}>
+          <View style={styles.userInfo}>
+            <View style={[styles.avatar, { backgroundColor: '#7C3AED' }]}>
+              <Ionicons name="person" size={20} color="white" />
+            </View>
+            <View style={styles.userDetails}>
+              <Text style={[styles.userName, { color: '#1F2937' }]}>Użytkownik</Text>
+              <Text style={[styles.userEmail, { color: '#6B7280' }]}>user@example.com</Text>
+            </View>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
+              <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <Ionicons name="close" size={20} color="#1F2937" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.header, { borderBottomColor: getBorderColor('primary') }]}>
+    <View style={[styles.header, { borderBottomColor: colors.border.primary }]}>
       <View style={styles.headerContent}>
         <View style={styles.userInfo}>
-          <View style={[styles.avatar, { backgroundColor: getPrimaryColor() }]}>
-            <Ionicons name="person" size={24} color={getTextColor('inverse')} />
+          <View style={[styles.avatar, { backgroundColor: colors.primary[600] }]}>
+            <Ionicons name="person" size={20} color={colors.text.inverse} />
           </View>
           <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: getTextColor('primary') }]}>
+            <Text style={[styles.userName, { color: colors.text.primary }]}>
               Użytkownik
             </Text>
-            <Text style={[styles.userEmail, { color: getTextColor('secondary') }]}>
+            <Text style={[styles.userEmail, { color: colors.text.secondary }]}>
               user@example.com
             </Text>
           </View>
         </View>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color={getTextColor('primary')} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
+            <Ionicons name="log-out-outline" size={20} color={colors.error[500]} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Ionicons name="close" size={20} color={colors.text.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -36,8 +68,8 @@ export default function HamburgerMenuHeader({ onClose }: HamburgerMenuHeaderProp
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   headerContent: {
@@ -51,25 +83,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   userDetails: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 2,
   },
   userEmail: {
-    fontSize: 14,
+    fontSize: 12,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoutButton: {
+    padding: 6,
+    borderRadius: 16,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
   },
   closeButton: {
-    padding: 8,
+    padding: 6,
+    borderRadius: 16,
   },
 });

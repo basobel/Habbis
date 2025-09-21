@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, TouchableOpacityProps } from 'react-native';
-import { useThemeFallback } from '@/hooks/useThemeFallback';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
 interface FormButtonProps extends TouchableOpacityProps {
   title: string;
@@ -8,25 +8,6 @@ interface FormButtonProps extends TouchableOpacityProps {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'small' | 'medium' | 'large';
 }
-
-const buttonVariants = {
-  primary: {
-    backgroundColor: (getPrimaryColor: () => string) => getPrimaryColor(),
-    textColor: (getTextColor: (variant: string) => string) => getTextColor('inverse'),
-    borderWidth: 0,
-  },
-  secondary: {
-    backgroundColor: () => 'transparent',
-    textColor: (getPrimaryColor: () => string) => getPrimaryColor(),
-    borderWidth: 1,
-    borderColor: (getPrimaryColor: () => string) => getPrimaryColor(),
-  },
-  danger: {
-    backgroundColor: (getErrorColor: () => string) => getErrorColor(),
-    textColor: (getTextColor: (variant: string) => string) => getTextColor('inverse'),
-    borderWidth: 0,
-  },
-};
 
 export default function FormButton({ 
   title, 
@@ -37,29 +18,51 @@ export default function FormButton({
   disabled,
   ...props 
 }: FormButtonProps) {
-  const { 
-    getPrimaryColor, 
-    getTextColor, 
-    getErrorColor,
-    getBackgroundColor,
-    isLoaded 
-  } = useThemeFallback();
+  const { colors, isLoaded } = useThemeContext();
 
-  const variantConfig = buttonVariants[variant];
+  if (!isLoaded || !colors) {
+    return (
+      <TouchableOpacity style={[styles.button, styles[size], style]} disabled>
+        <Text style={styles.text}>{title}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  const getButtonColors = () => {
+    switch (variant) {
+      case 'secondary':
+        return {
+          backgroundColor: 'transparent',
+          textColor: colors.primary[600],
+          borderColor: colors.primary[600],
+          borderWidth: 1,
+        };
+      case 'danger':
+        return {
+          backgroundColor: colors.error[500],
+          textColor: colors.text.inverse,
+          borderColor: colors.error[500],
+          borderWidth: 0,
+        };
+      default:
+        return {
+          backgroundColor: colors.primary[600],
+          textColor: colors.text.inverse,
+          borderColor: colors.primary[600],
+          borderWidth: 0,
+        };
+    }
+  };
+
+  const buttonColors = getButtonColors();
   
   const buttonStyle = [
     styles.button,
     styles[size],
     {
-      backgroundColor: variantConfig.backgroundColor(getPrimaryColor),
-      borderWidth: variantConfig.borderWidth,
-      ...(variantConfig.borderWidth > 0 && {
-        borderColor: variantConfig.borderColor?.(getPrimaryColor),
-      }),
-    },
-    (disabled || loading) && { 
-      backgroundColor: getBackgroundColor('secondary'),
-      borderColor: getBackgroundColor('secondary'),
+      backgroundColor: (disabled || loading) ? colors.background.secondary : buttonColors.backgroundColor,
+      borderColor: (disabled || loading) ? colors.background.secondary : buttonColors.borderColor,
+      borderWidth: buttonColors.borderWidth,
     },
     style,
   ];
@@ -67,14 +70,11 @@ export default function FormButton({
   const textStyle = [
     styles.text,
     {
-      color: variantConfig.textColor(getTextColor),
-    },
-    (disabled || loading) && { 
-      color: getTextColor('inverse'),
+      color: (disabled || loading) ? colors.text.secondary : buttonColors.textColor,
     },
   ];
 
-  const indicatorColor = variant === 'secondary' ? getPrimaryColor() : getTextColor('inverse');
+  const indicatorColor = variant === 'secondary' ? colors.primary[600] : colors.text.inverse;
 
   return (
     <TouchableOpacity
