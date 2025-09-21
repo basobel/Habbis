@@ -50,6 +50,16 @@ export default function CircularMenu({
   ).current;
   const closeButtonAnimation = useRef(new Animated.Value(0)).current;
 
+  // Synchronizacja animacji ze stanem
+  useEffect(() => {
+    if (!isOpen) {
+      // Resetuj animacje gdy menu jest zamknięte
+      menuAnimation.setValue(0);
+      buttonAnimations.forEach(anim => anim.setValue(0));
+      closeButtonAnimation.setValue(0);
+    }
+  }, [isOpen, menuAnimation, buttonAnimations, closeButtonAnimation]);
+
   // Pozycjonowanie menu z uwzględnieniem SafeArea
   const getMenuPosition = () => {
     const bottomMargin = Math.max(insets.bottom + 20, 30); // Minimum 30px, ale uwzględnij SafeArea
