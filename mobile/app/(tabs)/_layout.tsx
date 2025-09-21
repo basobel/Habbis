@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import CircularMenu from '@/components/CircularMenu';
+import TopPanel from '@/components/TopPanel';
 import { useRouter } from 'expo-router';
 
 const menuItems = [
@@ -66,8 +67,14 @@ export default function TabLayout() {
     );
   }
 
+  const handleNavigate = (screen: string) => {
+    router.push(screen as any);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <TopPanel onNavigate={handleNavigate} />
+      
       <Stack
         screenOptions={{
           headerShown: false,
