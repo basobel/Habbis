@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import FadeInView from '@/components/FadeInView';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -66,7 +67,8 @@ export default function StatisticsScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Quick Stats */}
         <View style={styles.statsGrid}>
@@ -204,7 +206,8 @@ export default function StatisticsScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

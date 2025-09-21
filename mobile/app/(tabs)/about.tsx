@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import FadeInView from '@/components/FadeInView';
 
 export default function AboutScreen() {
   const { colors, isLoaded } = useThemeContext();
@@ -98,7 +99,8 @@ export default function AboutScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* App Info */}
         <View style={[styles.appInfoCard, { backgroundColor: colors.background.card }]}>
@@ -201,7 +203,8 @@ export default function AboutScreen() {
           </Text>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

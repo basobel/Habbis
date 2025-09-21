@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import FadeInView from '@/components/FadeInView';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -87,7 +88,8 @@ export default function PremiumScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={[styles.heroSection, { backgroundColor: colors.accent.gold }]}>
@@ -199,7 +201,8 @@ export default function PremiumScreen() {
           </Text>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

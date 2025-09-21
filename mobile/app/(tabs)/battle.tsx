@@ -5,16 +5,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   RefreshControl,
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useThemeContext } from '../../src/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
+import FadeInView from '@/components/FadeInView';
 
 const { width } = Dimensions.get('window');
 
@@ -32,7 +29,6 @@ interface BattleMode {
 
 export default function BattleScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
@@ -140,16 +136,17 @@ export default function BattleScreen() {
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: backgroundPrimary }]}>
+      <View style={[styles.container, { backgroundColor: backgroundPrimary }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: textPrimary }]}>Loading battle modes...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: backgroundPrimary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: backgroundPrimary }]}>
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -158,11 +155,18 @@ export default function BattleScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <SharedHeader
-          title="🗡️ System Walki"
-          subtitle="Wybierz tryb walki i rozpocznij przygodę"
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+        <View style={[styles.header, { backgroundColor: backgroundPrimary }]}>
+          <View style={styles.headerContent}>
+            <View>
+              <Text style={[styles.title, { color: textPrimary }]}>
+                🗡️ System Walki
+              </Text>
+              <Text style={[styles.subtitle, { color: textSecondary }]}>
+                Wybierz tryb walki i rozpocznij przygodę
+              </Text>
+            </View>
+          </View>
+        </View>
 
         {/* Battle Modes Grid */}
         <View style={styles.modesGrid}>
@@ -291,18 +295,35 @@ export default function BattleScreen() {
       </ScrollView>
 
       {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+      </View>
+    </FadeInView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 60,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.7,
   },
   scrollView: {
     flex: 1,

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import FadeInView from '@/components/FadeInView';
 
 export default function HelpScreen() {
   const { colors, isLoaded } = useThemeContext();
@@ -93,7 +94,8 @@ export default function HelpScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Search */}
         <View style={[styles.searchContainer, { backgroundColor: colors.background.card }]}>
@@ -194,7 +196,8 @@ export default function HelpScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

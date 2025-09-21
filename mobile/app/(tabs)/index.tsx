@@ -5,14 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import HamburgerMenu from '@/components/HamburgerMenu';
-import SharedHeader from '@/components/SharedHeader';
+import FadeInView from '@/components/FadeInView';
 
 interface Habit {
   id: string;
@@ -27,9 +24,7 @@ interface Habit {
 
 export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   // Mock data
   const [habits, setHabits] = useState<Habit[]>([
@@ -114,16 +109,17 @@ export default function HabitsScreen() {
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading habits...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
         <View style={styles.headerContent}>
@@ -248,7 +244,8 @@ export default function HabitsScreen() {
         )}
       </ScrollView>
 
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

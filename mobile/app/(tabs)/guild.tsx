@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -12,9 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
+import FadeInView from '@/components/FadeInView';
 import GuildCard from '@/components/GuildCard';
 import CreateGuildModal from '@/components/CreateGuildModal';
 
@@ -44,7 +41,6 @@ interface Guild {
 
 export default function GuildScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
   const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -161,26 +157,29 @@ export default function GuildScreen() {
 
   if (!isLoaded || !colors) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="Gildie"
-          subtitle="Loading..."
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading guilds...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="Gildie"
-        subtitle={`${guilds.length} gildii • ${guilds.filter(g => g.members < g.maxMembers).length} rekrutuje`}
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
+              Gildie
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              {guilds.length} gildii • {guilds.filter(g => g.members < g.maxMembers).length} rekrutuje
+            </Text>
+          </View>
+        </View>
+      </View>
 
       {/* Search Bar */}
       <View style={[styles.searchContainer, { backgroundColor: colors.background.card }]}>
@@ -288,17 +287,36 @@ export default function GuildScreen() {
       />
 
       {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+      </View>
+    </FadeInView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { 
+    flex: 1,
+    paddingTop: 60,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { fontSize: 16, fontWeight: '500' },
   searchContainer: {

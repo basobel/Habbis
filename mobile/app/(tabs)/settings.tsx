@@ -9,11 +9,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useTheme } from '@/hooks/useTheme';
+import FadeInView from '@/components/FadeInView';
 
 export default function SettingsScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { themeMode, setTheme } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [soundEnabled, setSoundEnabled] = React.useState(true);
   const [hapticEnabled, setHapticEnabled] = React.useState(true);
@@ -35,11 +34,10 @@ export default function SettingsScreen() {
         {
           id: 'theme',
           title: 'Motyw',
-          subtitle: themeMode === 'system' ? 'Systemowy' : themeMode === 'dark' ? 'Ciemny' : 'Jasny',
+          subtitle: 'Jasny',
           icon: 'color-palette-outline',
           onPress: () => {
-            const newTheme = themeMode === 'light' ? 'dark' : themeMode === 'dark' ? 'system' : 'light';
-            setTheme(newTheme);
+            console.log('Toggle theme');
           },
         },
       ],
@@ -131,7 +129,8 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {settingsSections.map((section, sectionIndex) => (
           <View key={section.title} style={styles.section}>
@@ -183,7 +182,8 @@ export default function SettingsScreen() {
           </View>
         ))}
       </ScrollView>
-    </View>
+      </View>
+    </FadeInView>
   );
 }
 

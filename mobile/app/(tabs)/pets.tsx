@@ -5,17 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   RefreshControl,
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useNavigation } from '@/hooks/useNavigation';
 import PetCard from '@/components/PetCard';
 import PetDetailsModal from '@/components/PetDetailsModal';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
+import FadeInView from '@/components/FadeInView';
 
 interface Pet {
   id: string;
@@ -38,12 +35,10 @@ interface Pet {
 
 export default function PetsScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const { handleNavigate } = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'common' | 'rare' | 'epic' | 'legendary'>('all');
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   // Mock data - w przyszłości będzie z Redux store
   const [pets, setPets] = useState<Pet[]>([
@@ -202,29 +197,37 @@ export default function PetsScreen() {
 
   if (!isLoaded || !colors || !colors.primary || !colors.primary[500]) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading pets...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <FadeInView duration={400}>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header */}
-      <SharedHeader
-        title="Moje Zwierzęta"
-        subtitle={`${pets.length} zwierząt • ${pets.filter(p => p.isActive).length} aktywnych`}
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        rightAction={{
-          icon: 'add',
-          onPress: () => {
-            // TODO: Implement add pet
-            console.log('Add pet');
-          }
-        }}
-      />
+      <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
+              Moje Zwierzęta
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              {pets.length} zwierząt • {pets.filter(p => p.isActive).length} aktywnych
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary[600] }]}
+            onPress={() => console.log('Add pet')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={24} color={colors.text.inverse} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Filter Tabs */}
       <View style={styles.filterContainer}>
@@ -313,18 +316,42 @@ export default function PetsScreen() {
       />
 
       {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+      </View>
+    </FadeInView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 60,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingContainer: {
     flex: 1,
