@@ -29,64 +29,99 @@ class UserService {
    * Update user profile
    */
   async updateProfile(data: UpdateProfileData): Promise<UserProfile> {
-    const response = await apiClient.put('/user/profile', data);
-    return response.data.data;
+    try {
+      const response = await apiClient.put('/user/profile', data);
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to update user profile', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Upload avatar
    */
   async uploadAvatar(avatarFile: FormData): Promise<{ avatar_url: string }> {
-    const response = await apiClient.post('/user/avatar', avatarFile, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data.data;
+    try {
+      const response = await apiClient.post('/user/avatar', avatarFile, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to upload avatar', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Get user statistics
    */
   async getStatistics(): Promise<UserStatistics> {
-    const response = await apiClient.get('/user/statistics');
-    return response.data.data;
+    try {
+      const response = await apiClient.get('/user/statistics');
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to fetch user statistics', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Get user equipment
    */
   async getEquipment(): Promise<UserEquipment[]> {
-    const response = await apiClient.get('/user/equipment');
-    return response.data.data;
+    try {
+      const response = await apiClient.get('/user/equipment');
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to fetch user equipment', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Equip item
    */
   async equipItem(itemId: number): Promise<UserEquipment> {
-    const response = await apiClient.post('/user/equipment/equip', {
-      item_id: itemId,
-    });
-    return response.data.data;
+    try {
+      const response = await apiClient.post('/user/equipment/equip', {
+        item_id: itemId,
+      });
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to equip item', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Get user avatars
    */
   async getAvatars(): Promise<UserAvatar[]> {
-    const response = await apiClient.get('/user/avatars');
-    return response.data.data;
+    try {
+      const response = await apiClient.get('/user/avatars');
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to fetch user avatars', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
    * Set active avatar
    */
   async setActiveAvatar(avatarId: number): Promise<UserAvatar> {
-    const response = await apiClient.post('/user/avatars/set-active', {
-      avatar_id: avatarId,
-    });
-    return response.data.data;
+    try {
+      const response = await apiClient.post('/user/avatars/set-active', {
+        avatar_id: avatarId,
+      });
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to set active avatar', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
@@ -96,8 +131,13 @@ class UserService {
     regular_currency: number;
     premium_currency: number;
   }> {
-    const response = await apiClient.post('/user/currency/add', data);
-    return response.data.data;
+    try {
+      const response = await apiClient.post('/user/currency/add', data);
+      return response.data.data;
+    } catch (error: any) {
+      logger.error('Failed to add currency', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   /**
