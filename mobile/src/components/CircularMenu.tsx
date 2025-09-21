@@ -89,8 +89,8 @@ export default function CircularMenu({
     return items.map((_, index) => {
         const angle = startAngle + angleStep * index;
       
-        const x = Math.cos(angle) * radius;
-        const y = -Math.sin(angle) * radius - radius * 0.2; // góra (minus przed sin)
+        const x = Math.cos(angle) * (radius * 0.7); // Zmniejszony radius
+        const y = -Math.sin(angle) * (radius * 0.7); // Mniejsze przesunięcie w górę
       
         return { x, y };
       });
@@ -267,7 +267,7 @@ export default function CircularMenu({
                       {
                         translateY: buttonAnimation.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [0, position.y],
+                          outputRange: [-50, position.y - 50],
                         }),
                       },
                       {

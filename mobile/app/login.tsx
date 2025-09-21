@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  Alert, 
+  TouchableOpacity, 
+  Animated, 
+  Dimensions,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useDispatch } from 'react-redux';
 import { router } from 'expo-router';
 import { login } from '@/store/slices/authSlice';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
-import ThemeToggle from '@/components/ThemeToggle';
 import { useThemeContext } from '@/contexts/ThemeContext';
+
+const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
@@ -18,6 +32,33 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  // Animacje
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  // Animacja wejścia
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   // Show loading if theme is not loaded
   if (!isLoaded || !colors) {
@@ -72,65 +113,112 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors?.background?.primary || '#F5F3FF' }]} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.header}>
-        <ThemeToggle size="small" showLabel={false} style={styles.themeToggle} />
-      </View>
-      <Text style={[styles.title, { color: colors?.text?.primary || '#4C1D95' }]}>Welcome Back</Text>
-      <Text style={[styles.subtitle, { color: colors?.text?.secondary || '#64748B' }]}>Sign in to continue your journey</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      
+      {/* Gradient Background */}
+      <LinearGradient
+        colors={[colors?.primary?.[600] || '#7C3AED', colors?.primary?.[800] || '#4C1D95']}
+        style={styles.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        {/* Decorative Elements */}
+        <View style={styles.decorativeCircle1} />
+        <View style={styles.decorativeCircle2} />
+        <View style={styles.decorativeCircle3} />
+      </LinearGradient>
 
-      <View style={styles.form}>
-        <FormInput
-          label="Email"
-          placeholder="Enter your email"
-          value={formData.email}
-          onChangeText={(text) => setFormData({ ...formData, email: text })}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          returnKeyType="next"
-          onSubmitEditing={() => {
-            // Focus next input (password)
-            // This will be handled by ref in FormInput
-          }}
-          error={errors.email}
-          required
-        />
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <View style={styles.scrollContent}>
 
-        <FormInput
-          label="Password"
-          placeholder="Enter your password"
-          value={formData.password}
-          onChangeText={(text) => setFormData({ ...formData, password: text })}
-          secureTextEntry
-          returnKeyType="done"
-          onSubmitEditing={handleLogin}
-          error={errors.password}
-          required
-        />
+          {/* Title Section */}
+          <Animated.View 
+            style={[
+              styles.titleSection,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <Text style={styles.title}>Witaj z powrotem!</Text>
+            <Text style={styles.subtitle}>Zaloguj się, aby kontynuować swoją przygodę z nawykami</Text>
+          </Animated.View>
 
-        <TouchableOpacity
-          style={styles.forgotPassword}
-          onPress={handleForgotPassword}
-        >
-          <Text style={[styles.forgotPasswordText, { color: colors?.primary?.[600] || '#7C3AED' }]}>Forgot Password?</Text>
-        </TouchableOpacity>
+          {/* Form Card */}
+          <Animated.View 
+            style={[
+              styles.formCard,
+              {
+                backgroundColor: colors?.background?.card || '#FFFFFF',
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <View style={styles.form}>
+              <FormInput
+                label="Email"
+                placeholder="Wprowadź swój email"
+                value={formData.email}
+                onChangeText={(text) => setFormData({ ...formData, email: text })}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="next"
+                error={errors.email}
+                required
+                style={styles.input}
+              />
 
-        <FormButton
-          title="Sign In"
-          onPress={handleLogin}
-          loading={isLoading}
-          disabled={isLoading}
-          style={styles.button}
-        />
+              <FormInput
+                label="Hasło"
+                placeholder="Wprowadź swoje hasło"
+                value={formData.password}
+                onChangeText={(text) => setFormData({ ...formData, password: text })}
+                secureTextEntry
+                returnKeyType="done"
+                onSubmitEditing={handleLogin}
+                error={errors.password}
+                required
+                style={styles.input}
+              />
 
-        <FormButton
-          title="Don't have an account? Sign Up"
-          onPress={() => router.replace('/register')}
-          variant="secondary"
-          style={styles.linkButton}
-        />
-      </View>
-    </ScrollView>
+              <TouchableOpacity
+                style={styles.forgotPassword}
+                onPress={handleForgotPassword}
+              >
+                <Text style={[styles.forgotPasswordText, { color: colors?.primary?.[600] || '#7C3AED' }]}>
+                  Zapomniałeś hasła?
+                </Text>
+              </TouchableOpacity>
+
+              <FormButton
+                title="Zaloguj się"
+                onPress={handleLogin}
+                loading={isLoading}
+                disabled={isLoading}
+                style={styles.button}
+                size="large"
+              />
+
+
+              <TouchableOpacity
+                onPress={() => router.replace('/register')}
+                style={styles.linkButton}
+              >
+                <Text style={[styles.linkButtonText, { color: colors?.primary?.[600] || '#7C3AED' }]}>
+                  Nie masz konta? Zarejestruj się
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -138,47 +226,103 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  header: {
+  gradient: {
     position: 'absolute',
-    top: 60,
-    right: 20,
-    zIndex: 1,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  themeToggle: {
-    padding: 8,
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+  },
+  titleSection: {
+    alignItems: 'center',
+    marginBottom: 16,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
+    color: 'white',
+    marginBottom: 6,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 32,
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
+    lineHeight: 20,
+  },
+  formCard: {
+    borderRadius: 20,
+    padding: 20,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
   },
   form: {
     width: '100%',
-    maxWidth: 400,
+  },
+  input: {
+    marginBottom: 12,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   forgotPasswordText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
   },
   button: {
     marginBottom: 16,
   },
   linkButton: {
-    marginTop: 8,
+    marginTop: 4,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  linkButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  // Decorative elements
+  decorativeCircle1: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  decorativeCircle2: {
+    position: 'absolute',
+    bottom: -100,
+    left: -100,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  decorativeCircle3: {
+    position: 'absolute',
+    top: '30%',
+    right: -80,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
 });
