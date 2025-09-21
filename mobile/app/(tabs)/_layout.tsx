@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 import CircularMenu from '@/components/CircularMenu';
 import TopPanel from '@/components/TopPanel';
 import { useRouter } from 'expo-router';
@@ -41,6 +43,16 @@ export default function TabLayout() {
   const { colors, isLoaded } = useThemeContext();
   const router = useRouter();
   const [isTopPanelExpanded, setIsTopPanelExpanded] = useState(false);
+  
+  // Check if user is authenticated
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth || { isAuthenticated: false });
+  
+  console.log('TabLayout render:', { isLoaded, colors: !!colors, isAuthenticated });
+  
+  // Don't render TopPanel if user is not authenticated
+  if (!isAuthenticated) {
+    console.log('TabLayout: User not authenticated, not rendering TopPanel');
+  }
 
   // Don't render if theme is not loaded
   if (!isLoaded || !colors) {

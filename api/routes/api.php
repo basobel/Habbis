@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PetController;
 use App\Http\Controllers\Api\BattleController;
 use App\Http\Controllers\Api\GuildController;
 use App\Http\Controllers\Api\AchievementController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -52,9 +53,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Password management
     Route::post('/password/change', [PasswordResetController::class, 'changePassword']);
 
-    // User profile
-    Route::get('profile', function (Request $request) {
-        return $request->user()->load(['pets', 'activeHabits', 'completedAchievements']);
+    // User profile and data
+    Route::prefix('user')->group(function () {
+        Route::get('profile', [UserController::class, 'getProfile']);
+        Route::put('profile', [UserController::class, 'updateProfile']);
+        Route::post('avatar', [UserController::class, 'uploadAvatar']);
+        Route::get('statistics', [UserController::class, 'getStatistics']);
+        Route::get('equipment', [UserController::class, 'getEquipment']);
+        Route::post('equipment/equip', [UserController::class, 'equipItem']);
+        Route::get('avatars', [UserController::class, 'getAvatars']);
+        Route::post('avatars/set-active', [UserController::class, 'setActiveAvatar']);
+        Route::post('currency/add', [UserController::class, 'addCurrency']);
     });
 
     // Habits

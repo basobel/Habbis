@@ -21,6 +21,7 @@ const createNoopStorage = () => {
 
 const storage = typeof window !== 'undefined' ? createWebStorage('local') : createNoopStorage();
 import authSlice from './slices/authSlice';
+import userSlice from './slices/userSlice';
 import habitsSlice from './slices/habitsSlice';
 import petsSlice from './slices/petsSlice';
 import battlesSlice from './slices/battlesSlice';
@@ -35,6 +36,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authSlice,
+  user: userSlice,
   habits: habitsSlice,
   pets: petsSlice,
   battles: battlesSlice,

@@ -23,10 +23,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'level',
         'experience_points',
         'premium_currency',
+        'regular_currency',
+        'is_premium',
+        'premium_expires_at',
         'total_streak_days',
         'current_streak_days',
         'last_activity_at',
         'settings',
+        'statistics',
+        'equipment',
+        'avatar_preferences',
         'notifications_enabled',
         'timezone',
     ];
@@ -39,7 +45,12 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_premium' => 'boolean',
+        'premium_expires_at' => 'datetime',
         'settings' => 'array',
+        'statistics' => 'array',
+        'equipment' => 'array',
+        'avatar_preferences' => 'array',
         'notifications_enabled' => 'boolean',
         'last_activity_at' => 'datetime',
     ];
@@ -94,6 +105,36 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Guild::class, 'leader_id');
     }
 
+    public function userStatistics(): HasMany
+    {
+        return $this->hasMany(UserStatistic::class);
+    }
+
+    public function currentStatistics(): HasMany
+    {
+        return $this->hasMany(UserStatistic::class)->latest()->limit(1);
+    }
+
+    public function equipment(): HasMany
+    {
+        return $this->hasMany(UserEquipment::class);
+    }
+
+    public function equippedItems(): HasMany
+    {
+        return $this->hasMany(UserEquipment::class)->where('is_equipped', true);
+    }
+
+    public function avatars(): HasMany
+    {
+        return $this->hasMany(UserAvatar::class);
+    }
+
+    public function activeAvatar(): HasMany
+    {
+        return $this->hasMany(UserAvatar::class)->where('is_active', true);
+    }
+
     // Helper methods
     public function addExperience(int $amount): void
     {
@@ -104,6 +145,51 @@ class User extends Authenticatable implements MustVerifyEmail
     public function addPremiumCurrency(int $amount): void
     {
         $this->increment('premium_currency', $amount);
+    }
+
+    public function addRegularCurrency(int $amount): void
+    {
+        $this->increment('regular_currency', $amount);
+    }
+
+    public function spendPremiumCurrency(int $amount): bool
+    {
+        if ($this->premium_currency >= $amount) {
+            $this->decrement('premium_currency', $amount);
+            return true;
+        }
+        return false;
+    }
+
+    public function spendRegularCurrency(int $amount): bool
+    {
+        if ($this->regular_currency >= $amount) {
+            $this->decrement('regular_currency', $amount);
+            return true;
+        }
+        return false;
+    }
+
+    public function isPremiumActive(): bool
+    {
+        return $this->is_premium && 
+               ($this->premium_expires_at === null || $this->premium_expires_at->isFuture());
+    }
+
+    public function activatePremium(int $days = 30): void
+    {
+        $this->update([
+            'is_premium' => true,
+            'premium_expires_at' => now()->addDays($days),
+        ]);
+    }
+
+    public function deactivatePremium(): void
+    {
+        $this->update([
+            'is_premium' => false,
+            'premium_expires_at' => null,
+        ]);
     }
 
     public function checkLevelUp(): void

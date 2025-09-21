@@ -7,9 +7,14 @@ import {
   Animated,
   Dimensions,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { fetchUserProfile } from '@/store/slices/userSlice';
+import { userService } from '@/services/userService';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -22,26 +27,27 @@ interface TopPanelProps {
 
 export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, onToggle, onClose }: TopPanelProps) {
   const { colors, isLoaded } = useThemeContext();
+  const dispatch = useDispatch();
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   
   const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
   const setIsExpanded = onClose || setInternalIsExpanded;
   
+  // Redux state
+  const { profile, statistics, loading } = useSelector((state: RootState) => state.user || { profile: null, statistics: null, loading: false });
+  
   // Animacje
   const expandAnimation = useRef(new Animated.Value(0)).current;
   const rotateAnimation = useRef(new Animated.Value(0)).current;
 
-  // Dane użytkownika (mock)
-  const userData = {
-    name: 'Użytkownik',
-    level: 15,
-    experience: 1250,
-    maxExperience: 2000,
-    coins: 1250,
-    premiumCoins: 45,
-    streak: 7,
-    achievements: 12,
-  };
+  // Load user data on mount
+  useEffect(() => {
+    console.log('TopPanel useEffect: profile =', !!profile, 'loading =', loading);
+    if (!profile && !loading) {
+      console.log('TopPanel: Dispatching fetchUserProfile');
+      dispatch(fetchUserProfile() as any);
+    }
+  }, [dispatch, profile, loading]);
 
 
   useEffect(() => {
@@ -71,19 +77,35 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
     onNavigate?.('/(tabs)/profile');
   };
 
+  // Calculate level progress
+  const levelProgress = profile ? userService.calculateLevelProgress(profile.experience_points, profile.level) : { current: 0, required: 100, percentage: 0 };
+
+  console.log('TopPanel render:', { isLoaded, colors: !!colors, profile: !!profile, loading });
+
   if (!isLoaded || !colors) {
+    console.log('TopPanel: Theme not loaded');
+    return null;
+  }
+
+  if (loading && !profile) {
+    console.log('TopPanel: Loading state');
     return (
-      <View style={[styles.container, { backgroundColor: colors?.background.card || '#F3F4F6' }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
         <View style={styles.basicInfo}>
-          <View style={[styles.avatar, { backgroundColor: colors?.primary?.[600] || '#7C3AED' }]}>
-            <Ionicons name="person" size={16} color="white" />
-          </View>
-          <View style={styles.stats}>
-            <Text style={[styles.coinsText, { color: colors?.text.primary || '#1F2937' }]}>1250</Text>
-            <Text style={[styles.premiumText, { color: colors?.text.secondary || '#6B7280' }]}>45</Text>
-          </View>
+          <Text style={[styles.loadingText, { color: colors.text.primary }]}>Loading...</Text>
         </View>
-      </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!profile) {
+    console.log('TopPanel: No profile data');
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.basicInfo}>
+          <Text style={[styles.loadingText, { color: colors.text.primary }]}>No profile data</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -101,20 +123,24 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
             onPress={handleProfilePress}
             activeOpacity={0.8}
           >
-            <Ionicons name="person" size={16} color={colors.text.inverse} />
+            {profile.avatar_url ? (
+              <Image source={{ uri: profile.avatar_url }} style={styles.avatarImage} />
+            ) : (
+              <Ionicons name="person" size={16} color={colors.text.inverse} />
+            )}
           </TouchableOpacity>
           
           <View style={styles.stats}>
             <View style={styles.coinsContainer}>
               <Ionicons name="logo-bitcoin" size={14} color="#F59E0B" />
               <Text style={[styles.coinsText, { color: colors.text.primary }]}>
-                {userData.coins.toLocaleString()}
+                {profile.regular_currency.toLocaleString()}
               </Text>
             </View>
             <View style={styles.premiumContainer}>
               <Ionicons name="diamond" size={14} color="#8B5CF6" />
               <Text style={[styles.premiumText, { color: colors.text.secondary }]}>
-                {userData.premiumCoins}
+                {profile.premium_currency}
               </Text>
             </View>
           </View>
@@ -156,11 +182,11 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
               <View style={styles.detailLeft}>
                 <Ionicons name="trophy" size={16} color={colors.primary[600]} />
                 <Text style={[styles.detailLabel, { color: colors.text.secondary }]}>
-                  Poziom {userData.level}
+                  Poziom {profile.level}
                 </Text>
               </View>
               <Text style={[styles.detailValue, { color: colors.text.primary }]}>
-                {userData.experience}/{userData.maxExperience} XP
+                {levelProgress.current}/{levelProgress.required} XP
               </Text>
             </View>
 
@@ -171,7 +197,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                   styles.progressFill,
                   {
                     backgroundColor: colors.primary[600],
-                    width: `${(userData.experience / userData.maxExperience) * 100}%`,
+                    width: `${levelProgress.percentage}%`,
                   },
                 ]}
               />
@@ -186,7 +212,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                 </Text>
               </View>
               <Text style={[styles.detailValue, { color: colors.text.primary }]}>
-                {userData.streak} dni
+                {profile.current_streak_days} dni
               </Text>
             </View>
 
@@ -199,7 +225,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                 </Text>
               </View>
               <Text style={[styles.detailValue, { color: colors.text.primary }]}>
-                {userData.achievements}
+                {profile.achievements?.length || 0}
               </Text>
             </View>
 
@@ -405,5 +431,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: 14,
+  },
+  avatarImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
