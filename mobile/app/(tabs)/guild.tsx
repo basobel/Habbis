@@ -41,7 +41,6 @@ interface Guild {
 
 export default function GuildScreen() {
   const { colors, isLoaded } = useThemeContext();
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'public' | 'private' | 'recruiting'>('all');

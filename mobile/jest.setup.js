@@ -1,3 +1,15 @@
+// Mock window object BEFORE importing react-native
+if (typeof window === 'undefined') {
+  global.window = {
+    localStorage: {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+      clear: jest.fn(),
+    },
+  };
+}
+
 import 'react-native-gesture-handler/jestSetup';
 
 // Mock react-native-reanimated

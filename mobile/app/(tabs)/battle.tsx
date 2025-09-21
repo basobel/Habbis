@@ -31,7 +31,6 @@ export default function BattleScreen() {
   const { colors, isLoaded } = useThemeContext();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
 
   // Fallback colors
   const primaryColor = colors?.primary?.[500] || '#7C3AED';
@@ -53,7 +52,7 @@ export default function BattleScreen() {
       id: 'arena',
       title: 'Arena PvP',
       description: 'Walcz z innymi graczami w turniejach',
-      icon: 'sword',
+      icon: 'sword-outline',
       color: error500,
       difficulty: 'hard',
       rewards: ['Trophy', 'Coins', 'XP'],
@@ -345,10 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   modeIcon: {
@@ -423,10 +419,7 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   statsTitle: {
@@ -465,10 +458,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   quickActionText: {

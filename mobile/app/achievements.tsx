@@ -12,10 +12,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { useNavigation } from '@/hooks/useNavigation';
-import SharedHeader from '@/components/SharedHeader';
-import HamburgerMenu from '@/components/HamburgerMenu';
+import TopPanel from '@/components/TopPanel';
+import CircularMenu from '@/components/CircularMenu';
 import AchievementCard from '@/components/AchievementCard';
-import AchievementCategory from '@/components/AchievementCategory';
 
 const { width } = Dimensions.get('window');
 
@@ -44,7 +43,6 @@ interface Achievement {
 export default function AchievementsScreen() {
   const { colors, isLoaded } = useThemeContext();
   const { handleNavigate } = useNavigation();
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -271,11 +269,7 @@ export default function AchievementsScreen() {
   if (!isLoaded || !colors) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
-        <SharedHeader
-          title="Osiągnięcia"
-          subtitle="Loading..."
-          onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        />
+        <TopPanel />
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading achievements...</Text>
         </View>
@@ -285,11 +279,7 @@ export default function AchievementsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <SharedHeader
-        title="Osiągnięcia"
-        subtitle={`${unlockedCount}/${achievements.length} odblokowanych • ${totalPoints} punktów`}
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-      />
+      <TopPanel />
 
       {/* Stats Overview */}
       <View style={[styles.statsContainer, { backgroundColor: colors.background.card }]}>
@@ -406,12 +396,8 @@ export default function AchievementsScreen() {
         )}
       </ScrollView>
 
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
+      {/* Circular Menu */}
+      <CircularMenu />
     </SafeAreaView>
   );
 }

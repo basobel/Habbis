@@ -16,6 +16,7 @@ export interface User {
   settings?: Record<string, any>;
   notifications_enabled: boolean;
   timezone: string;
+  email_verified_at?: string;
   created_at: string;
   updated_at: string;
   // Additional fields for the new UI
@@ -23,6 +24,7 @@ export interface User {
   power?: number;
   gold?: number;
   class?: string;
+  achievements?: Achievement[];
 }
 
 // Pet types
@@ -217,6 +219,7 @@ export interface RegisterData {
 export interface AuthResponse {
   user: User;
   token: string;
+  email_verified?: boolean;
 }
 
 export interface HabitsResponse {

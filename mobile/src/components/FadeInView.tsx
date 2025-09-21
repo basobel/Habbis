@@ -19,7 +19,7 @@ export default function FadeInView({
       toValue: 1,
       duration,
       delay,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   }, [fadeAnim, duration, delay]);
 

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
 import { router } from 'expo-router';
 import { register } from '@/store/slices/authSlice';
+import { PetSpecies } from '@/types';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
@@ -10,8 +12,15 @@ import PetSpeciesSelector from '@/components/PetSpeciesSelector';
 import { Colors } from '../src/constants/colors';
 
 export default function RegisterScreen() {
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
+  const dispatch = useDispatch<AppDispatch>();
+  const [formData, setFormData] = useState<{
+    username: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    pet_name: string;
+    pet_species: PetSpecies;
+  }>({
     username: '',
     email: '',
     password: '',
@@ -175,7 +184,7 @@ export default function RegisterScreen() {
 
         <PetSpeciesSelector
           selectedSpecies={formData.pet_species}
-          onSpeciesChange={(species) => setFormData({ ...formData, pet_species: species })}
+          onSpeciesChange={(species) => setFormData({ ...formData, pet_species: species as PetSpecies })}
         />
 
         <FormButton

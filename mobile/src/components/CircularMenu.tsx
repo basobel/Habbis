@@ -357,10 +357,7 @@ const styles = StyleSheet.create({
   },
   mainButton: {
     elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.4)',
   },
   menuButtonContent: {
     flex: 1,
@@ -385,10 +382,7 @@ const styles = StyleSheet.create({
   },
   menuItemButton: {
     elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
   },
   menuItemContent: {
     flex: 1,

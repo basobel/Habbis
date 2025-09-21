@@ -65,7 +65,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
       Animated.timing(rotateAnimation, {
         toValue: isExpanded ? 1 : 0,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }),
     ]).start();
   }, [isExpanded]);
@@ -241,7 +241,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                     key={item.id}
                     style={styles.menuButton}
                     onPress={() => {
-                      onNavigate?.(`/${item.id}`);
+                      onNavigate?.(`/(tabs)/${item.id}`);
                       setIsExpanded(false);
                     }}
                     activeOpacity={0.7}
@@ -279,7 +279,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                       if (item.id === 'logout') {
                         onNavigate?.('/login');
                       } else {
-                        onNavigate?.(`/${item.id}`);
+                        onNavigate?.(`/(tabs)/${item.id}`);
                       }
                       setIsExpanded(false);
                     }}
@@ -419,10 +419,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 2,
   },
   menuButtonText: {

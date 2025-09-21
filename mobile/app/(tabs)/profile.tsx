@@ -25,7 +25,6 @@ export default function ProfileScreen() {
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [isUserStatsVisible, setIsUserStatsVisible] = useState(true);
-  const [isHamburgerMenuVisible, setIsHamburgerMenuVisible] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const lastScrollY = useRef(0);
 

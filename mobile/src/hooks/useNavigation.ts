@@ -15,22 +15,22 @@ export const useNavigation = () => {
         router.push('/(tabs)/profile');
         break;
       case 'settings':
-        router.push('/settings');
+        router.push('/(tabs)/settings');
         break;
       case 'premium':
-        router.push('/premium');
+        router.push('/(tabs)/premium');
         break;
       case 'achievements':
         router.push('/achievements');
         break;
       case 'statistics':
-        router.push('/statistics');
+        router.push('/(tabs)/statistics');
         break;
       case 'help':
-        router.push('/help');
+        router.push('/(tabs)/help');
         break;
       case 'about':
-        router.push('/about');
+        router.push('/(tabs)/about');
         break;
       case 'logout':
         dispatch(logout() as any);
