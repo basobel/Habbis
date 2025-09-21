@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import CircularMenu from '@/components/CircularMenu';
 import TopPanel from '@/components/TopPanel';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { useRouter } from 'expo-router';
 
 const menuItems = [
@@ -47,12 +48,7 @@ export default function TabLayout() {
   // Check if user is authenticated
   const { isAuthenticated } = useSelector((state: RootState) => state.auth || { isAuthenticated: false });
   
-  console.log('TabLayout render:', { isLoaded, colors: !!colors, isAuthenticated });
-  
   // Don't render TopPanel if user is not authenticated
-  if (!isAuthenticated) {
-    console.log('TabLayout: User not authenticated, not rendering TopPanel');
-  }
 
   // Don't render if theme is not loaded
   if (!isLoaded || !colors) {
@@ -78,51 +74,54 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <TopPanel 
-        onNavigate={handleNavigate}
-        isExpanded={isTopPanelExpanded}
-        onToggle={() => setIsTopPanelExpanded(!isTopPanelExpanded)}
-        onClose={() => setIsTopPanelExpanded(false)}
-      />
-      
-      {/* Overlay dla zamykania TopPanel */}
-      {isTopPanelExpanded && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => setIsTopPanelExpanded(false)}
+    <ErrorBoundary>
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+        {isAuthenticated && (
+          <TopPanel 
+            onNavigate={handleNavigate}
+            isExpanded={isTopPanelExpanded}
+            onToggle={() => setIsTopPanelExpanded(!isTopPanelExpanded)}
+            onClose={() => setIsTopPanelExpanded(false)}
+          />
+        )}
+        
+        {/* Overlay dla zamykania TopPanel */}
+        {isTopPanelExpanded && (
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={() => setIsTopPanelExpanded(false)}
+          />
+        )}
+        
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="pets" />
+          <Stack.Screen name="battle" />
+          <Stack.Screen name="guild" />
+          <Stack.Screen name="profile" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="premium" />
+          <Stack.Screen name="statistics" />
+          <Stack.Screen name="help" />
+          <Stack.Screen name="about" />
+        </Stack>
+        
+        <CircularMenu
+          items={menuItems}
+          size={50}
+          radius={120}
+          position="bottom-center"
+          onItemPress={(item) => {
+            router.push(item.route as any);
+          }}
         />
-      )}
-      
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="pets" />
-        <Stack.Screen name="battle" />
-        <Stack.Screen name="guild" />
-        <Stack.Screen name="profile" />
-        <Stack.Screen name="settings" />
-        <Stack.Screen name="premium" />
-        <Stack.Screen name="statistics" />
-        <Stack.Screen name="help" />
-        <Stack.Screen name="about" />
-      </Stack>
-      
-      <CircularMenu
-        items={menuItems}
-        size={50}
-        radius={120}
-        position="bottom-center"
-        onItemPress={(item) => {
-          router.push(item.route as any);
-        }}
-      />
-
-    </View>
+      </View>
+    </ErrorBoundary>
   );
 }
 

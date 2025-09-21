@@ -11,10 +11,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { fetchUserProfile } from '@/store/slices/userSlice';
-import { userService } from '@/services/userService';
+// Removed unused logger import
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -27,27 +26,33 @@ interface TopPanelProps {
 
 export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, onToggle, onClose }: TopPanelProps) {
   const { colors, isLoaded } = useThemeContext();
-  const dispatch = useDispatch();
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
-  
+
   const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
   const setIsExpanded = onClose || setInternalIsExpanded;
-  
-  // Redux state
-  const { profile, statistics, loading } = useSelector((state: RootState) => state.user || { profile: null, statistics: null, loading: false });
+
+  // Get user data from auth state
+  const { user: profile, isLoading: loading } = useSelector((state: RootState) => state.auth);
   
   // Animacje
   const expandAnimation = useRef(new Animated.Value(0)).current;
   const rotateAnimation = useRef(new Animated.Value(0)).current;
 
-  // Load user data on mount
-  useEffect(() => {
-    console.log('TopPanel useEffect: profile =', !!profile, 'loading =', loading);
-    if (!profile && !loading) {
-      console.log('TopPanel: Dispatching fetchUserProfile');
-      dispatch(fetchUserProfile() as any);
-    }
-  }, [dispatch, profile, loading]);
+  // Calculate derived data from profile
+  const levelProgress = profile ? {
+    current: profile.experience_points % 1000, // Simple calculation
+    required: 1000,
+    percentage: (profile.experience_points % 1000) / 10
+  } : { current: 0, required: 1000, percentage: 0 };
+
+  const currencies = {
+    regular: profile?.regular_currency || 0,
+    premium: profile?.premium_currency || 0,
+  };
+
+  const streak = profile?.current_streak_days || 0;
+  const achievements = profile?.achievements || [];
+  // Note: isPremium is available but not currently used in UI
 
 
   useEffect(() => {
@@ -77,18 +82,13 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
     onNavigate?.('/(tabs)/profile');
   };
 
-  // Calculate level progress
-  const levelProgress = profile ? userService.calculateLevelProgress(profile.experience_points, profile.level) : { current: 0, required: 100, percentage: 0 };
-
-  console.log('TopPanel render:', { isLoaded, colors: !!colors, profile: !!profile, loading });
+  // Level progress is now calculated via selector
 
   if (!isLoaded || !colors) {
-    console.log('TopPanel: Theme not loaded');
     return null;
   }
 
   if (loading && !profile) {
-    console.log('TopPanel: Loading state');
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
         <View style={styles.basicInfo}>
@@ -99,7 +99,6 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
   }
 
   if (!profile) {
-    console.log('TopPanel: No profile data');
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
         <View style={styles.basicInfo}>
@@ -131,18 +130,18 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
           </TouchableOpacity>
           
           <View style={styles.stats}>
-            <View style={styles.coinsContainer}>
-              <Ionicons name="logo-bitcoin" size={14} color="#F59E0B" />
-              <Text style={[styles.coinsText, { color: colors.text.primary }]}>
-                {profile.regular_currency.toLocaleString()}
-              </Text>
-            </View>
-            <View style={styles.premiumContainer}>
-              <Ionicons name="diamond" size={14} color="#8B5CF6" />
-              <Text style={[styles.premiumText, { color: colors.text.secondary }]}>
-                {profile.premium_currency}
-              </Text>
-            </View>
+                    <View style={styles.coinsContainer}>
+                      <Ionicons name="logo-bitcoin" size={14} color="#F59E0B" />
+                      <Text style={[styles.coinsText, { color: colors.text.primary }]}>
+                        {currencies.regular.toLocaleString()}
+                      </Text>
+                    </View>
+                    <View style={styles.premiumContainer}>
+                      <Ionicons name="diamond" size={14} color="#8B5CF6" />
+                      <Text style={[styles.premiumText, { color: colors.text.secondary }]}>
+                        {currencies.premium}
+                      </Text>
+                    </View>
           </View>
 
           <Animated.View
@@ -211,9 +210,9 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                   Seria
                 </Text>
               </View>
-              <Text style={[styles.detailValue, { color: colors.text.primary }]}>
-                {profile.current_streak_days} dni
-              </Text>
+                      <Text style={[styles.detailValue, { color: colors.text.primary }]}>
+                        {streak} dni
+                      </Text>
             </View>
 
             {/* Osiągnięcia */}
@@ -224,9 +223,9 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                   Osiągnięcia
                 </Text>
               </View>
-              <Text style={[styles.detailValue, { color: colors.text.primary }]}>
-                {profile.achievements?.length || 0}
-              </Text>
+                      <Text style={[styles.detailValue, { color: colors.text.primary }]}>
+                        {achievements.length}
+                      </Text>
             </View>
 
             {/* Menu przyciski z ikonkami i tekstem */}

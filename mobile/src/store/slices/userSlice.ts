@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { userService, UserProfile, UserStatistics, UserEquipment, UserAvatar } from '@/services/userService';
+import { userService } from '@/services/userService';
+import { UserProfile, UserStatistics, UserEquipment, UserAvatar, UpdateProfileData, AddCurrencyData } from '@/types/user';
+import { logger } from '@/utils/logger';
 
 interface UserState {
   profile: UserProfile | null;
@@ -24,12 +26,10 @@ export const fetchUserProfile = createAsyncThunk(
   'user/fetchProfile',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('Redux: fetchUserProfile thunk starting');
       const profile = await userService.getProfile();
-      console.log('Redux: fetchUserProfile thunk success', profile);
       return profile;
     } catch (error: any) {
-      console.error('Redux: fetchUserProfile thunk error', error);
+      logger.error('Failed to fetch user profile', error);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch profile');
     }
   }
@@ -150,22 +150,13 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        console.log('Redux: fetchUserProfile.fulfilled', action.payload);
         state.loading = false;
         
-        // action.payload is now directly the user data (not wrapped in {success, data})
         const userData = action.payload;
         state.profile = userData;
         state.statistics = userData.statistics || null;
         state.equipment = userData.equipment || [];
         state.avatars = userData.avatars || [];
-        
-        console.log('Redux: state updated', { 
-          profile: !!state.profile, 
-          statistics: !!state.statistics,
-          profileUsername: state.profile?.username,
-          profileLevel: state.profile?.level
-        });
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

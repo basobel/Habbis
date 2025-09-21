@@ -46,8 +46,10 @@ export const authApi = {
   logout: () =>
     apiService.post<ApiResponse>('/auth/logout'),
     
-  getMe: () =>
-    apiService.get<{ user: User }>('/auth/me'),
+  getMe: () => {
+    if (__DEV__) console.log('authApi.getMe: Making request to /auth/me');
+    return apiService.get<{ user: User }>('/auth/me');
+  },
     
   refresh: () =>
     apiService.post<AuthResponse>('/auth/refresh'),

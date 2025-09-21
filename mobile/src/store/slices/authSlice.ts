@@ -60,9 +60,12 @@ export const getMe = createAsyncThunk<{ user: User }, void>(
   'auth/getMe',
   async (_, { rejectWithValue }) => {
     try {
+      if (__DEV__) console.log('getMe: Starting...');
       const response = await authApi.getMe();
+      if (__DEV__) console.log('getMe: Response received:', response);
       return response;
     } catch (error: any) {
+      if (__DEV__) console.log('getMe: Error occurred:', error);
       return rejectWithValue(error.response?.data?.message || 'Failed to get user data');
     }
   }

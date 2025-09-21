@@ -1,109 +1,26 @@
 import { apiClient } from './apiClient';
+import { logger } from '@/utils/logger';
+import { 
+  UserProfile, 
+  UserStatistics, 
+  UserEquipment, 
+  UserAvatar, 
+  UpdateProfileData, 
+  AddCurrencyData 
+} from '@/types/user';
 
-export interface UserProfile {
-  id: number;
-  username: string;
-  email: string;
-  avatar_url?: string;
-  level: number;
-  experience_points: number;
-  regular_currency: number;
-  premium_currency: number;
-  is_premium: boolean;
-  premium_expires_at?: string;
-  current_streak_days: number;
-  total_streak_days: number;
-  last_activity_at?: string;
-  settings?: any;
-  avatar_preferences?: any;
-  statistics?: UserStatistics;
-  equipment: UserEquipment[];
-  active_avatar?: UserAvatar;
-  achievements: any[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UserStatistics {
-  id: number;
-  user_id: number;
-  total_habits_completed: number;
-  total_habits_created: number;
-  total_days_active: number;
-  longest_streak: number;
-  current_streak: number;
-  habits_completed_today: number;
-  habits_completed_this_week: number;
-  habits_completed_this_month: number;
-  habits_completed_this_year: number;
-  category_stats?: Record<string, number>;
-  time_stats?: Record<string, number>;
-  completion_rate: number;
-  perfect_days: number;
-  zero_days: number;
-  guild_contributions: number;
-  battles_won: number;
-  battles_lost: number;
-  pets_owned: number;
-  achievements_unlocked: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UserEquipment {
-  id: number;
-  user_id: number;
-  type: 'avatar' | 'pet_accessory' | 'background' | 'frame' | 'badge';
-  item_id: string;
-  item_name: string;
-  item_description?: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  is_equipped: boolean;
-  acquired_at: string;
-  metadata?: any;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UserAvatar {
-  id: number;
-  user_id: number;
-  avatar_type: 'default' | 'custom' | 'generated';
-  avatar_url?: string;
-  avatar_name?: string;
-  avatar_config?: any;
-  is_active: boolean;
-  is_default: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UpdateProfileData {
-  username?: string;
-  email?: string;
-  avatar_url?: string;
-  settings?: any;
-  avatar_preferences?: any;
-}
-
-export interface AddCurrencyData {
-  type: 'regular' | 'premium';
-  amount: number;
-}
+// Types are now imported from @/types/user
 
 class UserService {
   /**
    * Get current user profile with full data
    */
   async getProfile(): Promise<UserProfile> {
-    console.log('userService.getProfile: Starting...');
     try {
       const response = await apiClient.get('/user/profile');
-      console.log('userService.getProfile: Success', response.data);
-      // Return only the user data, not the full API response structure
       return response.data.data;
     } catch (error: any) {
-      console.error('userService.getProfile: Error', error.response?.data || error.message);
+      logger.error('Failed to fetch user profile', error.response?.data || error.message);
       throw error;
     }
   }

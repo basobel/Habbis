@@ -1,7 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { logger } from '@/utils/logger';
 
 interface Props {
   children: ReactNode;
@@ -13,7 +14,7 @@ interface State {
   error?: Error;
 }
 
-class ErrorBoundaryClass extends Component<Props, State> {
+class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
@@ -24,8 +25,12 @@ class ErrorBoundaryClass extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logger.error('ErrorBoundary caught an error', { error, errorInfo });
   }
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: undefined });
+  };
 
   render() {
     if (this.state.hasError) {
@@ -33,47 +38,62 @@ class ErrorBoundaryClass extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      return <ErrorFallback error={this.state.error} />;
+      return <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />;
     }
 
     return this.props.children;
   }
 }
 
-function ErrorFallback({ error }: { error?: Error }) {
-  const { colors, isLoaded } = useThemeContext();
-
-  const handleRetry = () => {
-    window.location.reload();
-  };
-
-  const backgroundColor = isLoaded && colors ? colors.background.primary : '#F8FAFC';
-  const textColor = isLoaded && colors ? colors.text.primary : '#1F2937';
-  const secondaryTextColor = isLoaded && colors ? colors.text.secondary : '#6B7280';
-  const buttonColor = isLoaded && colors ? colors.primary[600] : '#7C3AED';
-
-  return (
-    <View style={[styles.container, { backgroundColor }]}>
-      <Ionicons name="warning" size={48} color="#EF4444" />
-      <Text style={[styles.title, { color: textColor }]}>
-        Oops! Something went wrong
-      </Text>
-      <Text style={[styles.message, { color: secondaryTextColor }]}>
-        {error?.message || 'An unexpected error occurred'}
-      </Text>
-      <TouchableOpacity
-        style={[styles.retryButton, { backgroundColor: buttonColor }]}
-        onPress={handleRetry}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.retryButtonText}>Try Again</Text>
-      </TouchableOpacity>
-    </View>
-  );
+interface ErrorFallbackProps {
+  error?: Error;
+  onRetry: () => void;
 }
 
-export default function ErrorBoundary(props: Props) {
-  return <ErrorBoundaryClass {...props} />;
+function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
+  const { colors, isLoaded } = useThemeContext();
+
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+        <View style={styles.content}>
+          <Ionicons name="warning" size={48} color="#EF4444" />
+          <Text style={[styles.title, { color: '#1F2937' }]}>Coś poszło nie tak</Text>
+          <Text style={[styles.message, { color: '#6B7280' }]}>
+            Wystąpił nieoczekiwany błąd. Spróbuj ponownie.
+          </Text>
+          <TouchableOpacity style={[styles.retryButton, { backgroundColor: '#7C3AED' }]} onPress={onRetry}>
+            <Text style={[styles.retryButtonText, { color: '#FFFFFF' }]}>Spróbuj ponownie</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <View style={styles.content}>
+        <Ionicons name="warning" size={48} color={colors.error[500]} />
+        <Text style={[styles.title, { color: colors.text.primary }]}>Coś poszło nie tak</Text>
+        <Text style={[styles.message, { color: colors.text.secondary }]}>
+          Wystąpił nieoczekiwany błąd. Spróbuj ponownie.
+        </Text>
+        {__DEV__ && error && (
+          <Text style={[styles.errorDetails, { color: colors.error[500] }]}>
+            {error.message}
+          </Text>
+        )}
+        <TouchableOpacity 
+          style={[styles.retryButton, { backgroundColor: colors.primary[600] }]} 
+          onPress={onRetry}
+        >
+          <Text style={[styles.retryButtonText, { color: colors.text.inverse }]}>
+            Spróbuj ponownie
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -83,9 +103,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  content: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: 'bold',
     marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
@@ -96,14 +120,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     lineHeight: 24,
   },
+  errorDetails: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 16,
+    fontFamily: 'monospace',
+  },
   retryButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
 });
+
+export default ErrorBoundary;

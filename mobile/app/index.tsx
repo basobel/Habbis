@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { router, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { getMe } from '@/store/slices/authSlice';
 import { RootState } from '@/store';
 import { useThemeContext } from '@/contexts/ThemeContext';
@@ -11,41 +11,53 @@ export default function IndexScreen() {
   const router = useRouter();
   const { colors, isLoaded } = useThemeContext();
   const authState = useSelector((state: RootState) => state.auth);
-  const [isRouterReady, setIsRouterReady] = useState(false);
+  const [hasNavigated, setHasNavigated] = useState(false);
   
-  // Wait for router to be ready
+  // Single effect to handle navigation logic
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsRouterReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!isRouterReady || !authState) return;
+    if (!isLoaded || !colors || hasNavigated) return;
     
-    const { isAuthenticated } = authState;
-    
-    // Check if user is already authenticated
-    if (isAuthenticated) {
-      router.replace('/(tabs)');
-    } else {
-      // Try to get user data from stored token
+    // If auth state is not available yet, try to get it
+    if (!authState) {
+      if (__DEV__) console.log('No auth state, dispatching getMe...');
       dispatch(getMe() as any);
+      return;
     }
-  }, [dispatch, authState, isRouterReady]);
-
-  useEffect(() => {
-    if (!isRouterReady || !authState) return;
     
-    const { isAuthenticated, isLoading } = authState;
+    const { isAuthenticated, isLoading, error } = authState;
     
-    if (!isLoading && !isAuthenticated) {
+    if (__DEV__) console.log('Auth state:', { isAuthenticated, isLoading, error });
+    
+    // If still loading, wait
+    if (isLoading) {
+      if (__DEV__) console.log('Still loading...');
+      return;
+    }
+    
+    // If there's an error, go to login
+    if (error) {
+      if (__DEV__) console.log('Auth error:', error);
+      setHasNavigated(true);
       router.replace('/login');
-    } else if (!isLoading && isAuthenticated) {
-      router.replace('/(tabs)');
+      return;
     }
-  }, [authState, isRouterReady]);
+    
+    // If not authenticated, go to login
+    if (!isAuthenticated) {
+      if (__DEV__) console.log('Not authenticated, going to login');
+      setHasNavigated(true);
+      router.replace('/login');
+      return;
+    }
+    
+    // If authenticated, go to main app
+    if (isAuthenticated) {
+      if (__DEV__) console.log('Authenticated, going to main app');
+      setHasNavigated(true);
+      router.replace('/(tabs)');
+      return;
+    }
+  }, [isLoaded, colors, authState, hasNavigated, dispatch, router]);
   
   // Check if theme is loaded
   if (!isLoaded || !colors) {

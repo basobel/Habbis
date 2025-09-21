@@ -15,13 +15,22 @@ export default function LoadingState({
 }: LoadingStateProps) {
   const { colors, isLoaded } = useThemeContext();
 
-  const textColor = color || (isLoaded && colors ? colors.text.secondary : '#6B7280');
-  const spinnerColor = color || (isLoaded && colors ? colors.primary[600] : '#7C3AED');
+  if (!isLoaded || !colors) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
+        <ActivityIndicator size={size} color="#7C3AED" />
+        <Text style={[styles.message, { color: '#6B7280' }]}>{message}</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size={size} color={spinnerColor} />
-      <Text style={[styles.text, { color: textColor }]}>
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <ActivityIndicator 
+        size={size} 
+        color={color || colors.primary[600]} 
+      />
+      <Text style={[styles.message, { color: colors.text.secondary }]}>
         {message}
       </Text>
     </View>
@@ -35,8 +44,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  text: {
-    marginTop: 12,
+  message: {
+    marginTop: 16,
     fontSize: 16,
     textAlign: 'center',
   },

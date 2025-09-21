@@ -6,7 +6,10 @@ export interface User {
   avatar_url?: string;
   level: number;
   experience_points: number;
+  regular_currency: number;
   premium_currency: number;
+  is_premium: boolean;
+  premium_expires_at?: string;
   total_streak_days: number;
   current_streak_days: number;
   last_activity_at?: string;
