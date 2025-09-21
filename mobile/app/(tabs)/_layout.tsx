@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import CircularMenu from '@/components/CircularMenu';
 import TopPanel from '@/components/TopPanel';
+import DropdownMenu from '@/components/DropdownMenu';
 import { useRouter } from 'expo-router';
 
 const menuItems = [
@@ -35,18 +36,12 @@ const menuItems = [
     route: '/(tabs)/guild',
     color: '#10B981',
   },
-  {
-    id: 'profile',
-    title: 'Profil',
-    icon: 'person' as const,
-    route: '/(tabs)/profile',
-    color: '#8B5CF6',
-  },
 ];
 
 export default function TabLayout() {
   const { colors, isLoaded } = useThemeContext();
   const router = useRouter();
+  const [isDropdownMenuVisible, setIsDropdownMenuVisible] = useState(false);
 
   // Don't render if theme is not loaded
   if (!isLoaded || !colors) {
@@ -71,9 +66,68 @@ export default function TabLayout() {
     router.push(screen as any);
   };
 
+  const dropdownItems = [
+    {
+      id: 'settings',
+      title: 'Ustawienia',
+      icon: 'settings' as const,
+      color: '#6B7280',
+      onPress: () => handleNavigate('/settings'),
+    },
+    {
+      id: 'profile',
+      title: 'Profil',
+      icon: 'person' as const,
+      color: '#8B5CF6',
+      onPress: () => handleNavigate('/(tabs)/profile'),
+    },
+    {
+      id: 'premium',
+      title: 'Premium',
+      icon: 'diamond' as const,
+      color: '#F59E0B',
+      onPress: () => handleNavigate('/premium'),
+    },
+    {
+      id: 'statistics',
+      title: 'Statystyki',
+      icon: 'bar-chart' as const,
+      color: '#10B981',
+      onPress: () => handleNavigate('/statistics'),
+    },
+    {
+      id: 'help',
+      title: 'Pomoc',
+      icon: 'help-circle' as const,
+      color: '#3B82F6',
+      onPress: () => handleNavigate('/help'),
+    },
+    {
+      id: 'about',
+      title: 'O aplikacji',
+      icon: 'information-circle' as const,
+      color: '#8B5CF6',
+      onPress: () => handleNavigate('/about'),
+    },
+    {
+      id: 'logout',
+      title: 'Wyloguj',
+      icon: 'log-out' as const,
+      color: '#EF4444',
+      onPress: () => {
+        // TODO: Implement logout
+        console.log('Logout');
+        handleNavigate('/login');
+      },
+    },
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      <TopPanel onNavigate={handleNavigate} />
+      <TopPanel 
+        onNavigate={handleNavigate} 
+        onHamburgerPress={() => setIsDropdownMenuVisible(true)}
+      />
       
       <Stack
         screenOptions={{
@@ -95,6 +149,13 @@ export default function TabLayout() {
         onItemPress={(item) => {
           router.push(item.route as any);
         }}
+      />
+
+      <DropdownMenu
+        items={dropdownItems}
+        isVisible={isDropdownMenuVisible}
+        onClose={() => setIsDropdownMenuVisible(false)}
+        position="top-right"
       />
     </View>
   );

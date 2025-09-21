@@ -15,15 +15,15 @@ const { width: screenWidth } = Dimensions.get('window');
 
 interface TopPanelProps {
   onNavigate?: (screen: string) => void;
+  onHamburgerPress?: () => void;
 }
 
-export default function TopPanel({ onNavigate }: TopPanelProps) {
+export default function TopPanel({ onNavigate, onHamburgerPress }: TopPanelProps) {
   const { colors, isLoaded } = useThemeContext();
   const [isExpanded, setIsExpanded] = useState(false);
   
   // Animacje
   const expandAnimation = useRef(new Animated.Value(0)).current;
-  const rotateAnimation = useRef(new Animated.Value(0)).current;
 
   // Dane użytkownika (mock)
   const userData = {
@@ -37,19 +37,13 @@ export default function TopPanel({ onNavigate }: TopPanelProps) {
     achievements: 12,
   };
 
+
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(expandAnimation, {
-        toValue: isExpanded ? 1 : 0,
-        duration: 300,
-        useNativeDriver: false,
-      }),
-      Animated.timing(rotateAnimation, {
-        toValue: isExpanded ? 1 : 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    Animated.timing(expandAnimation, {
+      toValue: isExpanded ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
   }, [isExpanded]);
 
   const toggleExpanded = () => {
@@ -108,22 +102,21 @@ export default function TopPanel({ onNavigate }: TopPanelProps) {
             </View>
           </View>
 
-          <Animated.View
-            style={{
-              transform: [{
-                rotate: rotateAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '180deg'],
-                }),
-              }],
-            }}
-          >
-            <Ionicons 
-              name="chevron-down" 
-              size={16} 
-              color={colors.text.secondary} 
-            />
-          </Animated.View>
+          <View style={styles.rightActions}>
+            {onHamburgerPress && (
+              <TouchableOpacity
+                style={[styles.hamburgerButton, { backgroundColor: colors.background.secondary }]}
+                onPress={onHamburgerPress}
+                activeOpacity={0.8}
+              >
+                <Ionicons 
+                  name="menu" 
+                  size={16} 
+                  color={colors.text.primary} 
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </TouchableOpacity>
 
         {/* Rozwijane szczegóły */}
@@ -268,6 +261,18 @@ const styles = StyleSheet.create({
   premiumText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  rightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  hamburgerButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   expandedContent: {
     overflow: 'hidden',

@@ -123,20 +123,27 @@ export default function HabitsScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {/* Header */}
-      <SharedHeader
-        title="Moje Nawyk"
-        subtitle={`${habits.length} nawyków • ${habits.filter(h => h.completed).length} ukończonych dziś`}
-        onHamburgerPress={() => setIsHamburgerMenuVisible(true)}
-        rightAction={{
-          icon: 'add',
-          onPress: () => {
-            // TODO: Implement add habit
-            console.log('Add habit');
-          }
-        }}
-      />
+      <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.headerContent}>
+          <View>
+            <Text style={[styles.title, { color: colors.text.primary }]}>Moje Nawyk</Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              {habits.length} nawyków • {habits.filter(h => h.completed).length} ukończonych dziś
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary[600] }]}
+            onPress={() => {
+              // TODO: Implement add habit
+              console.log('Add habit');
+            }}
+          >
+            <Ionicons name="add" size={20} color={colors.text.inverse} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Habits List */}
       <ScrollView
@@ -241,19 +248,40 @@ export default function HabitsScreen() {
         )}
       </ScrollView>
 
-      {/* Hamburger Menu */}
-      <HamburgerMenu
-        isVisible={isHamburgerMenuVisible}
-        onClose={() => setIsHamburgerMenuVisible(false)}
-        onNavigate={handleNavigate}
-      />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 60, // Wysokość TopPanel + margines
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,
