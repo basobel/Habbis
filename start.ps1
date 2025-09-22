@@ -100,7 +100,7 @@ Write-Host "Aplikacja automatycznie odswiezy sie podczas zmian w kodzie!" -Foreg
 Write-Host ""
 
 # Uruchom Expo w nowym oknie PowerShell
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD'; npx expo start --web --clear"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD'; pnpm exec expo start --web --clear"
 
 # Wyświetl podsumowanie
 Write-Host ""

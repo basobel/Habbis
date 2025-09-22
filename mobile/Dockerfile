@@ -1,16 +1,16 @@
 FROM node:18-alpine
 
-# Install Expo CLI globally
-RUN npm install -g @expo/cli
+# Install pnpm and Expo CLI globally
+RUN npm install -g pnpm @expo/cli
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package*.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN npm install
+RUN pnpm install
 
 # Copy application code
 COPY . .
@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 19000 19001 19002 19006
 
 # Start Expo development server
-CMD ["npx", "expo", "start", "--web", "--lan"]
+CMD ["pnpm", "exec", "expo", "start", "--web", "--lan"]

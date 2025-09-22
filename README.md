@@ -100,16 +100,16 @@ php artisan route:clear
 docker-compose exec expo bash
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run linter
-npm run lint
+pnpm run lint
 
 # Run type check
-npm run type-check
+pnpm run type-check
 
 # Run tests
-npm test
+pnpm test
 ```
 
 ## 🗄️ Database Schema
@@ -231,13 +231,13 @@ docker-compose exec api php artisan test --coverage
 ### Frontend Tests
 ```bash
 # Run all tests
-docker-compose exec expo npm test
+docker-compose exec expo pnpm test
 
 # Run tests in watch mode
-docker-compose exec expo npm test -- --watch
+docker-compose exec expo pnpm test -- --watch
 
 # Run tests with coverage
-docker-compose exec expo npm test -- --coverage
+docker-compose exec expo pnpm test -- --coverage
 ```
 
 ## 📊 Performance Monitoring
@@ -275,7 +275,7 @@ docker-compose exec expo npm test -- --coverage
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes
-4. Run tests: `docker-compose exec api php artisan test && docker-compose exec expo npm test`
+4. Run tests: `docker-compose exec api php artisan test && docker-compose exec expo pnpm test`
 5. Commit changes: `git commit -m 'Add amazing feature'`
 6. Push to branch: `git push origin feature/amazing-feature`
 7. Open a Pull Request

@@ -62,8 +62,8 @@ try {
     $dockerComposeContent = $dockerComposeContent -replace "#     - habbis-network", "    - habbis-network"
     $dockerComposeContent = $dockerComposeContent -replace "#   command:", "  command:"
     $dockerComposeContent = $dockerComposeContent -replace "#     sh -c \"", "    sh -c \""
-    $dockerComposeContent = $dockerComposeContent -replace "#       npm install &&", "      npm install &&"
-    $dockerComposeContent = $dockerComposeContent -replace "#       npx expo start --web --port 19006", "      npx expo start --web --port 19006"
+    $dockerComposeContent = $dockerComposeContent -replace "#       npm install &&", "      pnpm install &&"
+    $dockerComposeContent = $dockerComposeContent -replace "#       npx expo start --web --port 19006", "      pnpm exec expo start --web --port 19006"
     $dockerComposeContent = $dockerComposeContent -replace "#     \"", "    \""
     
     Set-Content "docker-compose.yml" $dockerComposeContent
