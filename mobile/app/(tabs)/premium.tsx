@@ -18,7 +18,7 @@ export default function PremiumScreen() {
 
   if (!isLoaded || !colors) {
     return (
-      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
@@ -92,7 +92,7 @@ export default function PremiumScreen() {
       <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <View style={[styles.heroSection, { backgroundColor: colors.accent.gold }]}>
+        <View style={[styles.heroSection, { backgroundColor: colors.accent?.gold || '#F59E0B' }]}>
           <View style={styles.heroContent}>
             <Ionicons name="diamond" size={48} color={colors.text.inverse} />
             <Text style={[styles.heroTitle, { color: colors.text.inverse }]}>
@@ -112,7 +112,7 @@ export default function PremiumScreen() {
           <View style={styles.featuresList}>
             {premiumFeatures.map((feature, index) => (
               <View key={index} style={[styles.featureItem, { backgroundColor: colors.background.card }]}>
-                <View style={[styles.featureIcon, { backgroundColor: colors.accent.gold }]}>
+                <View style={[styles.featureIcon, { backgroundColor: colors.accent?.gold || '#F59E0B' }]}>
                   <Ionicons name={feature.icon as any} size={24} color={colors.text.inverse} />
                 </View>
                 <View style={styles.featureText}>
@@ -141,14 +141,14 @@ export default function PremiumScreen() {
                   styles.pricingCard,
                   { 
                     backgroundColor: colors.background.card,
-                    borderColor: plan.popular ? colors.accent.gold : colors.border.primary,
+                    borderColor: plan.popular ? (colors.accent?.gold || '#F59E0B') : colors.border.primary,
                     borderWidth: plan.popular ? 2 : 1,
                   }
                 ]}
                 activeOpacity={0.7}
               >
                 {plan.popular && (
-                  <View style={[styles.popularBadge, { backgroundColor: colors.accent.gold }]}>
+                  <View style={[styles.popularBadge, { backgroundColor: colors.accent?.gold || '#F59E0B' }]}>
                     <Text style={[styles.popularText, { color: colors.text.inverse }]}>
                       NAJPOPULARNIEJSZY
                     </Text>
@@ -169,8 +169,8 @@ export default function PremiumScreen() {
                   {plan.description}
                 </Text>
                 {plan.discount && (
-                  <View style={[styles.discountBadge, { backgroundColor: colors.success[100] }]}>
-                    <Text style={[styles.discountText, { color: colors.success[600] }]}>
+                  <View style={[styles.discountBadge, { backgroundColor: colors.success?.[100] || '#DCFCE7' }]}>
+                    <Text style={[styles.discountText, { color: colors.success?.[600] || '#16A34A' }]}>
                       {plan.discount}
                     </Text>
                   </View>
@@ -189,7 +189,7 @@ export default function PremiumScreen() {
             Dołącz do tysięcy użytkowników, którzy już osiągnęli swoje cele
           </Text>
           <TouchableOpacity
-            style={[styles.ctaButton, { backgroundColor: colors.accent.gold }]}
+            style={[styles.ctaButton, { backgroundColor: colors.accent?.gold || '#F59E0B' }]}
             activeOpacity={0.8}
           >
             <Text style={[styles.ctaButtonText, { color: colors.text.inverse }]}>

@@ -53,6 +53,12 @@ export class BaseApiService {
   }
 
   private handleError(error: any): ApiError {
+    if (__DEV__) {
+      console.log('BaseApiService Error:', error);
+      console.log('Error response:', error.response?.data);
+      console.log('Error status:', error.response?.status);
+    }
+    
     if (error.response) {
       // Server responded with error status
       return {

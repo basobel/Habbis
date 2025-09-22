@@ -1,7 +1,7 @@
 // Environment configuration
 export const config = {
   api: {
-    baseUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api',
+    baseUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.215:8000/api',
     timeout: 10000,
   },
   app: {

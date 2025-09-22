@@ -50,6 +50,13 @@ interface ThemeColors {
     500: string;
     600: string;
   };
+  success: {
+    50: string;
+    100: string;
+    500: string;
+    600: string;
+    700: string;
+  };
   error: {
     500: string;
     600: string;
@@ -114,6 +121,7 @@ export const useTheme = () => {
         input: Colors.dark.input,
         primary: Colors.primary,
         secondary: Colors.secondary,
+        success: Colors.success,
         error: Colors.error,
         accent: Colors.accent,
       };
@@ -131,6 +139,7 @@ export const useTheme = () => {
       },
       primary: Colors.primary,
       secondary: Colors.secondary,
+      success: Colors.success,
       error: Colors.error,
       accent: Colors.accent,
     };

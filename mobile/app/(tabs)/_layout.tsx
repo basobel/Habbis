@@ -73,6 +73,15 @@ export default function TabLayout() {
     router.push(screen as any);
   };
 
+  // Callbacki do wzajemnego zamykania komponentów
+  const handleCloseTopPanel = () => {
+    setIsTopPanelExpanded(false);
+  };
+
+  const handleTopPanelToggle = () => {
+    setIsTopPanelExpanded(!isTopPanelExpanded);
+  };
+
   return (
     <ErrorBoundary>
       <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
@@ -80,8 +89,8 @@ export default function TabLayout() {
           <TopPanel 
             onNavigate={handleNavigate}
             isExpanded={isTopPanelExpanded}
-            onToggle={() => setIsTopPanelExpanded(!isTopPanelExpanded)}
-            onClose={() => setIsTopPanelExpanded(false)}
+            onToggle={handleTopPanelToggle}
+            onClose={handleCloseTopPanel}
           />
         )}
         
@@ -90,7 +99,7 @@ export default function TabLayout() {
           <TouchableOpacity
             style={styles.overlay}
             activeOpacity={1}
-            onPress={() => setIsTopPanelExpanded(false)}
+            onPressIn={handleCloseTopPanel}
           />
         )}
         
@@ -119,6 +128,7 @@ export default function TabLayout() {
           onItemPress={(item) => {
             router.push(item.route as any);
           }}
+          onClose={handleCloseTopPanel}
         />
       </View>
     </ErrorBoundary>

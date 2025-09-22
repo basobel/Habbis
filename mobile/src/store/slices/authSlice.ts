@@ -24,10 +24,14 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials>(
   'auth/login',
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
+      if (__DEV__) console.log('Login attempt with credentials:', credentials);
       const response = await authApi.login(credentials);
+      if (__DEV__) console.log('Login response:', response);
       return response;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      if (__DEV__) console.log('Login error:', error);
+      if (__DEV__) console.log('Error response data:', error.response?.data);
+      return rejectWithValue(error.response?.data?.message || error.message || 'Login failed');
     }
   }
 );

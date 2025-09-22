@@ -17,7 +17,7 @@ export default function StatisticsScreen() {
 
   if (!isLoaded || !colors) {
     return (
-      <View style={[styles.container, { backgroundColor: colors?.background.primary || '#F5F3FF' }]}>
+      <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#6B7280' }]}>Loading...</Text>
         </View>
@@ -45,7 +45,7 @@ export default function StatisticsScreen() {
       value: '72/100',
       subtitle: 'nawyków wykonanych',
       icon: 'stats-chart-outline',
-      color: colors.accent.gold,
+      color: colors.accent?.gold || '#F59E0B',
     },
     {
       title: 'Najdłuższa seria',
@@ -162,10 +162,10 @@ export default function StatisticsScreen() {
                         {
                           width: `${habit.completion}%`,
                           backgroundColor: habit.completion >= 80 
-                            ? colors.success[500] 
+                            ? colors.success?.[500] || '#22C55E'
                             : habit.completion >= 60 
-                            ? colors.accent.gold 
-                            : colors.error[500],
+                            ? colors.accent?.gold || '#F59E0B'
+                            : colors.error?.[500] || '#EF4444',
                         }
                       ]}
                     />
@@ -186,7 +186,7 @@ export default function StatisticsScreen() {
           </Text>
           <View style={styles.insightsList}>
             <View style={styles.insightItem}>
-              <Ionicons name="trending-up" size={20} color={colors.success[500]} />
+              <Ionicons name="trending-up" size={20} color={colors.success?.[500] || '#22C55E'} />
               <Text style={[styles.insightText, { color: colors.text.primary }]}>
                 Twoja wydajność wzrosła o 15% w tym miesiącu
               </Text>
@@ -198,7 +198,7 @@ export default function StatisticsScreen() {
               </Text>
             </View>
             <View style={styles.insightItem}>
-              <Ionicons name="trophy" size={20} color={colors.accent.gold} />
+              <Ionicons name="trophy" size={20} color={colors.accent?.gold || '#F59E0B'} />
               <Text style={[styles.insightText, { color: colors.text.primary }]}>
                 Medytacja to Twój najsilniejszy nawyk
               </Text>

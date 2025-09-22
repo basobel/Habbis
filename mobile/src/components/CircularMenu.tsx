@@ -27,6 +27,7 @@ interface CircularMenuProps {
   size?: number;
   radius?: number;
   position?: 'bottom-center' | 'bottom-right' | 'bottom-left';
+  onClose?: () => void; // Callback do zamykania innych komponentów
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -37,6 +38,7 @@ export default function CircularMenu({
   size = 60,
   radius = 120,
   position = 'bottom-center',
+  onClose,
 }: CircularMenuProps) {
   const { colors, isDark } = useThemeContext();
   const router = useRouter();
@@ -110,6 +112,7 @@ export default function CircularMenu({
 
   // Animacja otwierania menu
   const openMenu = () => {
+    onClose?.(); // Zamknij inne komponenty gdy otwieramy menu
     setIsOpen(true);
     
     // Animacja głównego przycisku (obrót)
@@ -180,6 +183,7 @@ export default function CircularMenu({
   };
 
 
+
   const menuPosition = getMenuPosition();
 
   return (
@@ -216,7 +220,7 @@ export default function CircularMenu({
         >
           <TouchableOpacity
             style={styles.menuButtonContent}
-            onPress={isOpen ? closeMenu : openMenu}
+            onPressIn={isOpen ? closeMenu : openMenu}
             activeOpacity={0.8}
           >
             <Animated.View
@@ -265,7 +269,7 @@ export default function CircularMenu({
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
-          onPress={closeMenu}
+          onPressIn={closeMenu}
         />
       )}
 
@@ -321,7 +325,7 @@ export default function CircularMenu({
                 >
                   <TouchableOpacity
                     style={styles.menuItemContent}
-                    onPress={() => handleItemPress(item)}
+                    onPressIn={() => handleItemPress(item)}
                     activeOpacity={0.8}
                   >
                     <Ionicons

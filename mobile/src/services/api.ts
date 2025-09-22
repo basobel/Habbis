@@ -2,7 +2,7 @@ import { BaseApiService } from './baseApi';
 import { AuthResponse, User } from '@/types';
 
 // API Configuration
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.215:8000/api';
 
 // Create API service instance
 const apiService = new BaseApiService(API_BASE_URL);

@@ -80,6 +80,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
 
   const handleProfilePress = () => {
     onNavigate?.('/(tabs)/profile');
+    setIsExpanded(false); // Zamknij panel po kliknięciu na profil
   };
 
   // Level progress is now calculated via selector
@@ -114,12 +115,12 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
         {/* Podstawowe informacje - zawsze widoczne */}
         <TouchableOpacity
           style={styles.basicInfo}
-          onPress={toggleExpanded}
+          onPressIn={toggleExpanded}
           activeOpacity={0.8}
         >
           <TouchableOpacity
             style={[styles.avatar, { backgroundColor: colors.primary[600] }]}
-            onPress={handleProfilePress}
+            onPressIn={handleProfilePress}
             activeOpacity={0.8}
           >
             {profile.avatar_url ? (
@@ -240,7 +241,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                   <TouchableOpacity
                     key={item.id}
                     style={styles.menuButton}
-                    onPress={() => {
+                    onPressIn={() => {
                       onNavigate?.(`/(tabs)/${item.id}`);
                       setIsExpanded(false);
                     }}
@@ -275,7 +276,7 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
                   <TouchableOpacity
                     key={item.id}
                     style={styles.menuButton}
-                    onPress={() => {
+                    onPressIn={() => {
                       if (item.id === 'logout') {
                         onNavigate?.('/login');
                       } else {
