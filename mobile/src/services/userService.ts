@@ -4,7 +4,6 @@ import {
   UserProfile, 
   UserStatistics, 
   UserEquipment, 
-  UserAvatar, 
   UpdateProfileData, 
   AddCurrencyData 
 } from '@/types/user';
@@ -96,33 +95,6 @@ class UserService {
     }
   }
 
-  /**
-   * Get user avatars
-   */
-  async getAvatars(): Promise<UserAvatar[]> {
-    try {
-      const response = await apiClient.get('/user/avatars');
-      return response.data.data;
-    } catch (error: any) {
-      logger.error('Failed to fetch user avatars', error.response?.data || error.message);
-      throw error;
-    }
-  }
-
-  /**
-   * Set active avatar
-   */
-  async setActiveAvatar(avatarId: number): Promise<UserAvatar> {
-    try {
-      const response = await apiClient.post('/user/avatars/set-active', {
-        avatar_id: avatarId,
-      });
-      return response.data.data;
-    } catch (error: any) {
-      logger.error('Failed to set active avatar', error.response?.data || error.message);
-      throw error;
-    }
-  }
 
   /**
    * Add currency (for testing)

@@ -113,6 +113,7 @@ export default function TabLayout() {
           <Stack.Screen name="battle" />
           <Stack.Screen name="guild" />
           <Stack.Screen name="profile" />
+          <Stack.Screen name="edit-profile" />
           <Stack.Screen name="settings" />
           <Stack.Screen name="premium" />
           <Stack.Screen name="statistics" />

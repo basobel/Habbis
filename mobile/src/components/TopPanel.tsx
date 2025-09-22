@@ -118,17 +118,17 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
           onPressIn={toggleExpanded}
           activeOpacity={0.8}
         >
-          <TouchableOpacity
-            style={[styles.avatar, { backgroundColor: colors.primary[600] }]}
-            onPressIn={handleProfilePress}
-            activeOpacity={0.8}
-          >
-            {profile.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={styles.avatarImage} />
-            ) : (
-              <Ionicons name="person" size={16} color={colors.text.inverse} />
-            )}
-          </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.avatar, { backgroundColor: colors.primary[600] }]}
+                    onPressIn={handleProfilePress}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons 
+                      name={profile.avatar_icon as any || 'person'} 
+                      size={16} 
+                      color={colors.text.inverse} 
+                    />
+                  </TouchableOpacity>
           
           <View style={styles.stats}>
                     <View style={styles.coinsContainer}>

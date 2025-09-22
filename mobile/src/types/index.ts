@@ -1,9 +1,13 @@
+// Import user-related types
+import { UserStatistics, UserEquipment, UserAvatar } from './user';
+
 // User types
 export interface User {
   id: number;
   username: string;
   email: string;
   avatar_url?: string;
+  avatar_icon?: string;
   level: number;
   experience_points: number;
   regular_currency: number;
@@ -25,6 +29,11 @@ export interface User {
   gold?: number;
   class?: string;
   achievements?: Achievement[];
+  // Profile data
+  statistics?: UserStatistics;
+  equipment?: UserEquipment[];
+  avatars?: UserAvatar[];
+  active_avatar?: UserAvatar;
 }
 
 // Pet types
@@ -274,6 +283,7 @@ export type RootStackParamList = {
 // Redux types
 export interface RootState {
   auth: AuthState;
+  user: UserState;
   habits: HabitsState;
   pets: PetsState;
   battles: BattlesState;
@@ -286,6 +296,15 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
+}
+
+export interface UserState {
+  profile: User | null;
+  statistics: UserStatistics | null;
+  equipment: UserEquipment[];
+  avatars: UserAvatar[];
+  loading: boolean;
   error: string | null;
 }
 

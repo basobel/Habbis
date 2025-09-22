@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { REHYDRATE } from 'redux-persist';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '@/types';
 import { authApi, setAuthToken } from '@/services/api';
+import { secureStorage } from '@/utils/secureStorage';
 
 interface AuthState {
   user: User | null;
@@ -17,6 +18,24 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+};
+
+// Helper function to save token to secure storage
+const saveTokenToStorage = async (token: string) => {
+  try {
+    await secureStorage.setItem('auth_token', token);
+  } catch (error) {
+    console.error('Failed to save token to secure storage:', error);
+  }
+};
+
+// Helper function to remove token from secure storage
+const removeTokenFromStorage = async () => {
+  try {
+    await secureStorage.removeItem('auth_token');
+  } catch (error) {
+    console.error('Failed to remove token from secure storage:', error);
+  }
 };
 
 // Async thunks
@@ -86,6 +105,7 @@ const authSlice = createSlice({
       state.token = action.payload;
       state.isAuthenticated = true;
       setAuthToken(action.payload);
+      saveTokenToStorage(action.payload);
     },
     clearAuth: (state) => {
       state.user = null;
@@ -93,6 +113,12 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
       setAuthToken(null);
+      removeTokenFromStorage();
+    },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -104,6 +130,8 @@ const authSlice = createSlice({
           state.user = action.payload.auth.user;
           state.isAuthenticated = action.payload.auth.isAuthenticated;
           setAuthToken(action.payload.auth.token);
+          // Also save to secure storage for consistency
+          saveTokenToStorage(action.payload.auth.token);
         }
       })
       // Login
@@ -118,6 +146,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.error = null;
         setAuthToken(action.payload.token);
+        saveTokenToStorage(action.payload.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -136,6 +165,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.error = null;
         setAuthToken(action.payload.token);
+        saveTokenToStorage(action.payload.token);
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
@@ -153,6 +183,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.error = null;
         setAuthToken(null);
+        removeTokenFromStorage();
       })
       .addCase(logout.rejected, (state, action) => {
         state.isLoading = false;
@@ -177,5 +208,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setToken, clearAuth } = authSlice.actions;
+export const { clearError, setToken, clearAuth, updateUser } = authSlice.actions;
 export default authSlice.reducer;

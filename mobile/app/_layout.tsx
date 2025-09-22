@@ -10,6 +10,8 @@ import { Colors } from '../src/constants/colors';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import { setGlobalStore } from '@/services/authInterceptor';
+import { useEffect } from 'react';
 
 function ThemedStack() {
   const { colors, isDark, isLoaded } = useThemeContext();
@@ -82,6 +84,11 @@ function LoadingScreen() {
 }
 
 export default function RootLayout() {
+  // Initialize auth interceptor with store
+  useEffect(() => {
+    setGlobalStore(store);
+  }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={<LoadingScreen />} persistor={persistor}>

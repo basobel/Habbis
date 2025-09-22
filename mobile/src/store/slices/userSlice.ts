@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { userService } from '@/services/userService';
-import { UserProfile, UserStatistics, UserEquipment, UserAvatar, UpdateProfileData, AddCurrencyData } from '@/types/user';
+import { UserProfile, UserStatistics, UserEquipment, UpdateProfileData, AddCurrencyData } from '@/types/user';
 import { logger } from '@/utils/logger';
+import { updateUser } from './authSlice';
 
 interface UserState {
   profile: UserProfile | null;
   statistics: UserStatistics | null;
   equipment: UserEquipment[];
-  avatars: UserAvatar[];
   loading: boolean;
   error: string | null;
 }
@@ -16,7 +16,6 @@ const initialState: UserState = {
   profile: null,
   statistics: null,
   equipment: [],
-  avatars: [],
   loading: false,
   error: null,
 };
@@ -37,9 +36,32 @@ export const fetchUserProfile = createAsyncThunk(
 
 export const updateUserProfile = createAsyncThunk(
   'user/updateProfile',
-  async (data: any, { rejectWithValue }) => {
+  async (data: any, { rejectWithValue, dispatch }) => {
     try {
       const profile = await userService.updateProfile(data);
+      // Update auth state with new user data
+      dispatch(updateUser({
+        username: profile.username,
+        email: profile.email,
+        avatar_url: profile.avatar_url,
+        avatar_icon: profile.avatar_icon,
+        level: profile.level,
+        experience_points: profile.experience_points,
+        regular_currency: profile.regular_currency,
+        premium_currency: profile.premium_currency,
+        is_premium: profile.is_premium,
+        premium_expires_at: profile.premium_expires_at,
+        current_streak_days: profile.current_streak_days,
+        total_streak_days: profile.total_streak_days,
+        last_activity_at: profile.last_activity_at,
+        settings: profile.settings,
+        statistics: profile.statistics,
+        equipment: profile.equipment,
+        avatars: profile.avatars,
+        active_avatar: profile.active_avatar,
+        created_at: profile.created_at,
+        updated_at: profile.updated_at,
+      }));
       return profile;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update profile');
@@ -83,29 +105,6 @@ export const equipItem = createAsyncThunk(
   }
 );
 
-export const fetchUserAvatars = createAsyncThunk(
-  'user/fetchAvatars',
-  async (_, { rejectWithValue }) => {
-    try {
-      const avatars = await userService.getAvatars();
-      return avatars;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch avatars');
-    }
-  }
-);
-
-export const setActiveAvatar = createAsyncThunk(
-  'user/setActiveAvatar',
-  async (avatarId: number, { rejectWithValue }) => {
-    try {
-      const avatar = await userService.setActiveAvatar(avatarId);
-      return avatar;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to set active avatar');
-    }
-  }
-);
 
 export const addCurrency = createAsyncThunk(
   'user/addCurrency',
@@ -127,7 +126,6 @@ const userSlice = createSlice({
       state.profile = null;
       state.statistics = null;
       state.equipment = [];
-      state.avatars = [];
       state.loading = false;
       state.error = null;
     },
@@ -156,7 +154,6 @@ const userSlice = createSlice({
         state.profile = userData;
         state.statistics = userData.statistics || null;
         state.equipment = userData.equipment || [];
-        state.avatars = userData.avatars || [];
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
@@ -171,6 +168,8 @@ const userSlice = createSlice({
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.profile = action.payload;
+        // Update auth state with new user data
+        // This will be handled by the auth slice through a cross-slice action
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
@@ -223,41 +222,6 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
       
-      // Fetch avatars
-      .addCase(fetchUserAvatars.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchUserAvatars.fulfilled, (state, action) => {
-        state.loading = false;
-        state.avatars = action.payload;
-      })
-      .addCase(fetchUserAvatars.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      
-      // Set active avatar
-      .addCase(setActiveAvatar.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(setActiveAvatar.fulfilled, (state, action) => {
-        state.loading = false;
-        // Update avatars list
-        const avatarIndex = state.avatars.findIndex(avatar => avatar.id === action.payload.id);
-        if (avatarIndex !== -1) {
-          state.avatars[avatarIndex] = action.payload;
-        }
-        // Update profile if it exists
-        if (state.profile) {
-          state.profile.active_avatar = action.payload;
-        }
-      })
-      .addCase(setActiveAvatar.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
       
       // Add currency
       .addCase(addCurrency.pending, (state) => {

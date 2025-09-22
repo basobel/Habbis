@@ -42,6 +42,7 @@ class UserController extends Controller
                 'username' => $user->username,
                 'email' => $user->email,
                 'avatar_url' => $user->avatar_url,
+                'avatar_icon' => $user->avatar_icon,
                 'level' => $user->level,
                 'experience_points' => $user->experience_points,
                 'regular_currency' => $user->regular_currency,
@@ -78,6 +79,7 @@ class UserController extends Controller
             'username' => 'sometimes|string|max:255|unique:users,username,' . $user->id,
             'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             'avatar_url' => 'sometimes|nullable|url',
+            'avatar_icon' => 'sometimes|string|max:50',
             'settings' => 'sometimes|array',
             'avatar_preferences' => 'sometimes|array',
         ]);
@@ -93,6 +95,7 @@ class UserController extends Controller
             'username',
             'email',
             'avatar_url',
+            'avatar_icon',
             'settings',
             'avatar_preferences'
         ]));

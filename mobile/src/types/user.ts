@@ -18,6 +18,7 @@ export interface UserProfile {
   username: string;
   email: string;
   avatar_url?: string;
+  avatar_icon?: string;
   level: number;
   experience_points: number;
   regular_currency: number;
