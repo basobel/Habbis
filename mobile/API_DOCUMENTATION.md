@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the API endpoints and services used in the Habbis mobile application.
+This document describes the API endpoints and services used in the Habbis mobile application. For complete project documentation, see [HABBIS_COMPLETE_DOCUMENTATION.md](../../HABBIS_COMPLETE_DOCUMENTATION.md).
 
 ## Base URL
 

@@ -1,5 +1,7 @@
 # Code Quality Guidelines
 
+> **Note**: For complete project documentation, see [HABBIS_COMPLETE_DOCUMENTATION.md](../../HABBIS_COMPLETE_DOCUMENTATION.md).
+
 ## ✅ **Zaimplementowane Ulepszenia**
 
 ### 1. **Logging System**
