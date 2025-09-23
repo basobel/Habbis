@@ -151,9 +151,11 @@ export default function ExpeditionScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     // Symulacja odświeżania danych
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
   };
 
   const handleExpeditionPress = (expedition: Expedition) => {
@@ -460,10 +462,7 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   energyInfo: {
@@ -498,10 +497,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
     elevation: 2,
   },
   activeHeader: {
@@ -542,10 +538,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
     elevation: 2,
   },
   expeditionIcon: {

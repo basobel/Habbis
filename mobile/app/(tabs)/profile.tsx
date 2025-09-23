@@ -37,17 +37,18 @@ export default function ProfileScreen() {
     }
   };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    dispatch(getMe() as any);
-    setTimeout(() => {
+    try {
+      await dispatch(getMe() as any);
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   }, [dispatch]);
 
   useEffect(() => {
     dispatch(getMe() as any);
-  }, [dispatch]);
+  }, []);
 
   // Sprawdź autoryzację i przekieruj na logowanie jeśli nieautoryzowany
   useEffect(() => {
@@ -207,10 +208,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   quickActionText: {
@@ -227,10 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   logoutText: {

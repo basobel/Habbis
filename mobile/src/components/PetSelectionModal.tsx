@@ -315,10 +315,7 @@ const styles = StyleSheet.create({
     height: screenHeight * 0.85,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.25)',
     elevation: 10,
   },
   container: {
@@ -402,10 +399,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
     elevation: 2,
   },
   selectionIndicator: {

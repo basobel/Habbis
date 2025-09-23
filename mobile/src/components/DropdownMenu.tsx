@@ -50,7 +50,7 @@ export default function DropdownMenu({
         Animated.timing(expandAnimation, {
           toValue: 1,
           duration: 300,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         ...itemAnimations.map((anim, index) =>
           Animated.timing(anim, {
@@ -66,7 +66,7 @@ export default function DropdownMenu({
         Animated.timing(expandAnimation, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         ...itemAnimations.map((anim) =>
           Animated.timing(anim, {
@@ -225,10 +225,7 @@ const styles = StyleSheet.create({
     width: 200,
     borderRadius: 12,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
     elevation: 8,
   },
   menuItem: {

@@ -97,9 +97,9 @@ export default function AchievementCard({ achievement }: AchievementCardProps) {
           borderColor: achievement.isUnlocked 
             ? getRarityColor(achievement.rarity)
             : colors?.border?.primary || '#C4B5FD',
-          shadowColor: achievement.isUnlocked 
-            ? getRarityColor(achievement.rarity)
-            : colors?.text?.primary || '#4C1D95',
+          boxShadow: achievement.isUnlocked 
+            ? `0 2px 8px ${getRarityColor(achievement.rarity)}40`
+            : '0 2px 8px rgba(0, 0, 0, 0.1)',
         }
       ]}
       activeOpacity={0.7}
@@ -275,9 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   header: {

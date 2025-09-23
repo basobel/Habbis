@@ -43,12 +43,12 @@ export default function EditProfileScreen() {
   }, [user]);
 
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = React.useCallback((field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
-  };
+  }, []);
 
   // Auto-save dla nazwy użytkownika i ikonki awatara
   useEffect(() => {
@@ -66,12 +66,12 @@ export default function EditProfileScreen() {
       if (Object.keys(updates).length > 0) {
         saveProfile(updates);
       }
-    }, 1000); // Auto-save po 1 sekundzie bez zmian
+    }, 500); // Zmniejszono timeout do 500ms dla lepszej wydajności
 
     return () => clearTimeout(timeoutId);
-  }, [formData.username, formData.avatar_icon, user?.username, user?.avatar_icon]);
+  }, [formData.username, formData.avatar_icon, user?.username, user?.avatar_icon, saveProfile]);
 
-  const saveProfile = async (updates: any) => {
+  const saveProfile = React.useCallback(async (updates: any) => {
     if (updates.username && updates.username.length < 3) return;
     
     setIsSaving(true);
@@ -82,19 +82,19 @@ export default function EditProfileScreen() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [dispatch]);
 
 
-  const handleIconSelect = (icon: string) => {
+  const handleIconSelect = React.useCallback((icon: string) => {
     setFormData(prev => ({
       ...prev,
       avatar_icon: icon,
     }));
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = React.useCallback(() => {
     router.back();
-  };
+  }, [router]);
 
   if (!isLoaded || !colors) {
     return (
@@ -229,10 +229,7 @@ const styles = StyleSheet.create({
     paddingTop: 60, // Dodaj padding-top żeby nie nakładało się z TopPanel
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   headerButton: {
@@ -271,10 +268,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   sectionTitle: {

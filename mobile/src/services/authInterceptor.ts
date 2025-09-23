@@ -39,8 +39,8 @@ const handleAuthError = async () => {
       globalStore.dispatch(clearAuth());
     }
     
-    // Navigate to login screen - use setTimeout to avoid navigation issues
-    setTimeout(() => {
+    // Navigate to login screen - use requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
       try {
         router.replace('/login');
       } catch (navError) {
@@ -50,7 +50,7 @@ const handleAuthError = async () => {
           window.location.href = '/login';
         }
       }
-    }, 100);
+    });
     
     logger.info('User automatically logged out due to authentication error');
   } catch (error) {

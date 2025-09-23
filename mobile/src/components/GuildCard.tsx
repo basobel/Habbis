@@ -57,7 +57,7 @@ export default function GuildCard({ guild, onPress, onJoin }: GuildCardProps) {
         {
           backgroundColor: colors?.background?.card || '#FFFFFF',
           borderColor: colors?.border?.primary || '#C4B5FD',
-          shadowColor: colors?.text?.primary || '#4C1D95',
+          boxShadow: `0 2px 8px ${colors?.text?.primary || '#4C1D95'}40`,
         }
       ]}
       onPress={onPress}
@@ -197,9 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   header: {

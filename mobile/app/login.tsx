@@ -245,10 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
+    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.12)',
     elevation: 8,
   },
   forgotPassword: {

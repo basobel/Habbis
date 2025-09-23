@@ -38,20 +38,20 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
   const expandAnimation = useRef(new Animated.Value(0)).current;
   const rotateAnimation = useRef(new Animated.Value(0)).current;
 
-  // Calculate derived data from profile
-  const levelProgress = profile ? {
+  // Calculate derived data from profile - memoized
+  const levelProgress = React.useMemo(() => profile ? {
     current: profile.experience_points % 1000, // Simple calculation
     required: 1000,
     percentage: (profile.experience_points % 1000) / 10
-  } : { current: 0, required: 1000, percentage: 0 };
+  } : { current: 0, required: 1000, percentage: 0 }, [profile?.experience_points]);
 
-  const currencies = {
+  const currencies = React.useMemo(() => ({
     regular: profile?.regular_currency || 0,
     premium: profile?.premium_currency || 0,
-  };
+  }), [profile?.regular_currency, profile?.premium_currency]);
 
-  const streak = profile?.current_streak_days || 0;
-  const achievements = profile?.achievements || [];
+  const streak = React.useMemo(() => profile?.current_streak_days || 0, [profile?.current_streak_days]);
+  const achievements = React.useMemo(() => profile?.achievements || [], [profile?.achievements]);
   // Note: isPremium is available but not currently used in UI
 
 

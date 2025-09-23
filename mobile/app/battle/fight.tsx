@@ -154,18 +154,22 @@ export default function FightScreen() {
     }));
 
     if (newEnemyHealth <= 0) {
-      setTimeout(() => {
-        setBattleState(prev => ({
-          ...prev,
-          winner: 'player',
-          isAnimating: false,
-        }));
-        addToLog(`${battleState.enemyPet.name} został pokonany! Zwycięstwo!`);
-      }, 2000);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setBattleState(prev => ({
+            ...prev,
+            winner: 'player',
+            isAnimating: false,
+          }));
+          addToLog(`${battleState.enemyPet.name} został pokonany! Zwycięstwo!`);
+        }, 2000);
+      });
     } else {
-      setTimeout(() => {
-        enemyAttack();
-      }, 2000);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          enemyAttack();
+        }, 2000);
+      });
     }
   };
 
@@ -186,13 +190,15 @@ export default function FightScreen() {
     }));
 
     if (newPlayerHealth <= 0) {
-      setTimeout(() => {
-        setBattleState(prev => ({
-          ...prev,
-          winner: 'enemy',
-        }));
-        addToLog(`${battleState.playerPet.name} został pokonany! Przegrana!`);
-      }, 1000);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setBattleState(prev => ({
+            ...prev,
+            winner: 'enemy',
+          }));
+          addToLog(`${battleState.playerPet.name} został pokonany! Przegrana!`);
+        }, 1000);
+      });
     }
   };
 
@@ -471,10 +477,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: '100%',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   petName: {

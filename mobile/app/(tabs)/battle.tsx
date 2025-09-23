@@ -52,7 +52,7 @@ export default function BattleScreen() {
       id: 'arena',
       title: 'Arena PvP',
       description: 'Walcz z innymi graczami w turniejach',
-      icon: 'sword-outline',
+      icon: 'flash-outline',
       color: error500,
       difficulty: 'hard',
       rewards: ['Trophy', 'Coins', 'XP'],
@@ -86,9 +86,11 @@ export default function BattleScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     // Symulacja odświeżania danych
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
   };
 
   const handleModePress = (mode: BattleMode) => {

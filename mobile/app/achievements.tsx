@@ -238,9 +238,11 @@ export default function AchievementsScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
   }, []);
 
   const categories = [
@@ -413,10 +415,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   statItem: {

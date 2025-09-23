@@ -24,9 +24,7 @@ export default function useScreenState(
     } catch (error) {
       console.error('Refresh error:', error);
     } finally {
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 1000);
+      setRefreshing(false);
     }
   }, [refreshCallback]);
 

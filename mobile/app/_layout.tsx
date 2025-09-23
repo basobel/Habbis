@@ -30,11 +30,6 @@ function ThemedStack() {
         <Stack.Screen name="register" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="achievements" />
-        <Stack.Screen name="settings" />
-        <Stack.Screen name="premium" />
-        <Stack.Screen name="statistics" />
-        <Stack.Screen name="help" />
-        <Stack.Screen name="about" />
       </Stack>
     );
   }
@@ -50,11 +45,6 @@ function ThemedStack() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="achievements" />
-        <Stack.Screen name="settings" />
-        <Stack.Screen name="premium" />
-        <Stack.Screen name="statistics" />
-        <Stack.Screen name="help" />
-        <Stack.Screen name="about" />
       </Stack>
     );
   }

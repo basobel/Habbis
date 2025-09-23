@@ -166,10 +166,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
     elevation: 8,
     overflow: 'hidden',
   },

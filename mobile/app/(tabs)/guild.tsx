@@ -101,9 +101,11 @@ export default function GuildScreen() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     // Symulacja ładowania danych
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
   }, []);
 
   const handleGuildPress = (guild: Guild) => {

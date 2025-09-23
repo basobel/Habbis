@@ -119,9 +119,11 @@ export default function PetsScreen() {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // Simulate API call
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    });
   }, []);
 
   const handlePetPress = (pet: Pet) => {

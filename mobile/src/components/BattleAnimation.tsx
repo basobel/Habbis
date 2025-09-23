@@ -56,7 +56,7 @@ export default function BattleAnimation({
     ]).start();
 
     // Middle animation based on type
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       switch (type) {
         case 'attack':
           Animated.sequence([
@@ -142,7 +142,7 @@ export default function BattleAnimation({
     }, duration * 0.3);
 
     // End animation
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       Animated.parallel([
         Animated.timing(scaleAnim, {
           toValue: 0,
