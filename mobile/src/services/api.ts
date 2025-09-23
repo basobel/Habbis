@@ -78,6 +78,9 @@ export const habitsApi = {
   skipHabit: (id: number, data?: { reason?: string }) =>
     apiService.post<ApiResponse>(`/habits/${id}/skip`, data),
     
+  undoHabit: (id: number) =>
+    apiService.post<ApiResponse>(`/habits/${id}/undo`),
+    
   getHabitStats: () =>
     apiService.get<ApiResponse>('/habits/stats/overview'),
 };

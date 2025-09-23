@@ -123,6 +123,31 @@ class Habit extends Model
         return $log;
     }
 
+    public function undoTodayCompletion(): bool
+    {
+        $today = today();
+        
+        // Find today's log
+        $todayLog = $this->todayLog()->first();
+        if (!$todayLog) {
+            return false; // No log to undo
+        }
+
+        // Remove the log entry
+        $todayLog->delete();
+
+        // Update habit stats (recalculate without today's completion)
+        $this->updateHabitStats(false);
+
+        // Update last_completed_at if it was today
+        if ($this->last_completed_at && $this->last_completed_at->isToday()) {
+            $this->last_completed_at = null;
+            $this->save();
+        }
+
+        return true;
+    }
+
     public function calculateXpReward(): int
     {
         $baseXp = $this->base_xp_reward;

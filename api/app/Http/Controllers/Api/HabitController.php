@@ -134,6 +134,24 @@ class HabitController extends Controller
         ]);
     }
 
+    public function undo(Request $request, Habit $habit): JsonResponse
+    {
+        $this->authorize('update', $habit);
+
+        $success = $habit->undoTodayCompletion();
+
+        if (!$success) {
+            return response()->json([
+                'message' => 'No completion to undo for today',
+            ], 400);
+        }
+
+        return response()->json([
+            'message' => 'Habit completion undone',
+            'streak_status' => $habit->fresh()->getStreakStatus(),
+        ]);
+    }
+
     public function stats(Request $request): JsonResponse
     {
         $user = $request->user();

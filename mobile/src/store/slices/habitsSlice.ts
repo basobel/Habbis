@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
 import { Habit, HabitStats, WeeklyProgress, MonthlyProgress, HabitsResponse, HabitResponse, HabitStatsResponse } from '@/types';
 import { habitsApi } from '@/services/api';
 
@@ -11,61 +12,9 @@ interface HabitsState {
   error: string | null;
 }
 
-// Mock data - w rzeczywistej aplikacji będzie pobierane z API
-const mockHabits: Habit[] = [
-  {
-    id: 1,
-    user_id: 1,
-    name: 'Poranny jogging',
-    description: '30 minut biegania każdego ranka',
-    difficulty: 'medium' as const,
-    target_frequency: 5,
-    target_days: [1, 2, 3, 4, 5],
-    reward_config: { xp: 50, gold: 10 },
-    base_xp_reward: 50,
-    streak_bonus_xp: 10,
-    premium_currency_reward: 5,
-    current_streak: 7,
-    longest_streak: 15,
-    total_completions: 45,
-    last_completed_at: '2024-01-15T06:30:00Z',
-    is_active: true,
-    reminders_enabled: true,
-    reminder_times: ['06:00'],
-    color: '#10B981',
-    icon: 'fitness',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T06:30:00Z',
-  },
-  {
-    id: 2,
-    user_id: 1,
-    name: 'Czytanie książek',
-    description: 'Czytanie 20 stron dziennie',
-    difficulty: 'easy' as const,
-    target_frequency: 7,
-    target_days: [0, 1, 2, 3, 4, 5, 6],
-    reward_config: { xp: 30, gold: 5 },
-    base_xp_reward: 30,
-    streak_bonus_xp: 5,
-    premium_currency_reward: 2,
-    current_streak: 12,
-    longest_streak: 25,
-    total_completions: 78,
-    last_completed_at: '2024-01-15T21:00:00Z',
-    is_active: true,
-    reminders_enabled: true,
-    reminder_times: ['21:00'],
-    color: '#3B82F6',
-    icon: 'book',
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-15T21:00:00Z',
-  },
-];
-
 const initialState: HabitsState = {
-  habits: mockHabits,
-  activeHabits: [], // Będzie obliczane przez selektory
+  habits: [],
+  activeHabits: [],
   selectedHabit: null,
   stats: null,
   isLoading: false,
@@ -78,8 +27,22 @@ export const fetchHabits = createAsyncThunk<HabitsResponse, { active?: boolean; 
   async (params = {}, { rejectWithValue }) => {
     try {
       const response = await habitsApi.getHabits(params);
-      return response.data as HabitsResponse;
+      console.log('API Response:', response); // Debug log
+      
+      // Sprawdź czy response istnieje
+      if (!response) {
+        return rejectWithValue('No response from server');
+      }
+      
+      // Sprawdź czy response ma właściwą strukturę
+      if (!response || typeof response !== 'object') {
+        console.log('Response structure:', response);
+        return rejectWithValue('Invalid response structure');
+      }
+      
+      return response as HabitsResponse;
     } catch (error: any) {
+      console.log('API Error:', error);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch habits');
     }
   }
@@ -157,6 +120,18 @@ export const skipHabit = createAsyncThunk(
   }
 );
 
+export const undoHabit = createAsyncThunk(
+  'habits/undoHabit',
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await habitsApi.undoHabit(id);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to undo habit');
+    }
+  }
+);
+
 export const fetchHabitStats = createAsyncThunk<HabitStatsResponse, void>(
   'habits/fetchHabitStats',
   async (_, { rejectWithValue }) => {
@@ -200,9 +175,18 @@ const habitsSlice = createSlice({
       })
       .addCase(fetchHabits.fulfilled, (state, action) => {
         state.isLoading = false;
-        const habits = Array.isArray(action.payload.habits) 
-          ? action.payload.habits 
-          : action.payload.habits?.data || [];
+        
+        // Sprawdź czy payload istnieje
+        if (!action.payload) {
+          state.error = 'No data received from server';
+          return;
+        }
+        
+        // Laravel zwraca habits jako paginated response z Laravel
+        const habitsData = action.payload.habits;
+        const habits = Array.isArray(habitsData) 
+          ? habitsData 
+          : (habitsData as any)?.data || [];
         state.habits = habits;
         // activeHabits będzie obliczane przez selektor
         state.error = null;
@@ -290,7 +274,8 @@ const habitsSlice = createSlice({
       })
       .addCase(completeHabit.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update habit in lists if needed
+        // Refresh habits to get updated data
+        // W rzeczywistej aplikacji można by zaktualizować konkretny habit
         state.error = null;
       })
       .addCase(completeHabit.rejected, (state, action) => {
@@ -308,6 +293,20 @@ const habitsSlice = createSlice({
         state.error = null;
       })
       .addCase(skipHabit.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      // Undo habit
+      .addCase(undoHabit.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(undoHabit.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Update habit in lists if needed
+        state.error = null;
+      })
+      .addCase(undoHabit.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
@@ -331,10 +330,14 @@ const habitsSlice = createSlice({
 export const { clearError, setSelectedHabit, updateHabitInList } = habitsSlice.actions;
 export default habitsSlice.reducer;
 
-// Selektory
+// Selektory z memoizacją
 export const selectAllHabits = (state: { habits: HabitsState }) => state.habits.habits;
-export const selectActiveHabits = (state: { habits: HabitsState }) => 
-  state.habits.habits.filter(habit => habit.is_active);
+
+export const selectActiveHabits = createSelector(
+  [selectAllHabits],
+  (habits) => habits.filter(habit => habit.is_active)
+);
+
 export const selectSelectedHabit = (state: { habits: HabitsState }) => state.habits.selectedHabit;
 export const selectHabitsStats = (state: { habits: HabitsState }) => state.habits.stats;
 export const selectHabitsLoading = (state: { habits: HabitsState }) => state.habits.isLoading;

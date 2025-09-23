@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('habits', HabitController::class);
     Route::post('habits/{habit}/complete', [HabitController::class, 'complete']);
     Route::post('habits/{habit}/skip', [HabitController::class, 'skip']);
+    Route::post('habits/{habit}/undo', [HabitController::class, 'undo']);
     Route::get('habits/stats/overview', [HabitController::class, 'stats']);
 
     // Pets

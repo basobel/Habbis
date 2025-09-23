@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,85 +13,102 @@ import FadeInView from '@/components/FadeInView';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import ScreenScrollView from '@/components/ScreenScrollView';
 import useScreenState from '@/hooks/useScreenState';
-
-interface Habit {
-  id: string;
-  title: string;
-  description: string;
-  streak: number;
-  target: number;
-  completed: boolean;
-  category: 'health' | 'work' | 'personal' | 'learning';
-  difficulty: 'easy' | 'medium' | 'hard';
-}
+import { useAppDispatch, useAppSelector } from '../../src/store/hooks';
+import { 
+  fetchHabits, 
+  completeHabit, 
+  skipHabit,
+  undoHabit,
+  selectAllHabits,
+  selectActiveHabits,
+  selectHabitsLoading,
+  selectHabitsError 
+} from '../../src/store/slices/habitsSlice';
+import { selectIsAuthenticated } from '../../src/store/slices/authSlice';
+import { Habit } from '../../src/types';
 
 export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
   const { refreshing, onRefresh } = useScreenState();
+  const dispatch = useAppDispatch();
+  
+  // Redux state
+  const habits = useAppSelector(selectActiveHabits);
+  const isLoading = useAppSelector(selectHabitsLoading);
+  const error = useAppSelector(selectHabitsError);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
-  // Mock data
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: '1',
-      title: 'Poranna gimnastyka',
-      description: '15 minut ćwiczeń każdego ranka',
-      streak: 7,
-      target: 30,
-      completed: false,
-      category: 'health',
-      difficulty: 'medium',
-    },
-    {
-      id: '2',
-      title: 'Czytanie książek',
-      description: '30 minut czytania dziennie',
-      streak: 12,
-      target: 21,
-      completed: true,
-      category: 'learning',
-      difficulty: 'easy',
-    },
-    {
-      id: '3',
-      title: 'Medytacja',
-      description: '10 minut medytacji',
-      streak: 3,
-      target: 7,
-      completed: false,
-      category: 'personal',
-      difficulty: 'easy',
-    },
-  ]);
+  // Helper function
+  const isCompletedToday = useCallback((habit: Habit) => {
+    return habit.last_completed_at && 
+      new Date(habit.last_completed_at).toDateString() === new Date().toDateString();
+  }, []);
 
+  // Memoized computed values
+  const completedTodayCount = useMemo(() => 
+    habits.filter((h: Habit) => isCompletedToday(h)).length,
+    [habits, isCompletedToday]
+  );
 
-  const handleHabitToggle = (habitId: string) => {
-    setHabits(prevHabits =>
-      prevHabits.map(habit =>
-        habit.id === habitId
-          ? { ...habit, completed: !habit.completed, streak: habit.completed ? habit.streak - 1 : habit.streak + 1 }
-          : habit
-      )
-    );
+  // Load habits on component mount
+  useEffect(() => {
+    // Sprawdź czy użytkownik jest zalogowany przed pobraniem nawyków
+    if (isAuthenticated) {
+      const loadHabits = async () => {
+        try {
+          await dispatch(fetchHabits({ active: true }));
+        } catch (error) {
+          console.log('Error loading habits:', error);
+        }
+      };
+      
+      loadHabits();
+    }
+  }, [dispatch, isAuthenticated]);
+
+  // Handle refresh
+  const handleRefresh = async () => {
+    await dispatch(fetchHabits({ active: true }));
+    onRefresh();
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'health': return 'fitness';
-      case 'work': return 'briefcase';
-      case 'personal': return 'person';
-      case 'learning': return 'book';
-      default: return 'star';
+  const handleHabitToggle = async (habitId: number) => {
+    const habit = habits.find((h: Habit) => h.id === habitId);
+    if (!habit) return;
+
+    // Check if habit is completed today
+    const habitCompletedToday = habit.last_completed_at && 
+      new Date(habit.last_completed_at).toDateString() === new Date().toDateString();
+
+    if (habitCompletedToday) {
+      // Undo habit completion (cofnij wykonanie)
+      await dispatch(undoHabit(habitId));
+    } else {
+      // Complete habit
+      await dispatch(completeHabit({ id: habitId }));
     }
+    
+    // Refresh habits to get updated data
+    await dispatch(fetchHabits({ active: true }));
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'health': return '#22C55E';
-      case 'work': return '#3B82F6';
-      case 'personal': return '#8B5CF6';
-      case 'learning': return '#F59E0B';
-      default: return '#6B7280';
-    }
+  const getCategoryIcon = (icon: string) => {
+    // Map backend icon names to Ionicons
+    const iconMap: { [key: string]: string } = {
+      'fitness': 'fitness',
+      'briefcase': 'briefcase',
+      'person': 'person',
+      'book': 'book',
+      'star': 'star',
+      'heart': 'heart',
+      'time': 'time',
+      'checkmark': 'checkmark',
+    };
+    return iconMap[icon] || 'star';
+  };
+
+  const getCategoryColor = (color: string) => {
+    return color || '#6B7280';
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -99,16 +116,26 @@ export default function HabitsScreen() {
       case 'easy': return '#22C55E';
       case 'medium': return '#F59E0B';
       case 'hard': return '#EF4444';
+      case 'expert': return '#8B5CF6';
       default: return '#6B7280';
     }
   };
-
 
   if (!isLoaded || !colors) {
     return (
       <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
           <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading habits...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (isLoading && habits.length === 0) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: colors.text.primary }]}>Loading habits...</Text>
         </View>
       </View>
     );
@@ -123,7 +150,7 @@ export default function HabitsScreen() {
           <View>
             <Text style={[styles.title, { color: colors.text.primary }]}>Moje Nawyk</Text>
             <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-              {habits.length} nawyków • {habits.filter(h => h.completed).length} ukończonych dziś
+              {habits.length} nawyków • {completedTodayCount} ukończonych dziś
             </Text>
           </View>
           <TouchableOpacity
@@ -141,7 +168,7 @@ export default function HabitsScreen() {
       {/* Habits List */}
       <ScrollView
         style={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
         showsVerticalScrollIndicator={false}
       >
         {habits.length === 0 ? (
@@ -163,49 +190,51 @@ export default function HabitsScreen() {
           </View>
         ) : (
           <View style={styles.habitsList}>
-            {habits.map((habit) => (
-              <TouchableOpacity
-                key={habit.id}
-                style={[
-                  styles.habitCard,
-                  {
-                    backgroundColor: colors.background.card,
-                    borderColor: habit.completed ? colors.primary[500] : colors.border.primary,
-                    borderWidth: habit.completed ? 2 : 1,
-                  }
-                ]}
-                onPress={() => handleHabitToggle(habit.id)}
-                activeOpacity={0.8}
-              >
+            {habits.map((habit: Habit) => {
+              const completed = isCompletedToday(habit);
+              return (
+                <TouchableOpacity
+                  key={habit.id}
+                  style={[
+                    styles.habitCard,
+                    {
+                      backgroundColor: colors.background.card,
+                      borderColor: completed ? colors.primary[500] : colors.border.primary,
+                      borderWidth: completed ? 2 : 1,
+                    }
+                  ]}
+                  onPress={() => handleHabitToggle(habit.id)}
+                  activeOpacity={0.8}
+                >
                 <View style={styles.habitHeader}>
                   <View style={styles.habitInfo}>
-                    <View style={[styles.categoryIcon, { backgroundColor: `${getCategoryColor(habit.category)}20` }]}>
+                    <View style={[styles.categoryIcon, { backgroundColor: `${getCategoryColor(habit.color)}20` }]}>
                       <Ionicons
-                        name={getCategoryIcon(habit.category) as any}
+                        name={getCategoryIcon(habit.icon) as any}
                         size={20}
-                        color={getCategoryColor(habit.category)}
+                        color={getCategoryColor(habit.color)}
                       />
                     </View>
                     <View style={styles.habitText}>
                       <Text style={[styles.habitTitle, { color: colors.text.primary }]}>
-                        {habit.title}
+                        {habit.name}
                       </Text>
                       <Text style={[styles.habitDescription, { color: colors.text.secondary }]}>
-                        {habit.description}
+                        {habit.description || 'Brak opisu'}
                       </Text>
                     </View>
                   </View>
                   <View style={[
                     styles.completionButton,
                     {
-                      backgroundColor: habit.completed ? colors.primary[500] : colors.background.primary,
-                      borderColor: habit.completed ? colors.primary[500] : colors.border.primary,
+                      backgroundColor: completed ? colors.primary[500] : colors.background.primary,
+                      borderColor: completed ? colors.primary[500] : colors.border.primary,
                     }
                   ]}>
                     <Ionicons
-                      name={habit.completed ? "checkmark" : "add"}
+                      name={completed ? "checkmark" : "add"}
                       size={20}
-                      color={habit.completed ? colors.text.inverse : colors.text.secondary}
+                      color={completed ? colors.text.inverse : colors.text.secondary}
                     />
                   </View>
                 </View>
@@ -213,7 +242,7 @@ export default function HabitsScreen() {
                 <View style={styles.habitStats}>
                   <View style={styles.statItem}>
                     <Text style={[styles.statValue, { color: colors.primary[600] }]}>
-                      {habit.streak}
+                      {habit.current_streak}
                     </Text>
                     <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
                       Streak
@@ -221,10 +250,10 @@ export default function HabitsScreen() {
                   </View>
                   <View style={styles.statItem}>
                     <Text style={[styles.statValue, { color: colors.text.secondary }]}>
-                      {habit.target}
+                      {habit.total_completions}
                     </Text>
                     <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
-                      Cel
+                      Ukończone
                     </Text>
                   </View>
                   <View style={styles.statItem}>
@@ -235,8 +264,17 @@ export default function HabitsScreen() {
                     </View>
                   </View>
                 </View>
-              </TouchableOpacity>
-            ))}
+                
+                {completed && (
+                  <View style={styles.completedHint}>
+                    <Text style={[styles.completedHintText, { color: colors.text.secondary }]}>
+                      Kliknij ponownie, aby cofnąć wykonanie
+                    </Text>
+                  </View>
+                )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
       </ScrollView>
@@ -392,5 +430,17 @@ const styles = StyleSheet.create({
   difficultyText: {
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  completedHint: {
+    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  completedHintText: {
+    fontSize: 12,
+    fontStyle: 'italic',
   },
 });
