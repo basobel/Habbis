@@ -8,14 +8,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useThemeContext } from '@/contexts/ThemeContext';
 import { Colors } from '../src/constants/colors';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
 import { setGlobalStore } from '@/services/authInterceptor';
 import { useEffect } from 'react';
 
 function ThemedStack() {
   const { colors, isDark, isLoaded } = useThemeContext();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   // Don't render until theme is loaded
   if (!isLoaded || !colors) {
@@ -34,22 +31,7 @@ function ThemedStack() {
     );
   }
 
-  // If user is authenticated, show main app with circular menu
-  if (isAuthenticated) {
-    return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="achievements" />
-      </Stack>
-    );
-  }
-
-  // If user is not authenticated, show login/register screens
+  // Always show all screens - let index.tsx handle navigation logic
   return (
     <Stack
       screenOptions={{
@@ -59,6 +41,8 @@ function ThemedStack() {
       <Stack.Screen name="index" />
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="achievements" />
     </Stack>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,10 +22,10 @@ import AvatarIconSelector from '@/components/AvatarIconSelector';
 export default function EditProfileScreen() {
   const dispatch = useDispatch();
   const { colors, isLoaded } = useThemeContext();
-  const { user, loading } = useSelector((state: RootState) => ({
-    user: state.auth.user,
-    loading: state.user?.loading || false,
-  }));
+  
+  // Separate selectors to prevent unnecessary rerenders
+  const user = useSelector((state: RootState) => state.auth.user);
+  const loading = useSelector((state: RootState) => state.user?.loading || false);
 
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -42,6 +42,19 @@ export default function EditProfileScreen() {
     }
   }, [user]);
 
+
+  const saveProfile = React.useCallback(async (updates: any) => {
+    if (updates.username && updates.username.length < 3) return;
+    
+    setIsSaving(true);
+    try {
+      await dispatch(updateUserProfile(updates) as any);
+    } catch (error: any) {
+      console.error('Failed to save profile:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [dispatch]);
 
   const handleInputChange = React.useCallback((field: string, value: string) => {
     setFormData(prev => ({
@@ -70,19 +83,6 @@ export default function EditProfileScreen() {
 
     return () => clearTimeout(timeoutId);
   }, [formData.username, formData.avatar_icon, user?.username, user?.avatar_icon, saveProfile]);
-
-  const saveProfile = React.useCallback(async (updates: any) => {
-    if (updates.username && updates.username.length < 3) return;
-    
-    setIsSaving(true);
-    try {
-      await dispatch(updateUserProfile(updates) as any);
-    } catch (error: any) {
-      console.error('Failed to save profile:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [dispatch]);
 
 
   const handleIconSelect = React.useCallback((icon: string) => {

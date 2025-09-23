@@ -1,29 +1,28 @@
+// jest.config.js
 module.exports = {
-  preset: 'react-native',
+  preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/android/',
     '<rootDir>/ios/',
   ],
-  transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@expo|expo|@unimodules|unimodules|sentry-expo|native-base|react-navigation|@react-navigation|@react-native-community|@react-native-picker|react-native-vector-icons|react-native-svg|react-native-gesture-handler|react-native-reanimated|react-native-screens|react-native-safe-area-context|@react-native-async-storage|expo-secure-store|expo-constants|expo-linking|expo-notifications|expo-splash-screen|expo-status-bar|expo-system-ui|expo-web-browser|expo-linear-gradient|expo-haptics|expo-blur)/)',
-  ],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testEnvironment: 'jsdom',
+  // RNTL nie potrzebuje DOM; 'node' jest szybsze. Jeśli masz testy z jsdom, możesz zmienić na 'jsdom'.
+  testEnvironment: 'node',
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/**/*.stories.{ts,tsx}',
   ],
   coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
+    global: { branches: 70, functions: 70, lines: 70, statements: 70 },
   },
+  // Performance
+  maxWorkers: '50%',
+  clearMocks: true,
+  restoreMocks: true,
+  cache: true,
 };

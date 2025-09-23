@@ -10,6 +10,7 @@ A professional-grade, containerized habit tracking application with virtual pets
 - **Database**: PostgreSQL 15 (optimized for gaming data)
 - **Cache**: Redis 7
 - **Infrastructure**: Full Docker containerization
+- **Package Manager**: pnpm (faster, more efficient than npm)
 - **CI/CD**: GitHub Actions with multi-environment deployment
 
 ### Key Features
@@ -25,6 +26,7 @@ A professional-grade, containerized habit tracking application with virtual pets
 ### Prerequisites
 - Docker & Docker Compose
 - Git
+- pnpm
 
 ### 1. Clone the Repository
 ```bash
@@ -63,13 +65,13 @@ docker-compose logs -f
 ### Using iOS Simulator
 ```bash
 # Start iOS simulator
-docker-compose exec expo npx expo start --ios
+docker-compose exec expo pnpm expo start --ios
 ```
 
 ### Using Android Emulator
 ```bash
 # Start Android emulator
-docker-compose exec expo npx expo start --android
+docker-compose exec expo pnpm expo start --android
 ```
 
 ## 🛠️ Development Commands
@@ -110,6 +112,9 @@ pnpm run type-check
 
 # Run tests
 pnpm test
+
+# Clear Expo cache
+pnpm exec expo start --clear
 ```
 
 ## 🗄️ Database Schema
@@ -320,10 +325,10 @@ docker-compose exec expo pnpm test -- --coverage
 ## 📞 Support
 
 ### Documentation
-- [API Documentation](docs/api.md)
-- [Database Schema](docs/database.md)
-- [Deployment Guide](docs/deployment.md)
-- [Contributing Guide](docs/contributing.md)
+- [Complete Documentation](HABBIS_COMPLETE_DOCUMENTATION.md)
+- [API Documentation](mobile/API_DOCUMENTATION.md)
+- [Development Guide](DEVELOPMENT.md)
+- [Code Quality Guidelines](mobile/CODE_QUALITY.md)
 
 ### Community
 - [Discord Server](https://discord.gg/habbis)

@@ -57,7 +57,7 @@ export default function IndexScreen() {
       router.replace('/(tabs)');
       return;
     }
-  }, [isLoaded, colors, authState, hasNavigated]);
+  }, [isLoaded, colors, authState?.isAuthenticated, authState?.isLoading, authState?.error, hasNavigated]);
   
   // Check if theme is loaded
   if (!isLoaded || !colors) {

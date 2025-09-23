@@ -34,7 +34,7 @@ docker-compose up -d
 ### 2. Uruchom Expo:
 ```bash
 cd mobile
-npx expo start --web --port 19006
+pnpm exec expo start --web --port 19006
 ```
 
 ## 🌐 Dostęp do aplikacji
@@ -79,6 +79,7 @@ docker-compose down
 
 - Docker Desktop
 - Node.js (dla Expo)
+- pnpm (package manager)
 - Expo Go (na telefonie)
 
 ## 📝 Notatki

@@ -88,7 +88,7 @@ cd mobile
 
 # Uruchom Expo w tle
 echo "🚀 Uruchamianie Expo..."
-nohup npx expo start --web --port 19006 > ../expo.log 2>&1 &
+nohup pnpm exec expo start --web --port 19006 > ../expo.log 2>&1 &
 EXPO_PID=$!
 
 # Poczekaj chwilę na uruchomienie Expo

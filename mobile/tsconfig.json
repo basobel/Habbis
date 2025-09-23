@@ -3,14 +3,14 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
+    "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "noEmit": true,
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/screens/*": ["./src/screens/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/store/*": ["./src/store/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

@@ -11,6 +11,8 @@
 .\stop.ps1
 ```
 
+**Uwaga**: Używamy `pnpm` jako package manager dla lepszej wydajności.
+
 ### Tryb Production
 ```powershell
 # Uruchom wszystko w Docker
@@ -117,11 +119,11 @@ docker version
 ### Expo nie uruchamia się
 ```powershell
 # Wyczyść cache
-npx expo start --clear
+pnpm exec expo start --clear
 
 # Sprawdź czy jesteś w katalogu mobile
 cd mobile
-npx expo start --web --clear
+pnpm exec expo start --web --clear
 ```
 
 ## 📚 Przydatne Komendy
