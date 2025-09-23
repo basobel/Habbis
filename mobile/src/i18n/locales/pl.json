@@ -1,0 +1,127 @@
+{
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "add": "Dodaj",
+    "close": "Zamknij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "done": "Gotowe",
+    "retry": "Spróbuj ponownie",
+    "refresh": "Odśwież"
+  },
+  "app": {
+    "name": "Habbis",
+    "tagline": "Gamifikowane Śledzenie Nawyku",
+    "description": "Zamień swoje nawyki w ekscytującą przygodę RPG! Śledź codzienne nawyki, rozwijaj swoją postać i walcz z potworami w Habbis."
+  },
+  "habits": {
+    "title": "Nawyki",
+    "subtitle": "{{count}} nawyków • {{completed}} ukończonych dziś",
+    "noHabits": "Brak nawyków",
+    "noHabitsDescription": "Dodaj swój pierwszy nawyk!",
+    "addHabit": "Dodaj nawyk",
+    "completedToday": "ukończonych dziś",
+    "streak": "Streak",
+    "completed": "Ukończone",
+    "difficulty": "Trudność",
+    "clickToUndo": "Kliknij ponownie, aby cofnąć wykonanie",
+    "loadingHabits": "Ładowanie nawyków...",
+    "checkAuth": "Sprawdź czy użytkownik jest zalogowany przed pobraniem nawyków"
+  },
+  "difficulty": {
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "hard": "Trudny", 
+    "expert": "Ekspert"
+  },
+  "auth": {
+    "login": "Zaloguj się",
+    "register": "Zarejestruj się",
+    "logout": "Wyloguj się",
+    "email": "Email",
+    "password": "Hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "resetPassword": "Resetuj hasło",
+    "changePassword": "Zmień hasło",
+    "emailVerification": "Weryfikacja email",
+    "loginSuccess": "Logowanie pomyślne",
+    "registerSuccess": "Rejestracja pomyślna",
+    "logoutSuccess": "Wylogowanie pomyślne"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "language": "Język",
+    "theme": "Motyw",
+    "notifications": "Powiadomienia",
+    "account": "Konto",
+    "privacy": "Prywatność",
+    "about": "O aplikacji",
+    "help": "Pomoc"
+  },
+  "languages": {
+    "en": "English",
+    "pl": "Polski"
+  },
+  "themes": {
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "auto": "Automatyczny"
+  },
+  "about": {
+    "title": "O aplikacji",
+    "version": "Wersja",
+    "build": "Build",
+    "description": "Aplikacja do budowania nawyków z elementami grywalizacji",
+    "features": {
+      "tracking": {
+        "title": "Śledzenie nawyków",
+        "description": "Monitoruj swoje codzienne nawyki i postępy"
+      },
+      "achievements": {
+        "title": "System osiągnięć",
+        "description": "Odbieraj nagrody za konsekwentne działanie"
+      },
+      "guilds": {
+        "title": "Gildie i społeczność",
+        "description": "Dołącz do gildii i motywuj się z innymi"
+      },
+      "statistics": {
+        "title": "Szczegółowe statystyki",
+        "description": "Analizuj swoje postępy i trendy"
+      },
+      "premium": {
+        "title": "Funkcje Premium",
+        "description": "Rozszerzone możliwości dla zaawansowanych użytkowników"
+      }
+    },
+    "links": {
+      "privacyPolicy": "Polityka prywatności",
+      "termsOfService": "Regulamin",
+      "support": "Wsparcie",
+      "github": "GitHub"
+    }
+  },
+  "help": {
+    "title": "Pomoc",
+    "faq": "Często zadawane pytania",
+    "contact": "Skontaktuj się z pomocą",
+    "tutorial": "Samouczek"
+  },
+  "errors": {
+    "networkError": "Błąd sieci. Sprawdź połączenie internetowe.",
+    "serverError": "Błąd serwera. Spróbuj ponownie później.",
+    "unauthorized": "Nieautoryzowany dostęp. Zaloguj się ponownie.",
+    "notFound": "Zasób nie został znaleziony.",
+    "validationError": "Sprawdź wprowadzone dane i spróbuj ponownie.",
+    "unknownError": "Wystąpił nieznany błąd."
+  }
+}

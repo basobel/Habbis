@@ -1,0 +1,127 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "done": "Done",
+    "retry": "Retry",
+    "refresh": "Refresh"
+  },
+  "app": {
+    "name": "Habbis",
+    "tagline": "Gamified Habit Tracking",
+    "description": "Transform your habits into an exciting RPG adventure! Track your daily habits, level up your character, and battle monsters in Habbis."
+  },
+  "habits": {
+    "title": "Habits",
+    "subtitle": "{{count}} habits • {{completed}} completed today",
+    "noHabits": "No habits",
+    "noHabitsDescription": "Add your first habit!",
+    "addHabit": "Add Habit",
+    "completedToday": "completed today",
+    "streak": "Streak",
+    "completed": "Completed",
+    "difficulty": "Difficulty",
+    "clickToUndo": "Click again to undo completion",
+    "loadingHabits": "Loading habits...",
+    "checkAuth": "Check if user is logged in before fetching habits"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium", 
+    "hard": "Hard",
+    "expert": "Expert"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "emailVerification": "Email Verification",
+    "loginSuccess": "Login successful",
+    "registerSuccess": "Registration successful",
+    "logoutSuccess": "Logout successful"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "account": "Account",
+    "privacy": "Privacy",
+    "about": "About",
+    "help": "Help"
+  },
+  "languages": {
+    "en": "English",
+    "pl": "Polski"
+  },
+  "themes": {
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version",
+    "build": "Build",
+    "description": "Habit building application with gamification elements",
+    "features": {
+      "tracking": {
+        "title": "Habit Tracking",
+        "description": "Monitor your daily habits and progress"
+      },
+      "achievements": {
+        "title": "Achievement System", 
+        "description": "Receive rewards for consistent action"
+      },
+      "guilds": {
+        "title": "Guilds and Community",
+        "description": "Join guilds and motivate yourself with others"
+      },
+      "statistics": {
+        "title": "Detailed Statistics",
+        "description": "Analyze your progress and trends"
+      },
+      "premium": {
+        "title": "Premium Features",
+        "description": "Extended capabilities for advanced users"
+      }
+    },
+    "links": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "support": "Support",
+      "github": "GitHub"
+    }
+  },
+  "help": {
+    "title": "Help",
+    "faq": "Frequently Asked Questions",
+    "contact": "Contact Support",
+    "tutorial": "Tutorial"
+  },
+  "errors": {
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "unauthorized": "Unauthorized access. Please login again.",
+    "notFound": "Resource not found.",
+    "validationError": "Please check your input and try again.",
+    "unknownError": "An unknown error occurred."
+  }
+}

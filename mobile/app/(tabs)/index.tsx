@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import FadeInView from '@/components/FadeInView';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import ScreenScrollView from '@/components/ScreenScrollView';
@@ -29,6 +30,7 @@ import { Habit } from '../../src/types';
 
 export default function HabitsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const { refreshing, onRefresh } = useScreenState();
   const dispatch = useAppDispatch();
   
@@ -52,7 +54,7 @@ export default function HabitsScreen() {
 
   // Load habits on component mount
   useEffect(() => {
-    // Sprawdź czy użytkownik jest zalogowany przed pobraniem nawyków
+    // Check if user is logged in before fetching habits
     if (isAuthenticated) {
       const loadHabits = async () => {
         try {
@@ -61,7 +63,7 @@ export default function HabitsScreen() {
           console.log('Error loading habits:', error);
         }
       };
-      
+
       loadHabits();
     }
   }, [dispatch, isAuthenticated]);
@@ -81,7 +83,7 @@ export default function HabitsScreen() {
       new Date(habit.last_completed_at).toDateString() === new Date().toDateString();
 
     if (habitCompletedToday) {
-      // Undo habit completion (cofnij wykonanie)
+      // Undo habit completion
       await dispatch(undoHabit(habitId));
     } else {
       // Complete habit
@@ -121,11 +123,15 @@ export default function HabitsScreen() {
     }
   };
 
+  const getDifficultyText = (difficulty: string) => {
+    return t(`difficulty.${difficulty}`);
+  };
+
   if (!isLoaded || !colors) {
     return (
       <View style={[styles.container, { backgroundColor: '#F5F3FF' }]}>
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>Loading habits...</Text>
+          <Text style={[styles.loadingText, { color: '#4C1D95' }]}>{t('habits.loadingHabits')}</Text>
         </View>
       </View>
     );
@@ -135,7 +141,7 @@ export default function HabitsScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: colors.text.primary }]}>Loading habits...</Text>
+          <Text style={[styles.loadingText, { color: colors.text.primary }]}>{t('habits.loadingHabits')}</Text>
         </View>
       </View>
     );
@@ -148,9 +154,9 @@ export default function HabitsScreen() {
       <View style={[styles.header, { backgroundColor: colors.background.primary }]}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={[styles.title, { color: colors.text.primary }]}>Moje Nawyk</Text>
+            <Text style={[styles.title, { color: colors.text.primary }]}>{t('habits.title')}</Text>
             <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-              {habits.length} nawyków • {completedTodayCount} ukończonych dziś
+              {t('habits.subtitle', { count: habits.length, completed: completedTodayCount })}
             </Text>
           </View>
           <TouchableOpacity
@@ -175,16 +181,16 @@ export default function HabitsScreen() {
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
             <Ionicons name="checkmark-circle-outline" size={48} color={colors.text.muted} />
             <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
-              Brak nawyków
+              {t('habits.noHabits')}
             </Text>
             <Text style={[styles.emptySubtitle, { color: colors.text.secondary }]}>
-              Dodaj swój pierwszy nawyk!
+              {t('habits.noHabitsDescription')}
             </Text>
             <TouchableOpacity
               style={[styles.addHabitButton, { backgroundColor: colors.primary[600] }]}
             >
               <Text style={[styles.addHabitButtonText, { color: colors.text.inverse }]}>
-                Dodaj nawyk
+                {t('habits.addHabit')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -245,7 +251,7 @@ export default function HabitsScreen() {
                       {habit.current_streak}
                     </Text>
                     <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
-                      Streak
+                      {t('habits.streak')}
                     </Text>
                   </View>
                   <View style={styles.statItem}>
@@ -253,13 +259,13 @@ export default function HabitsScreen() {
                       {habit.total_completions}
                     </Text>
                     <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
-                      Ukończone
+                      {t('habits.completed')}
                     </Text>
                   </View>
                   <View style={styles.statItem}>
                     <View style={[styles.difficultyBadge, { backgroundColor: `${getDifficultyColor(habit.difficulty)}20` }]}>
                       <Text style={[styles.difficultyText, { color: getDifficultyColor(habit.difficulty) }]}>
-                        {habit.difficulty.toUpperCase()}
+                        {getDifficultyText(habit.difficulty).toUpperCase()}
                       </Text>
                     </View>
                   </View>
@@ -268,7 +274,7 @@ export default function HabitsScreen() {
                 {completed && (
                   <View style={styles.completedHint}>
                     <Text style={[styles.completedHintText, { color: colors.text.secondary }]}>
-                      Kliknij ponownie, aby cofnąć wykonanie
+                      {t('habits.clickToUndo')}
                     </Text>
                   </View>
                 )}

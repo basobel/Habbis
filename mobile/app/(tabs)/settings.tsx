@@ -9,13 +9,17 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import FadeInView from '@/components/FadeInView';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export default function SettingsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t, currentLanguage } = useI18n();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [soundEnabled, setSoundEnabled] = React.useState(true);
   const [hapticEnabled, setHapticEnabled] = React.useState(true);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
   if (!isLoaded || !colors) {
     return (
@@ -29,12 +33,26 @@ export default function SettingsScreen() {
 
   const settingsSections = [
     {
+      title: t('settings.language'),
+      items: [
+        {
+          id: 'language',
+          title: t('settings.language'),
+          subtitle: t(`languages.${currentLanguage}`),
+          icon: 'language-outline',
+          onPress: () => {
+            setShowLanguageSelector(true);
+          },
+        },
+      ],
+    },
+    {
       title: 'Wygląd',
       items: [
         {
           id: 'theme',
-          title: 'Motyw',
-          subtitle: 'Jasny',
+          title: t('settings.theme'),
+          subtitle: t('themes.light'),
           icon: 'color-palette-outline',
           onPress: () => {
             console.log('Toggle theme');
@@ -183,6 +201,10 @@ export default function SettingsScreen() {
         ))}
       </ScrollView>
       </View>
+      
+      {showLanguageSelector && (
+        <LanguageSelector onClose={() => setShowLanguageSelector(false)} />
+      )}
     </FadeInView>
   );
 }

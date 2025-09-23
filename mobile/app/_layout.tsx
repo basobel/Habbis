@@ -6,10 +6,12 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useThemeContext } from '@/contexts/ThemeContext';
+import { I18nProvider } from '@/contexts/I18nContext';
 import { Colors } from '../src/constants/colors';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { setGlobalStore } from '@/services/authInterceptor';
 import { useEffect } from 'react';
+import '../src/i18n'; // Initialize i18n
 
 function ThemedStack() {
   const { colors, isDark, isLoaded } = useThemeContext();
@@ -66,14 +68,16 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-        <ThemeProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaProvider>
-              <StatusBar style="auto" />
-              <ThemedStack />
-            </SafeAreaProvider>
-          </GestureHandlerRootView>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <SafeAreaProvider>
+                <StatusBar style="auto" />
+                <ThemedStack />
+              </SafeAreaProvider>
+            </GestureHandlerRootView>
+          </ThemeProvider>
+        </I18nProvider>
       </PersistGate>
     </Provider>
   );
