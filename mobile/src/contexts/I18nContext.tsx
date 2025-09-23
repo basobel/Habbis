@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setApiLanguage } from '@/services/api';
 
 interface I18nContextType {
   currentLanguage: string;
@@ -20,6 +21,11 @@ export function I18nProvider({ children }: I18nProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
 
+  // Set default language immediately
+  useEffect(() => {
+    setApiLanguage(i18n.language);
+  }, []);
+
   // Load saved language on app start
   useEffect(() => {
     const loadSavedLanguage = async () => {
@@ -28,6 +34,11 @@ export function I18nProvider({ children }: I18nProviderProps) {
         if (savedLanguage && savedLanguage !== i18n.language) {
           await i18n.changeLanguage(savedLanguage);
           setCurrentLanguage(savedLanguage);
+          // Set language for API requests
+          setApiLanguage(savedLanguage);
+        } else {
+          // Set default language for API requests
+          setApiLanguage(i18n.language);
         }
       } catch (error) {
         console.log('Error loading saved language:', error);
@@ -57,6 +68,8 @@ export function I18nProvider({ children }: I18nProviderProps) {
       await i18n.changeLanguage(language);
       await AsyncStorage.setItem('habbis-language', language);
       setCurrentLanguage(language);
+      // Set language for API requests
+      setApiLanguage(language);
     } catch (error) {
       console.log('Error changing language:', error);
       throw error;

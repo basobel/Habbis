@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { RootState } from '@/types';
 import { updateUserProfile } from '@/store/slices/userSlice';
 import FadeInView from '@/components/FadeInView';
@@ -22,6 +23,7 @@ import AvatarIconSelector from '@/components/AvatarIconSelector';
 export default function EditProfileScreen() {
   const dispatch = useDispatch();
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   
   // Separate selectors to prevent unnecessary rerenders
   const user = useSelector((state: RootState) => state.auth.user);
@@ -170,7 +172,7 @@ export default function EditProfileScreen() {
                 }]}
                 value={formData.username}
                 onChangeText={(value) => handleInputChange('username', value)}
-                placeholder="Wprowadź nazwę użytkownika"
+                placeholder={t('auth.enterUsername')}
                 placeholderTextColor={colors.text.tertiary}
                 maxLength={50}
                 autoCapitalize="none"

@@ -86,6 +86,10 @@ export interface Habit {
   icon: string;
   created_at: string;
   updated_at: string;
+  // Translated fields from API
+  translated_difficulty?: string;
+  translated_icon?: string;
+  translated_category?: string;
 }
 
 export type HabitDifficulty = 'easy' | 'medium' | 'hard' | 'expert';

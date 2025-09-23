@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface CreateGuildModalProps {
   visible: boolean;
@@ -33,6 +34,7 @@ interface GuildFormData {
 
 export default function CreateGuildModal({ visible, onClose, onCreateGuild }: CreateGuildModalProps) {
   const { colors } = useThemeContext();
+  const { t } = useI18n();
   const [formData, setFormData] = useState<GuildFormData>({
     name: '',
     description: '',
@@ -142,7 +144,7 @@ export default function CreateGuildModal({ visible, onClose, onCreateGuild }: Cr
                     color: colors?.text?.primary || '#4C1D95',
                   }
                 ]}
-                placeholder="Wprowadź nazwę gildii"
+                placeholder={t('auth.enterGuildName')}
                 placeholderTextColor={colors?.text?.secondary || '#6B7280'}
                 value={formData.name}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}

@@ -18,12 +18,14 @@ import { login } from '@/store/slices/authSlice';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -148,8 +150,8 @@ export default function LoginScreen() {
             ]}
           >
             <FormInput
-              label="Email"
-              placeholder="Wprowadź swój email"
+              label={t('auth.email')}
+              placeholder={t('auth.enterEmail')}
               value={formData.email}
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               keyboardType="email-address"
@@ -160,8 +162,8 @@ export default function LoginScreen() {
             />
 
             <FormInput
-              label="Hasło"
-              placeholder="Wprowadź swoje hasło"
+              label={t('auth.password')}
+              placeholder={t('auth.enterPassword')}
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
               secureTextEntry
@@ -176,12 +178,12 @@ export default function LoginScreen() {
               onPress={handleForgotPassword}
             >
               <Text style={[styles.forgotPasswordText, { color: colors.primary[600] }]}>
-                Zapomniałeś hasła?
+                {t('auth.forgotPassword')}
               </Text>
             </TouchableOpacity>
 
             <FormButton
-              title="Zaloguj się"
+              title={t('auth.login')}
               onPress={handleLogin}
               loading={isLoading}
               disabled={isLoading}

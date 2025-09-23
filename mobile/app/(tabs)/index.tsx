@@ -123,8 +123,9 @@ export default function HabitsScreen() {
     }
   };
 
-  const getDifficultyText = (difficulty: string) => {
-    return t(`difficulty.${difficulty}`);
+  const getDifficultyText = (habit: Habit) => {
+    // Use translated difficulty from API if available, otherwise fallback to local translation
+    return habit.translated_difficulty || t(`difficulty.${habit.difficulty}`);
   };
 
   if (!isLoaded || !colors) {
@@ -265,7 +266,7 @@ export default function HabitsScreen() {
                   <View style={styles.statItem}>
                     <View style={[styles.difficultyBadge, { backgroundColor: `${getDifficultyColor(habit.difficulty)}20` }]}>
                       <Text style={[styles.difficultyText, { color: getDifficultyColor(habit.difficulty) }]}>
-                        {getDifficultyText(habit.difficulty).toUpperCase()}
+                        {getDifficultyText(habit).toUpperCase()}
                       </Text>
                     </View>
                   </View>

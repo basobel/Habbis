@@ -23,10 +23,16 @@ export class BaseApiService {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Accept-Language': 'en', // Default language
       },
     });
 
     this.setupInterceptors();
+  }
+
+  // Method to set language header
+  setLanguage(language: string) {
+    this.client.defaults.headers.common['Accept-Language'] = language;
   }
 
   private setupInterceptors(): void {

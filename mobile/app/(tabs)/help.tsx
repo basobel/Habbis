@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import FadeInView from '@/components/FadeInView';
 
 export default function HelpScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
 
@@ -50,7 +52,7 @@ export default function HelpScreen() {
     {
       id: 5,
       question: 'Jak zresetować hasło?',
-      answer: 'Na ekranie logowania naciśnij "Zapomniałem hasła" i podaj swój adres email. Otrzymasz link do resetowania hasła.',
+      answer: t('help.faqItems.resetPassword.answer'),
     },
     {
       id: 6,

@@ -12,6 +12,11 @@ export const setAuthToken = (token: string | null) => {
   apiService.setAuthToken(token);
 };
 
+// Helper function to set language for API requests
+export const setApiLanguage = (language: string) => {
+  apiService.setLanguage(language);
+};
+
 // API Types
 export interface LoginCredentials {
   email: string;

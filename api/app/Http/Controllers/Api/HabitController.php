@@ -26,6 +26,12 @@ class HabitController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
+        // Add translated attributes to habits
+        $habits->each(function ($habit) {
+            $habit->translated_difficulty = $habit->getTranslatedDifficultyAttribute();
+            $habit->translated_icon = $habit->getTranslatedIconAttribute();
+        });
+
         return response()->json([
             'habits' => $habits,
         ]);

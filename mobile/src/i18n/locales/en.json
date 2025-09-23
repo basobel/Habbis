@@ -55,7 +55,11 @@
     "emailVerification": "Email Verification",
     "loginSuccess": "Login successful",
     "registerSuccess": "Registration successful",
-    "logoutSuccess": "Logout successful"
+    "logoutSuccess": "Logout successful",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "enterUsername": "Enter username",
+    "enterGuildName": "Enter guild name"
   },
   "settings": {
     "title": "Settings",
@@ -114,7 +118,14 @@
     "title": "Help",
     "faq": "Frequently Asked Questions",
     "contact": "Contact Support",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "searchPlaceholder": "Search help topics...",
+    "faqItems": {
+      "resetPassword": {
+        "question": "How to reset password?",
+        "answer": "On the login screen, press \"Forgot Password\" and enter your email address. You will receive a link to reset your password."
+      }
+    }
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",

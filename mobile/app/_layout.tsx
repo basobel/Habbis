@@ -60,15 +60,10 @@ function LoadingScreen() {
 }
 
 export default function RootLayout() {
-  // Initialize auth interceptor with store
-  useEffect(() => {
-    setGlobalStore(store);
-  }, []);
-
   return (
-    <Provider store={store}>
-      <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-        <I18nProvider>
+    <I18nProvider>
+      <Provider store={store}>
+        <PersistGate loading={<LoadingScreen />} persistor={persistor}>
           <ThemeProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <SafeAreaProvider>
@@ -77,8 +72,8 @@ export default function RootLayout() {
               </SafeAreaProvider>
             </GestureHandlerRootView>
           </ThemeProvider>
-        </I18nProvider>
-      </PersistGate>
-    </Provider>
+        </PersistGate>
+      </Provider>
+    </I18nProvider>
   );
 }

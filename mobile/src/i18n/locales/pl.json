@@ -55,7 +55,11 @@
     "emailVerification": "Weryfikacja email",
     "loginSuccess": "Logowanie pomyślne",
     "registerSuccess": "Rejestracja pomyślna",
-    "logoutSuccess": "Wylogowanie pomyślne"
+    "logoutSuccess": "Wylogowanie pomyślne",
+    "enterEmail": "Wprowadź swój email",
+    "enterPassword": "Wprowadź swoje hasło",
+    "enterUsername": "Wprowadź nazwę użytkownika",
+    "enterGuildName": "Wprowadź nazwę gildii"
   },
   "settings": {
     "title": "Ustawienia",
@@ -114,7 +118,14 @@
     "title": "Pomoc",
     "faq": "Często zadawane pytania",
     "contact": "Skontaktuj się z pomocą",
-    "tutorial": "Samouczek"
+    "tutorial": "Samouczek",
+    "searchPlaceholder": "Szukaj tematów pomocy...",
+    "faqItems": {
+      "resetPassword": {
+        "question": "Jak zresetować hasło?",
+        "answer": "Na ekranie logowania naciśnij \"Zapomniałem hasła\" i podaj swój adres email. Otrzymasz link do resetowania hasła."
+      }
+    }
   },
   "errors": {
     "networkError": "Błąd sieci. Sprawdź połączenie internetowe.",
