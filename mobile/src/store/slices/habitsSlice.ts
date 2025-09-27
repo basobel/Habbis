@@ -27,7 +27,6 @@ export const fetchHabits = createAsyncThunk<HabitsResponse, { active?: boolean; 
   async (params = {}, { rejectWithValue }) => {
     try {
       const response = await habitsApi.getHabits(params);
-      console.log('API Response:', response); // Debug log
       
       // Sprawdź czy response istnieje
       if (!response) {
@@ -36,13 +35,11 @@ export const fetchHabits = createAsyncThunk<HabitsResponse, { active?: boolean; 
       
       // Sprawdź czy response ma właściwą strukturę
       if (!response || typeof response !== 'object') {
-        console.log('Response structure:', response);
         return rejectWithValue('Invalid response structure');
       }
       
       return response as HabitsResponse;
     } catch (error: any) {
-      console.log('API Error:', error);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch habits');
     }
   }

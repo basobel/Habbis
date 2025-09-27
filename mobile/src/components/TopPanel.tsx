@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
   View,
   Text,
@@ -19,20 +19,20 @@ const { width: screenWidth } = Dimensions.get('window');
 
 interface TopPanelProps {
   onNavigate?: (screen: string) => void;
-  isExpanded?: boolean;
-  onToggle?: () => void;
-  onClose?: () => void;
+  onCloseOther?: () => void;
 }
 
-export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, onToggle, onClose }: TopPanelProps) {
+const TopPanel = forwardRef<{ close: () => void }, TopPanelProps>(({ onNavigate, onCloseOther }, ref) => {
   const { colors, isLoaded } = useThemeContext();
-  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
-
-  const isExpanded = externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
-  const setIsExpanded = onClose || setInternalIsExpanded;
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Get user data from auth state
   const { user: profile, isLoading: loading } = useSelector((state: RootState) => state.auth);
+  
+  // Expose close method to parent
+  useImperativeHandle(ref, () => ({
+    close: () => setIsExpanded(false)
+  }));
   
   // Animacje
   const expandAnimation = useRef(new Animated.Value(0)).current;
@@ -71,16 +71,24 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
   }, [isExpanded]);
 
   const toggleExpanded = () => {
-    if (onToggle) {
-      onToggle();
-    } else {
-      setIsExpanded(!isExpanded);
+    const willBeExpanded = !isExpanded;
+    setIsExpanded(willBeExpanded);
+    
+    // Zamknij inne menu gdy otwieramy TopPanel
+    if (willBeExpanded) {
+      onCloseOther?.();
     }
   };
 
   const handleProfilePress = () => {
+    // Zamknij CircularMenu gdy klikniesz profil (niezależnie od stanu TopPanel)
+    onCloseOther?.();
+    // Zamknij TopPanel jeśli był otwarty
+    if (isExpanded) {
+      setIsExpanded(false);
+    }
+    // Nawigacja bez opóźnienia - jak inne taby
     onNavigate?.('/(tabs)/profile');
-    setIsExpanded(false); // Zamknij panel po kliknięciu na profil
   };
 
   // Level progress is now calculated via selector
@@ -110,8 +118,18 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background.card }]}>
-      <SafeAreaView>
+    <>
+      {/* Overlay do zamykania po kliknięciu gdziekolwiek */}
+      {isExpanded && (
+        <TouchableOpacity
+          style={styles.overlay}
+          onPressIn={() => setIsExpanded(false)}
+          activeOpacity={1}
+        />
+      )}
+      
+      <View style={[styles.container, { backgroundColor: colors.background.card }]}>
+        <SafeAreaView>
         {/* Podstawowe informacje - zawsze widoczne */}
         <TouchableOpacity
           style={styles.basicInfo}
@@ -309,16 +327,27 @@ export default function TopPanel({ onNavigate, isExpanded: externalIsExpanded, o
         </Animated.View>
       </SafeAreaView>
     </View>
+    </>
   );
-}
+});
+
+export default TopPanel;
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
   container: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1000,
+    zIndex: 1020,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0, 0, 0, 0.1)',
   },

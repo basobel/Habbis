@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -27,23 +27,32 @@ interface CircularMenuProps {
   size?: number;
   radius?: number;
   position?: 'bottom-center' | 'bottom-right' | 'bottom-left';
-  onClose?: () => void; // Callback do zamykania innych komponentów
+  onCloseOther?: () => void;
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-export default function CircularMenu({
-  items,
-  onItemPress,
-  size = 60,
-  radius = 120,
-  position = 'bottom-center',
-  onClose,
-}: CircularMenuProps) {
+function CircularMenu(props: CircularMenuProps, ref: React.Ref<{ close: () => void }>) {
+  const {
+    items,
+    onItemPress,
+    size = 60,
+    radius = 120,
+    position = 'bottom-center',
+    onCloseOther,
+  } = props;
   const { colors, isDark } = useThemeContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Ref do śledzenia czy animacja jest w trakcie
+  const isAnimating = useRef(false);
+  
+  // Expose close method to parent
+  useImperativeHandle(ref, () => ({
+    close: () => closeMenu()
+  }));
   
   // Animacje
   const menuAnimation = useRef(new Animated.Value(0)).current;
@@ -52,15 +61,7 @@ export default function CircularMenu({
   ).current;
   const closeButtonAnimation = useRef(new Animated.Value(0)).current;
 
-  // Synchronizacja animacji ze stanem
-  useEffect(() => {
-    if (!isOpen) {
-      // Resetuj animacje gdy menu jest zamknięte
-      menuAnimation.setValue(0);
-      buttonAnimations.forEach(anim => anim.setValue(0));
-      closeButtonAnimation.setValue(0);
-    }
-  }, [isOpen, menuAnimation, buttonAnimations, closeButtonAnimation]);
+  // Animacje są resetowane automatycznie w openMenu/closeMenu
 
   // Pozycjonowanie menu z uwzględnieniem SafeArea
   const getMenuPosition = () => {
@@ -112,8 +113,12 @@ export default function CircularMenu({
 
   // Animacja otwierania menu
   const openMenu = () => {
-    onClose?.(); // Zamknij inne komponenty gdy otwieramy menu
+    if (isAnimating.current) return;
+    
+    isAnimating.current = true;
     setIsOpen(true);
+    // Zamknij TopPanel gdy otwieramy CircularMenu
+    onCloseOther?.();
     
     // Animacja głównego przycisku (obrót)
     Animated.timing(menuAnimation, {
@@ -127,7 +132,7 @@ export default function CircularMenu({
       Animated.timing(anim, {
         toValue: 1,
         duration: 200,
-        delay: index * 80, // Zwiększone opóźnienie dla lepszego efektu
+        delay: index * 80,
         useNativeDriver: true,
       }).start();
     });
@@ -138,11 +143,17 @@ export default function CircularMenu({
       duration: 200,
       delay: items.length * 80 + 100,
       useNativeDriver: true,
-    }).start();
+    }).start(() => {
+      isAnimating.current = false;
+    });
   };
 
   // Animacja zamykania menu
   const closeMenu = () => {
+    if (isAnimating.current) return;
+    
+    isAnimating.current = true;
+    
     // Animacja przycisku zamknięcia
     Animated.timing(closeButtonAnimation, {
       toValue: 0,
@@ -155,7 +166,7 @@ export default function CircularMenu({
       Animated.timing(anim, {
         toValue: 0,
         duration: 150,
-        delay: (items.length - index - 1) * 60, // Od prawa do lewa
+        delay: (items.length - index - 1) * 60,
         useNativeDriver: true,
       }).start();
     });
@@ -168,6 +179,7 @@ export default function CircularMenu({
       useNativeDriver: true,
     }).start(() => {
       setIsOpen(false);
+      isAnimating.current = false;
     });
   };
 
@@ -351,11 +363,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999,
+    zIndex: 1003,
   },
   menuButton: {
     position: 'absolute',
-    zIndex: 1001,
+    zIndex: 1004,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -375,7 +387,7 @@ const styles = StyleSheet.create({
   },
   menuItemsContainer: {
     position: 'absolute',
-    zIndex: 1002,
+    zIndex: 1005,
     width: 0,
     height: 0,
   },
@@ -394,3 +406,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default React.forwardRef(CircularMenu);

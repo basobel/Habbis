@@ -47,7 +47,12 @@ export default function ProfileScreen() {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getMe() as any);
+    // Opóźnij getMe() żeby animacja CircularMenu mogła się wykonać
+    const timer = setTimeout(() => {
+      dispatch(getMe() as any);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   // Sprawdź autoryzację i przekieruj na logowanie jeśli nieautoryzowany

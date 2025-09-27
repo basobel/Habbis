@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Stack } from 'expo-router';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useThemeContext } from '@/contexts/ThemeContext';
@@ -43,13 +43,12 @@ const menuItems = [
 export default function TabLayout() {
   const { colors, isLoaded } = useThemeContext();
   const router = useRouter();
-  const [isTopPanelExpanded, setIsTopPanelExpanded] = useState(false);
+  const topPanelRef = useRef<{ close: () => void }>(null);
+  const circularMenuRef = useRef<{ close: () => void }>(null);
   
   // Check if user is authenticated
   const { isAuthenticated } = useSelector((state: RootState) => state.auth || { isAuthenticated: false });
   
-  // Don't render TopPanel if user is not authenticated
-
   // Don't render if theme is not loaded
   if (!isLoaded || !colors) {
     return (
@@ -73,13 +72,9 @@ export default function TabLayout() {
     router.push(screen as any);
   };
 
-  // Callbacki do wzajemnego zamykania komponentów
-  const handleCloseTopPanel = () => {
-    setIsTopPanelExpanded(false);
-  };
-
-  const handleTopPanelToggle = () => {
-    setIsTopPanelExpanded(!isTopPanelExpanded);
+  // Proste zamykanie - kliknij gdziekolwiek indziej
+  const handleCloseAll = () => {
+    // CircularMenu i TopPanel same się zamkną przez swoje overlay
   };
 
   return (
@@ -87,19 +82,12 @@ export default function TabLayout() {
       <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
         {isAuthenticated && (
           <TopPanel 
+            ref={topPanelRef}
             onNavigate={handleNavigate}
-            isExpanded={isTopPanelExpanded}
-            onToggle={handleTopPanelToggle}
-            onClose={handleCloseTopPanel}
-          />
-        )}
-        
-        {/* Overlay dla zamykania TopPanel */}
-        {isTopPanelExpanded && (
-          <TouchableOpacity
-            style={styles.overlay}
-            activeOpacity={1}
-            onPressIn={handleCloseTopPanel}
+            onCloseOther={() => {
+              // Zamknij CircularMenu gdy otwieramy TopPanel
+              circularMenuRef.current?.close();
+            }}
           />
         )}
         
@@ -122,6 +110,7 @@ export default function TabLayout() {
         </Stack>
         
         <CircularMenu
+          ref={circularMenuRef}
           items={menuItems}
           size={50}
           radius={120}
@@ -129,7 +118,10 @@ export default function TabLayout() {
           onItemPress={(item) => {
             router.push(item.route as any);
           }}
-          onClose={handleCloseTopPanel}
+          onCloseOther={() => {
+            // Zamknij TopPanel gdy otwieramy Circ  ularMenu
+            topPanelRef.current?.close();
+          }}
         />
       </View>
     </ErrorBoundary>

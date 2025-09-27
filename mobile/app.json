@@ -23,7 +23,8 @@
       "package": "com.habbis.app"
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "fontDisplay": "swap"
     },
     "icon": "./assets/icon.png",
     "plugins": [
