@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import FadeInView from '@/components/FadeInView';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import ScreenScrollView from '@/components/ScreenScrollView';
+import AddHabitModal from '@/components/AddHabitModal';
 import useScreenState from '@/hooks/useScreenState';
 import { useAppDispatch, useAppSelector } from '../../src/store/hooks';
 import { 
@@ -33,6 +34,7 @@ export default function HabitsScreen() {
   const { t } = useI18n();
   const { refreshing, onRefresh } = useScreenState();
   const dispatch = useAppDispatch();
+  const [isAddHabitModalVisible, setIsAddHabitModalVisible] = useState(false);
   
   // Redux state
   const habits = useAppSelector(selectActiveHabits);
@@ -162,10 +164,7 @@ export default function HabitsScreen() {
           </View>
           <TouchableOpacity
             style={[styles.addButton, { backgroundColor: colors.primary[600] }]}
-            onPress={() => {
-              // TODO: Implement add habit
-              console.log('Add habit');
-            }}
+            onPress={() => setIsAddHabitModalVisible(true)}
           >
             <Ionicons name="add" size={20} color={colors.text.inverse} />
           </TouchableOpacity>
@@ -180,7 +179,7 @@ export default function HabitsScreen() {
       >
         {habits.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
-            <Ionicons name="checkmark-circle-outline" size={48} color={colors.text.muted} />
+            <Ionicons name="checkmark-circle-outline" size={40} color={colors.text.muted} />
             <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
               {t('habits.noHabits')}
             </Text>
@@ -272,13 +271,6 @@ export default function HabitsScreen() {
                   </View>
                 </View>
                 
-                {completed && (
-                  <View style={styles.completedHint}>
-                    <Text style={[styles.completedHintText, { color: colors.text.secondary }]}>
-                      {t('habits.clickToUndo')}
-                    </Text>
-                  </View>
-                )}
                 </TouchableOpacity>
               );
             })}
@@ -287,6 +279,11 @@ export default function HabitsScreen() {
       </ScrollView>
 
       </View>
+      
+      <AddHabitModal
+        visible={isAddHabitModalVisible}
+        onClose={() => setIsAddHabitModalVisible(false)}
+      />
     </FadeInView>
   );
 }

@@ -17,10 +17,11 @@ export default function IndexScreen() {
   useEffect(() => {
     if (!isLoaded || !colors || hasNavigated) return;
     
-    // If auth state is not available yet, try to get it
+    // If auth state is not available yet, go to login
     if (!authState) {
-      if (__DEV__) console.log('No auth state, dispatching getMe...');
-      dispatch(getMe() as any);
+      if (__DEV__) console.log('No auth state, going to login...');
+      setHasNavigated(true);
+      router.replace('/login');
       return;
     }
     

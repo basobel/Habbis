@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
+import { useI18n } from '@/contexts/I18nContext';
 import { router } from 'expo-router';
 import { register } from '@/store/slices/authSlice';
 import { PetSpecies } from '@/types';
@@ -13,6 +14,7 @@ import { Colors } from '../src/constants/colors';
 
 export default function RegisterScreen() {
   const dispatch = useDispatch<AppDispatch>();
+  const { t } = useI18n();
   const [formData, setFormData] = useState<{
     username: string;
     email: string;
@@ -127,7 +129,7 @@ export default function RegisterScreen() {
       <View style={styles.form}>
         <FormInput
           label="Username"
-          placeholder="Enter your username"
+          placeholder={t('forms.placeholders.username')}
           value={formData.username}
           onChangeText={(text) => setFormData({ ...formData, username: text })}
           autoCapitalize="none"
@@ -138,7 +140,7 @@ export default function RegisterScreen() {
 
         <FormInput
           label="Email"
-          placeholder="Enter your email"
+          placeholder={t('forms.placeholders.email')}
           value={formData.email}
           onChangeText={(text) => setFormData({ ...formData, email: text })}
           keyboardType="email-address"
@@ -150,7 +152,7 @@ export default function RegisterScreen() {
 
         <FormInput
           label="Password"
-          placeholder="Create a strong password"
+          placeholder={t('forms.placeholders.password')}
           value={formData.password}
           onChangeText={(text) => setFormData({ ...formData, password: text })}
           secureTextEntry
@@ -163,7 +165,7 @@ export default function RegisterScreen() {
 
         <FormInput
           label="Confirm Password"
-          placeholder="Confirm your password"
+          placeholder={t('forms.placeholders.confirmPassword')}
           value={formData.password_confirmation}
           onChangeText={(text) => setFormData({ ...formData, password_confirmation: text })}
           secureTextEntry
@@ -174,7 +176,7 @@ export default function RegisterScreen() {
 
         <FormInput
           label="Pet Name (Optional)"
-          placeholder="Give your pet a name"
+          placeholder={t('forms.placeholders.petName')}
           value={formData.pet_name}
           onChangeText={(text) => setFormData({ ...formData, pet_name: text })}
           returnKeyType="done"
@@ -188,7 +190,7 @@ export default function RegisterScreen() {
         />
 
         <FormButton
-          title="Create Account"
+          title={t('forms.buttons.createAccount')}
           onPress={handleRegister}
           loading={isLoading}
           disabled={isLoading}

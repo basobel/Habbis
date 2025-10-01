@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { router } from 'expo-router';
+import { useI18n } from '@/contexts/I18nContext';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 
 export default function ChangePasswordScreen() {
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     current_password: '',
     password: '',
@@ -101,7 +103,7 @@ export default function ChangePasswordScreen() {
         <View style={styles.form}>
           <FormInput
             label="Current Password"
-            placeholder="Enter your current password"
+            placeholder={t('forms.placeholders.password')}
             value={formData.current_password}
             onChangeText={(text) => setFormData({ ...formData, current_password: text })}
             secureTextEntry
@@ -111,7 +113,7 @@ export default function ChangePasswordScreen() {
 
           <FormInput
             label="New Password"
-            placeholder="Enter your new password"
+            placeholder={t('forms.placeholders.password')}
             value={formData.password}
             onChangeText={(text) => setFormData({ ...formData, password: text })}
             secureTextEntry
@@ -123,7 +125,7 @@ export default function ChangePasswordScreen() {
 
           <FormInput
             label="Confirm New Password"
-            placeholder="Confirm your new password"
+            placeholder={t('forms.placeholders.confirmPassword')}
             value={formData.password_confirmation}
             onChangeText={(text) => setFormData({ ...formData, password_confirmation: text })}
             secureTextEntry
@@ -132,7 +134,7 @@ export default function ChangePasswordScreen() {
           />
 
           <FormButton
-            title="Change Password"
+            title={t('forms.buttons.changePassword')}
             onPress={handleChangePassword}
             loading={isLoading}
             disabled={isLoading}
@@ -140,7 +142,7 @@ export default function ChangePasswordScreen() {
           />
 
           <FormButton
-            title="Cancel"
+            title={t('forms.buttons.cancel')}
             onPress={() => router.back()}
             variant="secondary"
             style={styles.button}

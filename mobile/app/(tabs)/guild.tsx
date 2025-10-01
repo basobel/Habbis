@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import FadeInView from '@/components/FadeInView';
 import GuildCard from '@/components/GuildCard';
 import CreateGuildModal from '@/components/CreateGuildModal';
@@ -41,6 +42,7 @@ interface Guild {
 
 export default function GuildScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'public' | 'private' | 'recruiting'>('all');
@@ -188,7 +190,7 @@ export default function GuildScreen() {
           <Ionicons name="search" size={20} color={colors.text.secondary} />
           <TextInput
             style={[styles.searchInput, { color: colors.text.primary }]}
-            placeholder="Szukaj gildii..."
+            placeholder={t('guilds.searchPlaceholder')}
             placeholderTextColor={colors.text.secondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -206,9 +208,9 @@ export default function GuildScreen() {
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {[
-            { key: 'all', label: 'Wszystkie' },
-            { key: 'public', label: 'Publiczne' },
-            { key: 'private', label: 'Prywatne' },
+            { key: 'all', label: t('guilds.filters.all') },
+            { key: 'public', label: t('guilds.filters.public') },
+            { key: 'private', label: t('guilds.filters.private') },
             { key: 'recruiting', label: 'Rekrutują' },
           ].map((filter) => (
             <TouchableOpacity
@@ -247,7 +249,7 @@ export default function GuildScreen() {
       >
         {filteredGuilds.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
-            <Ionicons name="people-outline" size={64} color={colors.text.secondary} />
+            <Ionicons name="people-outline" size={48} color={colors.text.secondary} />
             <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
               Brak gildii
             </Text>

@@ -134,5 +134,162 @@
     "notFound": "Zasób nie został znaleziony.",
     "validationError": "Sprawdź wprowadzone dane i spróbuj ponownie.",
     "unknownError": "Wystąpił nieznany błąd."
+  },
+  "categories": {
+    "fitness": "Fitness",
+    "health": "Zdrowie",
+    "mindfulness": "Mindfulness",
+    "learning": "Nauka",
+    "productivity": "Produktywność",
+    "social": "Społeczność",
+    "creative": "Kreatywność",
+    "financial": "Finanse"
+  },
+  "icons": {
+    "fitness": "Fitness",
+    "book": "Czytanie",
+    "leaf": "Medytacja",
+    "water": "Nawodnienie",
+    "sleep": "Sen",
+    "code": "Programowanie",
+    "music": "Muzyka",
+    "paint": "Sztuka",
+    "heart": "Zdrowie",
+    "brain": "Nauka",
+    "time": "Zarządzanie czasem",
+    "money": "Finanse"
+  },
+  "pets": {
+    "title": "Zwierzęta",
+    "addPet": "Dodaj zwierzę",
+    "feed": "Karmienie",
+    "play": "Zabawa",
+    "pet": "Zwierzę",
+    "equip": "Ekwipowanie",
+    "stats": "Statystyki",
+    "equipment": "Ekwipunek",
+    "actions": "Akcje",
+    "species": {
+      "cat": "Kot",
+      "dog": "Pies",
+      "dragon": "Smok",
+      "fish": "Ryba"
+    },
+    "rarity": {
+      "common": "Pospolite",
+      "rare": "Rzadkie",
+      "epic": "Epickie",
+      "legendary": "Legendarne"
+    },
+    "filters": {
+      "all": "Wszystkie",
+      "active": "Aktywne",
+      "common": "Pospolite",
+      "rare": "Rzadkie",
+      "epic": "Epickie",
+      "legendary": "Legendarne"
+    },
+    "actions": {
+      "feeding": "Karmienie",
+      "playing": "Zabawa",
+      "equipping": "Ekwipowanie",
+      "petting": "Głaskanie"
+    },
+    "equipment": {
+      "hat": "Kapelusz",
+      "glasses": "Okulary",
+      "crown": "Korona"
+    }
+  },
+  "guilds": {
+    "title": "Gildie",
+    "searchPlaceholder": "Szukaj gildii...",
+    "createGuild": "Utwórz gildię",
+    "joinGuild": "Dołącz do gildii",
+    "guildName": "Nazwa gildii",
+    "guildDescription": "Opis gildii",
+    "guildTags": "Tagi gildii",
+    "maxMembers": "Maksymalna liczba członków",
+    "minLevel": "Minimalny poziom",
+    "experience": "Doświadczenie",
+    "addTag": "Dodaj tag...",
+    "filters": {
+      "all": "Wszystkie",
+      "public": "Publiczne",
+      "private": "Prywatne"
+    },
+    "status": {
+      "recruiting": "Rekrutuje",
+      "full": "Pełna",
+      "private": "Prywatna"
+    }
+  },
+  "battles": {
+    "arena": "Arena",
+    "dungeon": "Loch",
+    "expedition": "Ekspedycja",
+    "battleStarted": "Walka rozpoczęta!",
+    "dungeonStarted": "Loch rozpoczęty!",
+    "expeditionStarted": "Ekspedycja rozpoczęta!",
+    "rewardsClaimed": "Nagrody odebrane!"
+  },
+  "forms": {
+    "placeholders": {
+      "username": "Wprowadź nazwę użytkownika",
+      "email": "Wprowadź swój email",
+      "password": "Utwórz silne hasło",
+      "confirmPassword": "Potwierdź swoje hasło",
+      "petName": "Nadaj swojemu zwierzęciu imię",
+      "habitName": "np. 10 pompek",
+      "habitDescription": "Krótki opis nawyku...",
+      "guildDescription": "Opisz cel i charakter gildii",
+      "searchGuilds": "Szukaj gildii...",
+      "searchHelp": "Szukaj w FAQ...",
+      "addTag": "Dodaj tag..."
+    },
+    "buttons": {
+      "createAccount": "Utwórz konto",
+      "backToLogin": "Powrót do logowania",
+      "sendResetLink": "Wyślij link resetujący",
+      "changePassword": "Zmień hasło",
+      "cancel": "Anuluj",
+      "createHabit": "Utwórz nawyk",
+      "creating": "Tworzenie...",
+      "resendEmail": "Wyślij ponownie email",
+      "signOut": "Wyloguj się"
+    },
+    "alerts": {
+      "error": "Błąd",
+      "success": "Sukces",
+      "loginError": "Błąd logowania",
+      "registrationFailed": "Rejestracja nieudana",
+      "habitNameRequired": "Wprowadź nazwę nawyku",
+      "habitCreatedSuccess": "Nawyki utworzony pomyślnie!",
+      "habitCreateFailed": "Nie udało się utworzyć nawyku",
+      "guildNameRequired": "Nazwa gildii jest wymagana",
+      "guildDescriptionRequired": "Opis gildii jest wymagany",
+      "guildTagsRequired": "Dodaj przynajmniej jeden tag",
+      "limitPets": "Możesz wybrać maksymalnie {{max}} zwierząt",
+      "minPets": "Musisz wybrać co najmniej {{min}} zwierząt",
+      "battleStarted": "Walka rozpoczęta!",
+      "dungeonStarted": "Loch rozpoczęty!",
+      "expeditionStarted": "Ekspedycja rozpoczęta!",
+      "rewardsClaimed": "Nagrody odebrane!",
+      "checkCredentials": "Sprawdź swoje dane logowania",
+      "tryAgain": "Spróbuj ponownie",
+      "resetEmailFailed": "Nie udało się wysłać emaila resetującego. Spróbuj ponownie.",
+      "changePasswordFailed": "Nie udało się zmienić hasła. Spróbuj ponownie.",
+      "verificationEmailFailed": "Nie udało się wysłać emaila weryfikacyjnego. Spróbuj ponownie."
+    }
+  },
+  "profile": {
+    "changeClass": "Zmień klasę",
+    "editProfile": "Edytuj profil",
+    "privacySettings": "Ustawienia prywatności",
+    "securitySettings": "Ustawienia bezpieczeństwa",
+    "aboutApp": "O aplikacji",
+    "help": "Pomoc",
+    "sendFeedback": "Wyślij opinię",
+    "toggleTheme": "Przełącz motyw"
   }
 }

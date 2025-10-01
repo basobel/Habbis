@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import PetCard from '@/components/PetCard';
 import PetDetailsModal from '@/components/PetDetailsModal';
 import FadeInView from '@/components/FadeInView';
@@ -35,6 +36,7 @@ interface Pet {
 
 export default function PetsScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'common' | 'rare' | 'epic' | 'legendary'>('all');
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
@@ -45,7 +47,7 @@ export default function PetsScreen() {
     {
       id: '1',
       name: 'Whiskers',
-      species: 'Cat',
+      species: t('pets.species.cat'),
       level: 5,
       experience: 750,
       maxExperience: 1000,
@@ -63,7 +65,7 @@ export default function PetsScreen() {
     {
       id: '2',
       name: 'Buddy',
-      species: 'Dog',
+      species: t('pets.species.dog'),
       level: 3,
       experience: 400,
       maxExperience: 600,
@@ -81,7 +83,7 @@ export default function PetsScreen() {
     {
       id: '3',
       name: 'Phoenix',
-      species: 'Dragon',
+      species: t('pets.species.dragon'),
       level: 8,
       experience: 1200,
       maxExperience: 1500,
@@ -99,7 +101,7 @@ export default function PetsScreen() {
     {
       id: '4',
       name: 'Bubbles',
-      species: 'Fish',
+      species: t('pets.species.fish'),
       level: 2,
       experience: 150,
       maxExperience: 300,
@@ -133,7 +135,7 @@ export default function PetsScreen() {
 
   const handleFeedPet = (pet: Pet) => {
     Alert.alert(
-      'Karmienie',
+      t('pets.actions.feeding'),
       `Nakarmiłeś ${pet.name}! 🍽️`,
       [{ text: 'OK' }]
     );
@@ -149,7 +151,7 @@ export default function PetsScreen() {
 
   const handlePlayWithPet = (pet: Pet) => {
     Alert.alert(
-      'Zabawa',
+      t('pets.actions.playing'),
       `${pet.name} jest szczęśliwy! 🎾`,
       [{ text: 'OK' }]
     );
@@ -235,12 +237,12 @@ export default function PetsScreen() {
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {[
-            { key: 'all', label: 'Wszystkie' },
-            { key: 'active', label: 'Aktywne' },
-            { key: 'common', label: 'Pospolite' },
-            { key: 'rare', label: 'Rzadkie' },
-            { key: 'epic', label: 'Epickie' },
-            { key: 'legendary', label: 'Legendarne' },
+            { key: 'all', label: t('pets.filters.all') },
+            { key: 'active', label: t('pets.filters.active') },
+            { key: 'common', label: t('pets.filters.common') },
+            { key: 'rare', label: t('pets.filters.rare') },
+            { key: 'epic', label: t('pets.filters.epic') },
+            { key: 'legendary', label: t('pets.filters.legendary') },
           ].map((filter) => (
             <TouchableOpacity
               key={filter.key}
@@ -274,7 +276,7 @@ export default function PetsScreen() {
       >
         {filteredPets.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.background.card }]}>
-            <Ionicons name="paw-outline" size={48} color={colors.text.muted} />
+            <Ionicons name="paw-outline" size={40} color={colors.text.muted} />
             <Text style={[styles.emptyTitle, { color: colors.text.primary }]}>
               Brak zwierząt
             </Text>

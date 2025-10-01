@@ -134,5 +134,162 @@
     "notFound": "Resource not found.",
     "validationError": "Please check your input and try again.",
     "unknownError": "An unknown error occurred."
+  },
+  "categories": {
+    "fitness": "Fitness",
+    "health": "Health",
+    "mindfulness": "Mindfulness",
+    "learning": "Learning",
+    "productivity": "Productivity",
+    "social": "Social",
+    "creative": "Creative",
+    "financial": "Financial"
+  },
+  "icons": {
+    "fitness": "Fitness",
+    "book": "Reading",
+    "leaf": "Meditation",
+    "water": "Hydration",
+    "sleep": "Sleep",
+    "code": "Programming",
+    "music": "Music",
+    "paint": "Art",
+    "heart": "Health",
+    "brain": "Learning",
+    "time": "Time Management",
+    "money": "Finance"
+  },
+  "pets": {
+    "title": "Pets",
+    "addPet": "Add Pet",
+    "feed": "Feed",
+    "play": "Play",
+    "pet": "Pet",
+    "equip": "Equip",
+    "stats": "Stats",
+    "equipment": "Equipment",
+    "actions": "Actions",
+    "species": {
+      "cat": "Cat",
+      "dog": "Dog",
+      "dragon": "Dragon",
+      "fish": "Fish"
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "actions": {
+      "feeding": "Feeding",
+      "playing": "Playing",
+      "equipping": "Equipping",
+      "petting": "Petting"
+    },
+    "equipment": {
+      "hat": "Hat",
+      "glasses": "Glasses",
+      "crown": "Crown"
+    }
+  },
+  "guilds": {
+    "title": "Guilds",
+    "searchPlaceholder": "Search guilds...",
+    "createGuild": "Create Guild",
+    "joinGuild": "Join Guild",
+    "guildName": "Guild Name",
+    "guildDescription": "Guild Description",
+    "guildTags": "Guild Tags",
+    "maxMembers": "Max Members",
+    "minLevel": "Min Level",
+    "experience": "Experience",
+    "addTag": "Add tag...",
+    "filters": {
+      "all": "All",
+      "public": "Public",
+      "private": "Private"
+    },
+    "status": {
+      "recruiting": "Recruiting",
+      "full": "Full",
+      "private": "Private"
+    }
+  },
+  "battles": {
+    "arena": "Arena",
+    "dungeon": "Dungeon",
+    "expedition": "Expedition",
+    "battleStarted": "Battle Started!",
+    "dungeonStarted": "Dungeon Started!",
+    "expeditionStarted": "Expedition Started!",
+    "rewardsClaimed": "Rewards Claimed!"
+  },
+  "forms": {
+    "placeholders": {
+      "username": "Enter your username",
+      "email": "Enter your email",
+      "password": "Create a strong password",
+      "confirmPassword": "Confirm your password",
+      "petName": "Give your pet a name",
+      "habitName": "e.g. 10 push-ups",
+      "habitDescription": "Brief description of your habit",
+      "guildDescription": "Describe the guild's purpose and character",
+      "searchGuilds": "Search guilds...",
+      "searchHelp": "Search help topics...",
+      "addTag": "Add tag..."
+    },
+    "buttons": {
+      "createAccount": "Create Account",
+      "backToLogin": "Back to Login",
+      "sendResetLink": "Send Reset Link",
+      "changePassword": "Change Password",
+      "cancel": "Cancel",
+      "createHabit": "Create Habit",
+      "creating": "Creating...",
+      "resendEmail": "Resend Email",
+      "signOut": "Sign Out"
+    },
+    "alerts": {
+      "error": "Error",
+      "success": "Success",
+      "loginError": "Login Error",
+      "registrationFailed": "Registration Failed",
+      "habitNameRequired": "Please enter habit name",
+      "habitCreatedSuccess": "Habit created successfully!",
+      "habitCreateFailed": "Failed to create habit",
+      "guildNameRequired": "Guild name is required",
+      "guildDescriptionRequired": "Guild description is required",
+      "guildTagsRequired": "Add at least one tag",
+      "limitPets": "You can select maximum {{max}} pets",
+      "minPets": "You must select at least {{min}} pets",
+      "battleStarted": "Battle Started!",
+      "dungeonStarted": "Dungeon Started!",
+      "expeditionStarted": "Expedition Started!",
+      "rewardsClaimed": "Rewards Claimed!",
+      "checkCredentials": "Check your login credentials",
+      "tryAgain": "Please try again",
+      "resetEmailFailed": "Failed to send reset email. Please try again.",
+      "changePasswordFailed": "Failed to change password. Please try again.",
+      "verificationEmailFailed": "Failed to send verification email. Please try again."
+    }
+  },
+  "profile": {
+    "changeClass": "Change class",
+    "editProfile": "Edit Profile",
+    "privacySettings": "Privacy Settings",
+    "securitySettings": "Security Settings",
+    "aboutApp": "About App",
+    "help": "Help",
+    "sendFeedback": "Send Feedback",
+    "toggleTheme": "Toggle theme"
   }
 }

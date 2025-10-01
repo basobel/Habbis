@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -52,6 +53,7 @@ export default function PetDetailsModal({
   onEquip,
 }: PetDetailsModalProps) {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [selectedTab, setSelectedTab] = useState<'stats' | 'equipment' | 'actions'>('stats');
   const slideAnim = useRef(new Animated.Value(screenHeight)).current;
 
@@ -98,24 +100,24 @@ export default function PetDetailsModal({
 
   const handleFeed = () => {
     onFeed(pet);
-    Alert.alert('Karmienie', `${pet.name} został nakarmiony! 🍽️`);
+    Alert.alert(t('pets.actions.feeding'), `${pet.name} został nakarmiony! 🍽️`);
   };
 
   const handlePlay = () => {
     onPlay(pet);
-    Alert.alert('Zabawa', `${pet.name} bawi się z Tobą! 🎾`);
+    Alert.alert(t('pets.actions.playing'), `${pet.name} bawi się z Tobą! 🎾`);
   };
 
   const handleEquip = (item: string) => {
     onEquip(pet, item);
-    Alert.alert('Ekwipowanie', `${item} zostało założone na ${pet.name}! ⚔️`);
+    Alert.alert(t('pets.actions.equipping'), `${item} zostało założone na ${pet.name}! ⚔️`);
   };
 
   const equipmentItems = [
     { id: 'collar', name: 'Obroża', icon: 'diamond-outline', rarity: 'common' },
-    { id: 'hat', name: 'Kapelusz', icon: 'hat', rarity: 'rare' },
-    { id: 'glasses', name: 'Okulary', icon: 'glasses-outline', rarity: 'epic' },
-    { id: 'crown', name: 'Korona', icon: 'crown-outline', rarity: 'legendary' },
+    { id: 'hat', name: t('pets.equipment.hat'), icon: 'hat', rarity: 'rare' },
+    { id: 'glasses', name: t('pets.equipment.glasses'), icon: 'glasses-outline', rarity: 'epic' },
+    { id: 'crown', name: t('pets.equipment.crown'), icon: 'crown-outline', rarity: 'legendary' },
   ];
 
   return (
@@ -162,9 +164,9 @@ export default function PetDetailsModal({
           {/* Tabs */}
           <View style={[styles.tabs, { backgroundColor: colors.background.primary }]}>
             {[
-              { key: 'stats', label: 'Statystyki', icon: 'stats-chart-outline' },
-              { key: 'equipment', label: 'Ekwipunek', icon: 'shirt-outline' },
-              { key: 'actions', label: 'Akcje', icon: 'play-outline' },
+              { key: 'stats', label: t('pets.stats'), icon: 'stats-chart-outline' },
+              { key: 'equipment', label: t('pets.equipment'), icon: 'shirt-outline' },
+              { key: 'actions', label: t('pets.actions'), icon: 'play-outline' },
             ].map((tab) => (
               <TouchableOpacity
                 key={tab.key}
@@ -341,7 +343,7 @@ export default function PetDetailsModal({
 
                 <TouchableOpacity
                   style={[styles.actionButton, { backgroundColor: colors.primary[500] }]}
-                  onPress={() => Alert.alert('Głaskanie', `${pet.name} jest szczęśliwy! 😊`)}
+                  onPress={() => Alert.alert(t('pets.actions.petting'), `${pet.name} jest szczęśliwy! 😊`)}
                 >
                   <Ionicons name="hand-left" size={24} color={colors.text.inverse} />
                   <Text style={[styles.actionButtonText, { color: colors.text.inverse }]}>

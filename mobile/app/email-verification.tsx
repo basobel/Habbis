@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { router } from 'expo-router';
+import { useI18n } from '@/contexts/I18nContext';
 import FormButton from '@/components/FormButton';
 import { RootState } from '@/store';
 
 export default function EmailVerificationScreen() {
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const { user, isLoading } = useSelector((state: RootState) => state.auth);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -61,7 +63,7 @@ export default function EmailVerificationScreen() {
 
         <View style={styles.actions}>
           <FormButton
-            title={resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Email'}
+            title={resendCooldown > 0 ? `Resend in ${resendCooldown}s` : t('forms.buttons.resendEmail')}
             onPress={handleResendVerification}
             disabled={resendCooldown > 0 || isLoading}
             loading={isLoading}
@@ -69,7 +71,7 @@ export default function EmailVerificationScreen() {
           />
 
           <FormButton
-            title="Sign Out"
+            title={t('forms.buttons.signOut')}
             onPress={handleLogout}
             variant="secondary"
             style={styles.button}

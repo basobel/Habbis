@@ -63,8 +63,8 @@ function CircularMenu(props: CircularMenuProps, ref: React.Ref<{ close: () => vo
 
   // Animacje są resetowane automatycznie w openMenu/closeMenu
 
-  // Pozycjonowanie menu z uwzględnieniem SafeArea
-  const getMenuPosition = () => {
+  // Pozycjonowanie menu z uwzględnieniem SafeArea - memoized
+  const menuPosition = React.useMemo(() => {
     const bottomMargin = Math.max(insets.bottom + 20, 30); // Minimum 30px, ale uwzględnij SafeArea
     const sideMargin = Math.max(insets.left + 20, 20); // Minimum 20px, ale uwzględnij SafeArea
     
@@ -90,10 +90,10 @@ function CircularMenu(props: CircularMenuProps, ref: React.Ref<{ close: () => vo
           left: screenWidth / 2 - size / 2,
         };
     }
-  };
+  }, [insets.bottom, insets.left, position, size]);
 
-  // Oblicz pozycje przycisków po łuku nad głównym przyciskiem
-  const getButtonPositions = () => {
+  // Oblicz pozycje przycisków po łuku nad głównym przyciskiem - memoized
+  const buttonPositions = React.useMemo(() => {
     // Kąt początkowy (lewa strona) i końcowy (prawa strona) - tylko górna połowa okręgu
     const startAngle = Math.PI; // 180 stopni (lewa strona)
     const endAngle = 0; // 0 stopni (prawa strona)
@@ -107,9 +107,7 @@ function CircularMenu(props: CircularMenuProps, ref: React.Ref<{ close: () => vo
       
         return { x, y };
       });
-  };
-
-  const buttonPositions = getButtonPositions();
+  }, [items.length, radius]);
 
   // Animacja otwierania menu
   const openMenu = () => {
@@ -196,7 +194,7 @@ function CircularMenu(props: CircularMenuProps, ref: React.Ref<{ close: () => vo
 
 
 
-  const menuPosition = getMenuPosition();
+  // menuPosition is now memoized above
 
   return (
     <>

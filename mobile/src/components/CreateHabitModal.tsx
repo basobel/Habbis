@@ -312,7 +312,7 @@ export default function CreateHabitModal({ visible, onClose, onCreateHabit }: Cr
               style={[styles.input, errors.name && { borderColor: colors.error }]}
               value={formData.name}
               onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
-              placeholder="np. Piję wodę, Ćwiczę, Czytam książkę"
+              placeholder={t('forms.placeholders.habitName')}
               placeholderTextColor={colors.text.placeholder}
               maxLength={50}
             />
@@ -326,7 +326,7 @@ export default function CreateHabitModal({ visible, onClose, onCreateHabit }: Cr
               style={[styles.input, styles.textArea, errors.description && { borderColor: colors.error }]}
               value={formData.description}
               onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
-              placeholder="Krótki opis nawyku..."
+              placeholder={t('forms.placeholders.habitDescription')}
               placeholderTextColor={colors.text.placeholder}
               multiline
               maxLength={200}
@@ -475,7 +475,7 @@ export default function CreateHabitModal({ visible, onClose, onCreateHabit }: Cr
 
         <View style={styles.buttonContainer}>
           <FormButton
-            title="Anuluj"
+            title={t('forms.buttons.cancel')}
             onPress={onClose}
             variant="secondary"
             style={{ flex: 1 }}

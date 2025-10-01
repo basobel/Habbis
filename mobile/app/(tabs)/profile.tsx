@@ -141,40 +141,6 @@ export default function ProfileScreen() {
             equipment={user.equipment || []} 
             pets={[]} // TODO: Add pets data
           />
-
-          {/* Quick Actions */}
-          <View style={styles.quickActionsContainer}>
-            <TouchableOpacity
-              style={[styles.quickActionButton, { backgroundColor: colors.primary[600] }]}
-              onPress={() => router.push('/(tabs)/settings')}
-            >
-              <Ionicons name="settings" size={20} color="white" />
-              <Text style={[styles.quickActionText, { color: 'white' }]}>
-                Ustawienia
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.quickActionButton, { backgroundColor: colors.primary[100] }]}
-              onPress={() => router.push('/(tabs)/statistics')}
-            >
-              <Ionicons name="bar-chart" size={20} color={colors.primary[600]} />
-              <Text style={[styles.quickActionText, { color: colors.primary[600] }]}>
-                Statystyki
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Logout Button */}
-          <TouchableOpacity
-            style={[styles.logoutButton, { backgroundColor: colors.error?.[500] || '#EF4444' }]}
-            onPress={handleLogout}
-          >
-            <Ionicons name="log-out" size={20} color="white" />
-            <Text style={[styles.logoutText, { color: 'white' }]}>
-              Wyloguj się
-            </Text>
-          </TouchableOpacity>
-
         </ScrollView>
       </View>
     </FadeInView>

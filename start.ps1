@@ -106,6 +106,8 @@ Start-Process powershell -ArgumentList @(
   'pnpm exec expo start --web --clear'
 ) -WorkingDirectory $PWD
 
+# pnpm run web:offline
+
 # Wyświetl podsumowanie
 Write-Host ""
 Write-Host "HABBIS DEVELOPMENT URUCHOMIONY!" -ForegroundColor Green

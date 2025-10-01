@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 // Removed unused logger import
@@ -24,6 +25,7 @@ interface TopPanelProps {
 
 const TopPanel = forwardRef<{ close: () => void }, TopPanelProps>(({ onNavigate, onCloseOther }, ref) => {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Get user data from auth state
@@ -252,9 +254,9 @@ const TopPanel = forwardRef<{ close: () => void }, TopPanelProps>(({ onNavigate,
               {/* Pierwszy rząd */}
               <View style={styles.menuRow}>
                 {[
-                  { id: 'settings', title: 'Ustawienia', icon: 'settings' as const, color: '#6B7280' },
+                  { id: 'settings', title: t('settings.title'), icon: 'settings' as const, color: '#6B7280' },
                   { id: 'premium', title: 'Premium', icon: 'diamond' as const, color: '#F59E0B' },
-                  { id: 'statistics', title: 'Statystyki', icon: 'bar-chart' as const, color: '#10B981' },
+                  { id: 'statistics', title: t('pets.stats'), icon: 'bar-chart' as const, color: '#10B981' },
                 ].map((item) => (
                   <TouchableOpacity
                     key={item.id}
@@ -287,9 +289,9 @@ const TopPanel = forwardRef<{ close: () => void }, TopPanelProps>(({ onNavigate,
               {/* Drugi rząd */}
               <View style={styles.menuRow}>
                 {[
-                  { id: 'help', title: 'Pomoc', icon: 'help-circle' as const, color: '#3B82F6' },
-                  { id: 'about', title: 'O aplikacji', icon: 'information-circle' as const, color: '#8B5CF6' },
-                  { id: 'logout', title: 'Wyloguj', icon: 'log-out' as const, color: '#EF4444' },
+                  { id: 'help', title: t('settings.help'), icon: 'help-circle' as const, color: '#3B82F6' },
+                  { id: 'about', title: t('settings.about'), icon: 'information-circle' as const, color: '#8B5CF6' },
+                  { id: 'logout', title: t('auth.logout'), icon: 'log-out' as const, color: '#EF4444' },
                 ].map((item) => (
                   <TouchableOpacity
                     key={item.id}

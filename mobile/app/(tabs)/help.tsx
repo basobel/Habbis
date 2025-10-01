@@ -105,7 +105,7 @@ export default function HelpScreen() {
             <Ionicons name="search" size={20} color={colors.text.muted} />
             <TextInput
               style={[styles.searchInput, { color: colors.text.primary }]}
-              placeholder="Szukaj w FAQ..."
+              placeholder={t('forms.placeholders.searchHelp')}
               placeholderTextColor={colors.text.muted}
               value={searchQuery}
               onChangeText={setSearchQuery}

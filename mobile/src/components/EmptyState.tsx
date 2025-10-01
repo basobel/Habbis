@@ -47,7 +47,7 @@ export default function EmptyState({
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Ionicons name={displayIcon} size={64} color={iconColor} />
+      <Ionicons name={displayIcon} size={48} color={iconColor} />
       <Text style={[styles.title, { color: textColor }]}>
         {title}
       </Text>

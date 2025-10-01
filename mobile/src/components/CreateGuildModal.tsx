@@ -165,7 +165,7 @@ export default function CreateGuildModal({ visible, onClose, onCreateGuild }: Cr
                     color: colors?.text?.primary || '#4C1D95',
                   }
                 ]}
-                placeholder="Opisz cel i charakter gildii"
+                placeholder={t('forms.placeholders.guildDescription')}
                 placeholderTextColor={colors?.text?.secondary || '#6B7280'}
                 value={formData.description}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
@@ -294,7 +294,7 @@ export default function CreateGuildModal({ visible, onClose, onCreateGuild }: Cr
                     color: colors?.text?.primary || '#4C1D95',
                   }
                 ]}
-                placeholder="Dodaj tag..."
+                placeholder={t('forms.placeholders.addTag')}
                 placeholderTextColor={colors?.text?.secondary || '#6B7280'}
                 value={newTag}
                 onChangeText={setNewTag}

@@ -213,7 +213,7 @@ const habitsSlice = createSlice({
       })
       .addCase(createHabit.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.habits.unshift(action.payload.habit);
+        state.habits.push(action.payload.habit);
         // activeHabits będzie obliczane przez selektor
         state.error = null;
       })

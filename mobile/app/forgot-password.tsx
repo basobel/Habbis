@@ -4,9 +4,11 @@ import { router } from 'expo-router';
 import FormInput from '@/components/FormInput';
 import FormButton from '@/components/FormButton';
 import { useThemeContext } from '@/contexts/ThemeContext';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function ForgotPasswordScreen() {
   const { colors, isLoaded } = useThemeContext();
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
@@ -81,7 +83,7 @@ export default function ForgotPasswordScreen() {
           </Text>
 
           <FormButton
-            title="Back to Login"
+            title={t('forms.buttons.backToLogin')}
             onPress={handleBackToLogin}
             style={styles.button}
           />
@@ -105,7 +107,7 @@ export default function ForgotPasswordScreen() {
         <View style={styles.form}>
           <FormInput
             label="Email Address"
-            placeholder="Enter your email address"
+            placeholder={t('forms.placeholders.email')}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -115,7 +117,7 @@ export default function ForgotPasswordScreen() {
           />
 
           <FormButton
-            title="Send Reset Link"
+            title={t('forms.buttons.sendResetLink')}
             onPress={handleSendResetEmail}
             loading={isLoading}
             disabled={isLoading}
